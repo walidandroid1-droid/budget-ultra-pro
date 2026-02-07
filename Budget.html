@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💰 Budget Dinars - Gestion Mensuelle/Hebdo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f3f4f6;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .card-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .input-group input {
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            transform: scale(1.02);
+        }
+
+        .currency {
+            position: relative;
+        }
+
+        .currency::after {
+            content: 'د.ت';
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            font-weight: bold;
+        }
+
+        .slider-container {
+            margin: 20px 0;
+            padding: 20px;
+            background: var(--light);
+            border-radius: 15px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.5);
+        }
+
+        .summary-box {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .summary-amount {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .weeks-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-item .value {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .info-item .label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .envelopes-config {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .envelope-config {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid var(--color);
+        }
+
+        .envelope-config h4 {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .percentage-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .percentage-input input {
+            width: 80px;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .calc-result {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .weeks-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .week-tab {
+            padding: 15px 25px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .week-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .week-tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .week-tab.borrowing::after {
+            content: '↔';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--warning);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .envelope-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border-left: 5px solid var(--color);
+            transition: all 0.3s ease;
+        }
+
+        .envelope-card:hover {
+            transform: translateX(5px);
+        }
+
+        .envelope-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .envelope-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .budget-info {
+            text-align: right;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .budget-info .weekly {
+            font-weight: bold;
+            color: var(--dark);
+            font-size: 1.2em;
+        }
+
+        .progress-container {
+            margin: 15px 0;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 25px;
+            background: #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--color);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .progress-bar-fill.warning {
+            background: var(--warning);
+        }
+
+        .progress-bar-fill.danger {
+            background: var(--danger);
+        }
+
+        .envelope-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .status-text {
+            font-weight: bold;
+        }
+
+        .status-text.good { color: var(--success); }
+        .status-text.warning { color: var(--warning); }
+        .status-text.danger { color: var(--danger); }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+        }
+
+        .btn-add {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-remove {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 30px;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .borrowing-alert {
+            background: #fef3c7;
+            border: 2px solid var(--warning);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            display: none;
+        }
+
+        .borrowing-alert.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        .monthly-recap {
+            background: var(--light);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .recap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .recap-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .recap-item .label {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .recap-item .value {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            animation: modalPop 0.3s ease;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+        }
+
+        .modal-confirm {
+            background: var(--primary);
+            color: white;
+        }
+
+        .modal-cancel {
+            background: #e5e7eb;
+            color: var(--dark);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: none;
+            animation: slideIn 0.5s ease;
+            z-index: 2000;
+            max-width: 300px;
+        }
+
+        .notification.success { border-left: 5px solid var(--success); }
+        .notification.warning { border-left: 5px solid var(--warning); }
+        .notification.error { border-left: 5px solid var(--danger); }
+
+        .hidden { display: none !important; }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.6em; }
+            .form-grid { grid-template-columns: 1fr; }
+            .envelopes-config { grid-template-columns: 1fr; }
+            .weeks-tabs { justify-content: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💰 Budget Dinars</h1>
+            <p class="subtitle">Gestion Mensuelle & Hebdomadaire</p>
+        </header>
+
+        <!-- ÉTAPE 1: Configuration Mensuelle -->
+        <div class="card" id="configCard">
+            <div class="card-title">
+                <span>📅</span> Configuration du Mois
+            </div>
+            
+            <div class="form-grid">
+                <div class="input-group">
+                    <label>💵 Revenu Principal</label>
+                    <div class="currency">
+                        <input type="number" id="revenu" value="2671" placeholder="0">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label>💳 Crédit à Rembourser</label>
+                    <div class="currency">
+                        <input type="number" id="credit" value="700" placeholder="0">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label>🏦 Épargne Disponible (Avant)</label>
+                    <div class="currency">
+                        <input type="number" id="epargneAvant" value="750" placeholder="0">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label>📆 Mois (pour calcul semaines)</label>
+                    <input type="month" id="monthYear" value="2025-02">
+                </div>
+            </div>
+
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span>🏦 Épargne Objectif Ce Mois</span>
+                    <span id="epargneValeur">500 د.ت</span>
+                </div>
+                <input type="range" id="epargneObjectif" min="0" max="1500" value="500" step="50">
+                <div style="display: flex; justify-content: space-between; font-size: 0.85em; color: #666; margin-top: 5px;">
+                    <span>0</span>
+                    <span>750</span>
+                    <span>1500</span>
+                </div>
+            </div>
+
+            <div class="summary-box">
+                <div>Reste à Répartir (Hebdomadaire)</div>
+                <div class="summary-amount" id="resteGlobal">0 د.ت</div>
+                <div class="weeks-info">
+                    <div class="info-item">
+                        <div class="value" id="nbSemaines">4</div>
+                        <div class="label">Semaines</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="value" id="budgetHebdo">0 د.ت</div>
+                        <div class="label">/semaine</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-save" onclick="goToEnvelopesConfig()">
+                Continuer → Répartition des Enveloppes
+            </button>
+        </div>
+
+        <!-- ÉTAPE 2: Configuration des Enveloppes Hebdo -->
+        <div class="card hidden" id="envelopesConfigCard">
+            <div class="card-title">
+                <span>📊</span> Répartition Hebdomadaire (Après Courses Fixe)
+            </div>
+            
+            <div style="background: #e0f2fe; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                <strong>🛒 Courses (Fixe):</strong> 180 د.ت/semaine × <span id="nbSemainesDisplay">4</span> = <span id="coursesTotal">720</span> د.ت/mois
+                <br>
+                <strong>Reste à répartir:</strong> <span id="resteApresCourses">0</span> د.ت/semaine
+            </div>
+
+            <div class="envelopes-config">
+                <div class="envelope-config" style="--color: #9C27B0;">
+                    <h4><span>👶</span> Enfants</h4>
+                    <div class="percentage-input">
+                        <input type="number" id="pctEnfants" value="25" min="0" max="100"> %
+                    </div>
+                    <div class="calc-result">
+                        → <span id="calcEnfants">0</span> د.ت/semaine
+                    </div>
+                </div>
+
+                <div class="envelope-config" style="--color: #2196F3;">
+                    <h4><span>⛽</span> Transport</h4>
+                    <div class="percentage-input">
+                        <input type="number" id="pctTransport" value="25" min="0" max="100"> %
+                    </div>
+                    <div class="calc-result">
+                        → <span id="calcTransport">0</span> د.ت/semaine
+                    </div>
+                </div>
+
+                <div class="envelope-config" style="--color: #FF9800;">
+                    <h4><span>👕</span> Habits/Maison</h4>
+                    <div class="percentage-input">
+                        <input type="number" id="pctHabits" value="50" min="0" max="100"> %
+                    </div>
+                    <div class="calc-result">
+                        → <span id="calcHabits">0</span> د.ت/semaine
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px; padding: 15px; background: #fef3c7; border-radius: 10px; text-align: center;" id="totalCheck">
+                Total: <span id="totalPercentage">100</span>% 
+                <span id="percentageWarning" style="color: var(--danger); display: none;">⚠️ Doit être = 100%</span>
+            </div>
+
+            <button class="btn btn-save" onclick="startBudget()" id="btnStart">
+                🚀 Démarrer le Suivi
+            </button>
+        </div>
+
+        <!-- ÉTAPE 3: Suivi Hebdomadaire -->
+        <div class="card hidden" id="trackingCard">
+            <div class="card-title">
+                <span>📆</span> Suivi par Semaine
+            </div>
+
+            <div class="weeks-tabs" id="weeksTabs">
+                <!-- Généré par JS -->
+            </div>
+
+            <div class="borrowing-alert" id="borrowingAlert">
+                ⚠️ <strong>Emprunt activé</strong>: Cette semaine utilise des fonds de la semaine suivante.
+                <div id="borrowingDetails" style="margin-top: 5px; font-size: 0.9em;"></div>
+            </div>
+
+            <div id="envelopesContainer">
+                <!-- Généré par JS -->
+            </div>
+
+            <div class="monthly-recap">
+                <h3 style="margin-bottom: 15px;">📊 Récapitulatif Mensuel</h3>
+                <div class="recap-grid" id="monthlyRecap">
+                    <!-- Généré par JS -->
+                </div>
+            </div>
+
+            <button class="btn btn-save" onclick="resetMonth()" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                🔄 Nouveau Mois
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal Transaction -->
+    <div class="modal" id="transactionModal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Transaction</h2>
+            <input type="number" id="transactionAmount" placeholder="0.00" step="0.01">
+            <div class="modal-buttons">
+                <button class="modal-btn modal-confirm" onclick="confirmTransaction()">Confirmer</button>
+                <button class="modal-btn modal-cancel" onclick="closeModal()">Annuler</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <span id="notificationText"></span>
+    </div>
+
+    <script>
+        // Données globales
+        let config = {
+            revenu: 2671,
+            credit: 700,
+            epargneAvant: 750,
+            epargneObjectif: 500,
+            monthYear: '2025-02',
+            nbSemaines: 4,
+            budgetHebdoTotal: 0,
+            resteApresCourses: 0
+        };
+
+        let envelopesConfig = {
+            courses: { fixed: 180, color: '#4CAF50', icon: '🛒', name: 'Courses' },
+            enfants: { pct: 25, color: '#9C27B0', icon: '👶', name: 'Enfants' },
+            transport: { pct: 25, color: '#2196F3', icon: '⛽', name: 'Transport' },
+            habits: { pct: 50, color: '#FF9800', icon: '👕', name: 'Habits/Maison' }
+        };
+
+        let weeksData = [];
+        let currentWeek = 1;
+        let currentEnvelope = null;
+        let currentAction = null;
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            setupEventListeners();
+            calculateBudget();
+        });
+
+        function setupEventListeners() {
+            // Inputs config
+            ['revenu', 'credit', 'epargneAvant'].forEach(id => {
+                document.getElementById(id).addEventListener('input', calculateBudget);
+            });
+
+            // Slider épargne
+            const slider = document.getElementById('epargneObjectif');
+            slider.addEventListener('input', (e) => {
+                document.getElementById('epargneValeur').textContent = e.target.value + ' د.ت';
+                calculateBudget();
+            });
+
+            // Mois
+            document.getElementById('monthYear').addEventListener('change', calculateBudget);
+
+            // Pourcentages enveloppes
+            ['pctEnfants', 'pctTransport', 'pctHabits'].forEach(id => {
+                document.getElementById(id).addEventListener('input', calculateEnvelopes);
+            });
+        }
+
+        function calculateBudget() {
+            config.revenu = parseFloat(document.getElementById('revenu').value) || 0;
+            config.credit = parseFloat(document.getElementById('credit').value) || 0;
+            config.epargneAvant = parseFloat(document.getElementById('epargneAvant').value) || 0;
+            config.epargneObjectif = parseFloat(document.getElementById('epargneObjectif').value) || 0;
+            config.monthYear = document.getElementById('monthYear').value;
+
+            // Calcul nombre de semaines dans le mois
+            config.nbSemaines = getWeeksInMonth(config.monthYear);
+            document.getElementById('nbSemaines').textContent = config.nbSemaines;
+
+            // Calcul reste global
+            const resteGlobal = config.revenu - config.credit + config.epargneAvant - config.epargneObjectif;
+            document.getElementById('resteGlobal').textContent = resteGlobal.toFixed(0) + ' د.ت';
+
+            // Budget hebdo total
+            config.budgetHebdoTotal = resteGlobal / config.nbSemaines;
+            document.getElementById('budgetHebdo').textContent = config.budgetHebdoTotal.toFixed(0) + ' د.ت';
+
+            // Mise à jour affichage config enveloppes
+            document.getElementById('nbSemainesDisplay').textContent = config.nbSemaines;
+            document.getElementById('coursesTotal').textContent = (180 * config.nbSemaines).toFixed(0);
+            
+            config.resteApresCourses = config.budgetHebdoTotal - 180;
+            document.getElementById('resteApresCourses').textContent = config.resteApresCourses.toFixed(0);
+
+            calculateEnvelopes();
+            saveData();
+        }
+
+        function getWeeksInMonth(monthYear) {
+            const [year, month] = monthYear.split('-').map(Number);
+            const firstDay = new Date(year, month - 1, 1);
+            const lastDay = new Date(year, month, 0);
+            const daysInMonth = lastDay.getDate();
+            
+            // Compter les semaines complètes ou partielles
+            let weeks = 0;
+            let currentDay = 1;
+            
+            while (currentDay <= daysInMonth) {
+                weeks++;
+                currentDay += 7;
+            }
+            
+            return Math.min(weeks, 5); // Max 5 semaines
+        }
+
+        function calculateEnvelopes() {
+            const pctEnfants = parseFloat(document.getElementById('pctEnfants').value) || 0;
+            const pctTransport = parseFloat(document.getElementById('pctTransport').value) || 0;
+            const pctHabits = parseFloat(document.getElementById('pctHabits').value) || 0;
+            
+            const total = pctEnfants + pctTransport + pctHabits;
+            document.getElementById('totalPercentage').textContent = total;
+            
+            const warning = document.getElementById('percentageWarning');
+            const btnStart = document.getElementById('btnStart');
+            
+            if (total !== 100) {
+                warning.style.display = 'inline';
+                btnStart.disabled = true;
+                btnStart.style.opacity = '0.5';
+            } else {
+                warning.style.display = 'none';
+                btnStart.disabled = false;
+                btnStart.style.opacity = '1';
+            }
+
+            // Calcul montants
+            const reste = config.resteApresCourses;
+            document.getElementById('calcEnfants').textContent = (reste * pctEnfants / 100).toFixed(0);
+            document.getElementById('calcTransport').textContent = (reste * pctTransport / 100).toFixed(0);
+            document.getElementById('calcHabits').textContent = (reste * pctHabits / 100).toFixed(0);
+
+            // Mise à jour config
+            envelopesConfig.enfants.pct = pctEnfants;
+            envelopesConfig.transport.pct = pctTransport;
+            envelopesConfig.habits.pct = pctHabits;
+        }
+
+        function goToEnvelopesConfig() {
+            document.getElementById('configCard').classList.add('hidden');
+            document.getElementById('envelopesConfigCard').classList.remove('hidden');
+            calculateEnvelopes();
+        }
+
+        function startBudget() {
+            // Initialisation des semaines
+            initializeWeeks();
+            
+            document.getElementById('envelopesConfigCard').classList.add('hidden');
+            document.getElementById('trackingCard').classList.remove('hidden');
+            
+            renderWeeksTabs();
+            renderEnvelopes();
+            updateMonthlyRecap();
+            
+            showNotification('🎉 Budget démarré ! Bonne gestion.', 'success');
+        }
+
+        function initializeWeeks() {
+            weeksData = [];
+            for (let i = 1; i <= config.nbSemaines; i++) {
+                weeksData.push({
+                    week: i,
+                    envelopes: {
+                        courses: { budget: 180, current: 180, history: [] },
+                        enfants: { budget: (config.resteApresCourses * envelopesConfig.enfants.pct / 100), current: (config.resteApresCourses * envelopesConfig.enfants.pct / 100), history: [] },
+                        transport: { budget: (config.resteApresCourses * envelopesConfig.transport.pct / 100), current: (config.resteApresCourses * envelopesConfig.transport.pct / 100), history: [] },
+                        habits: { budget: (config.resteApresCourses * envelopesConfig.habits.pct / 100), current: (config.resteApresCourses * envelopesConfig.habits.pct / 100), history: [] }
+                    },
+                    borrowing: { from: 0, to: 0 } // Emprunt reçu/donné
+                });
+            }
+            saveData();
+        }
+
+        function renderWeeksTabs() {
+            const container = document.getElementById('weeksTabs');
+            container.innerHTML = '';
+            
+            weeksData.forEach((week, index) => {
+                const tab = document.createElement('div');
+                tab.className = 'week-tab' + (week.week === currentWeek ? ' active' : '');
+                tab.textContent = 'S' + week.week;
+                
+                // Indicateur d'emprunt
+                if (week.borrowing.from > 0 || week.borrowing.to > 0) {
+                    tab.classList.add('borrowing');
+                }
+                
+                tab.onclick = () => switchWeek(week.week);
+                container.appendChild(tab);
+            });
+        }
+
+        function switchWeek(weekNum) {
+            currentWeek = weekNum;
+            renderWeeksTabs();
+            renderEnvelopes();
+            updateBorrowingAlert();
+        }
+
+        function renderEnvelopes() {
+            const container = document.getElementById('envelopesContainer');
+            const weekData = weeksData[currentWeek - 1];
+            
+            container.innerHTML = '';
+            
+            Object.keys(weekData.envelopes).forEach(key => {
+                const env = weekData.envelopes[key];
+                const config = envelopesConfig[key];
+                const percentage = (env.current / env.budget) * 100;
+                
+                const card = document.createElement('div');
+                card.className = 'envelope-card';
+                card.style.setProperty('--color', config.color);
+                
+                let statusClass = 'good';
+                let statusText = '✅ OK';
+                
+                if (percentage <= 20) {
+                    statusClass = 'danger';
+                    statusText = '⚠️ CRITIQUE';
+                } else if (percentage <= 50) {
+                    statusClass = 'warning';
+                    statusText = '⚡ Attention';
+                }
+                
+                card.innerHTML = `
+                    <div class="envelope-header">
+                        <div class="envelope-title">
+                            <span>${config.icon}</span>
+                            ${config.name}
+                        </div>
+                        <div class="budget-info">
+                            <div>Budget: ${env.budget.toFixed(0)} د.ت</div>
+                            <div class="weekly">Reste: ${env.current.toFixed(2)} د.ت</div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-container">
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill ${percentage <= 20 ? 'danger' : percentage <= 50 ? 'warning' : ''}" 
+                                 style="width: ${Math.max(0, Math.min(100, percentage))}%; background: ${config.color}">
+                                ${percentage.toFixed(0)}%
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="envelope-status">
+                        <span class="status-text ${statusClass}">${statusText}</span>
+                        <span>Dépensé: ${(env.budget - env.current).toFixed(2)} د.ت</span>
+                    </div>
+                    
+                    <div class="controls">
+                        <button class="btn btn-add" onclick="openTransaction('${key}', 'add')">+ Ajouter</button>
+                        <button class="btn btn-remove" onclick="openTransaction('${key}', 'remove')" ${env.current <= 0 ? 'disabled' : ''}>- Dépenser</button>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        function openTransaction(envelopeKey, action) {
+            currentEnvelope = envelopeKey;
+            currentAction = action;
+            
+            const envConfig = envelopesConfig[envelopeKey];
+            document.getElementById('modalTitle').textContent = 
+                action === 'add' ? `Ajouter à ${envConfig.name}` : `Dépenser de ${envConfig.name}`;
+            document.getElementById('transactionAmount').value = '';
+            document.getElementById('transactionModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('transactionModal').style.display = 'none';
+            currentEnvelope = null;
+            currentAction = null;
+        }
+
+        function confirmTransaction() {
+            const amount = parseFloat(document.getElementById('transactionAmount').value);
+            if (isNaN(amount) || amount <= 0) {
+                showNotification('Montant invalide', 'error');
+                return;
+            }
+
+            const weekData = weeksData[currentWeek - 1];
+            const env = weekData.envelopes[currentEnvelope];
+
+            if (currentAction === 'add') {
+                env.current += amount;
+                env.history.push({ type: 'add', amount, date: new Date().toLocaleDateString('fr-FR') });
+                showNotification(`+${amount.toFixed(2)} د.ت ajouté`, 'success');
+            } else {
+                // Gestion avec emprunt
+                if (amount > env.current) {
+                    const deficit = amount - env.current;
+                    
+                    // Emprunter à la semaine suivante si possible
+                    if (currentWeek < config.nbSemaines) {
+                        const nextWeek = weeksData[currentWeek];
+                        const availableInNext = Math.min(deficit, nextWeek.envelopes[currentEnvelope].current);
+                        
+                        if (availableInNext > 0) {
+                            nextWeek.envelopes[currentEnvelope].current -= availableInNext;
+                            nextWeek.borrowing.from += availableInNext;
+                            weekData.borrowing.to += availableInNext;
+                            
+                            env.current = 0;
+                            env.history.push({ type: 'remove', amount: env.current, date: new Date().toLocaleDateString('fr-FR'), note: 'Partiel' });
+                            env.history.push({ type: 'remove', amount: availableInNext, date: new Date().toLocaleDateString('fr-FR'), note: 'Emprunt S' + (currentWeek + 1) });
+                            
+                            showNotification(`⚠️ Emprunt de ${availableInNext.toFixed(2)} د.ت à la semaine ${currentWeek + 1}`, 'warning');
+                        } else {
+                            showNotification('Fonds insuffisants même avec emprunt', 'error');
+                            return;
+                        }
+                    } else {
+                        showNotification('Dernière semaine: impossible d\'emprunter', 'error');
+                        return;
+                    }
+                } else {
+                    env.current -= amount;
+                    env.history.push({ type: 'remove', amount, date: new Date().toLocaleDateString('fr-FR') });
+                    showNotification(`-${amount.toFixed(2)} د.ت retiré`, 'warning');
+                }
+            }
+
+            saveData();
+            renderEnvelopes();
+            renderWeeksTabs();
+            updateBorrowingAlert();
+            updateMonthlyRecap();
+            closeModal();
+        }
+
+        function updateBorrowingAlert() {
+            const weekData = weeksData[currentWeek - 1];
+            const alert = document.getElementById('borrowingAlert');
+            const details = document.getElementById('borrowingDetails');
+            
+            if (weekData.borrowing.from > 0 || weekData.borrowing.to > 0) {
+                alert.classList.add('show');
+                let text = '';
+                if (weekData.borrowing.from > 0) {
+                    text += `Reçu ${weekData.borrowing.from.toFixed(2)} د.ت de la semaine ${currentWeek - 1}. `;
+                }
+                if (weekData.borrowing.to > 0) {
+                    text += `Prêté ${weekData.borrowing.to.toFixed(2)} د.ت à la semaine ${currentWeek + 1}.`;
+                }
+                details.textContent = text;
+            } else {
+                alert.classList.remove('show');
+            }
+        }
+
+        function updateMonthlyRecap() {
+            const recap = document.getElementById('monthlyRecap');
+            
+            let totalBudget = 0;
+            let totalCurrent = 0;
+            let totalSpent = 0;
+            
+            weeksData.forEach(week => {
+                Object.values(week.envelopes).forEach(env => {
+                    totalBudget += env.budget;
+                    totalCurrent += env.current;
+                    totalSpent += (env.budget - env.current);
+                });
+            });
+
+            recap.innerHTML = `
+                <div class="recap-item">
+                    <div class="label">Budget Total</div>
+                    <div class="value">${totalBudget.toFixed(0)} د.ت</div>
+                </div>
+                <div class="recap-item">
+                    <div class="label">Dépensé</div>
+                    <div class="value" style="color: var(--danger)">${totalSpent.toFixed(0)} د.ت</div>
+                </div>
+                <div class="recap-item">
+                    <div class="label">Reste</div>
+                    <div class="value" style="color: var(--success)">${totalCurrent.toFixed(0)} د.ت</div>
+                </div>
+                <div class="recap-item">
+                    <div class="label">Épargne Prévue</div>
+                    <div class="value" style="color: var(--primary)">${config.epargneObjectif.toFixed(0)} د.ت</div>
+                </div>
+            `;
+        }
+
+        function resetMonth() {
+            if (!confirm('Nouveau mois? Toutes les données seront réinitialisées.')) return;
+            
+            localStorage.removeItem('budgetDinarsData');
+            location.reload();
+        }
+
+        function showNotification(message, type) {
+            const notif = document.getElementById('notification');
+            document.getElementById('notificationText').textContent = message;
+            notif.className = 'notification ' + type;
+            notif.style.display = 'block';
+            
+            setTimeout(() => {
+                notif.style.display = 'none';
+            }, 3000);
+        }
+
+        function saveData() {
+            const data = {
+                config,
+                envelopesConfig,
+                weeksData,
+                currentWeek
+            };
+            localStorage.setItem('budgetDinarsData', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('budgetDinarsData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                config = data.config || config;
+                envelopesConfig = data.envelopesConfig || envelopesConfig;
+                weeksData = data.weeksData || [];
+                currentWeek = data.currentWeek || 1;
+                
+                // Restaurer valeurs dans les inputs
+                document.getElementById('revenu').value = config.revenu;
+                document.getElementById('credit').value = config.credit;
+                document.getElementById('epargneAvant').value = config.epargneAvant;
+                document.getElementById('epargneObjectif').value = config.epargneObjectif;
+                document.getElementById('monthYear').value = config.monthYear;
+                document.getElementById('epargneValeur').textContent = config.epargneObjectif + ' د.ت';
+                
+                document.getElementById('pctEnfants').value = envelopesConfig.enfants.pct;
+                document.getElementById('pctTransport').value = envelopesConfig.transport.pct;
+                document.getElementById('pctHabits').value = envelopesConfig.habits.pct;
+                
+                // Si des données de semaines existent, aller directement au suivi
+                if (weeksData.length > 0) {
+                    document.getElementById('configCard').classList.add('hidden');
+                    document.getElementById('envelopesConfigCard').classList.add('hidden');
+                    document.getElementById('trackingCard').classList.remove('hidden');
+                    renderWeeksTabs();
+                    renderEnvelopes();
+                    updateMonthlyRecap();
+                }
+            }
+        }
+
+        // Fermer modal avec Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+            if (e.key === 'Enter' && document.getElementById('transactionModal').style.display === 'flex') {
+                confirmTransaction();
+            }
+        });
+    </script>
+</body>
+</html>'''
