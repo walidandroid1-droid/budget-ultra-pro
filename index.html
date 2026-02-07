@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Budget Ultra Pro V2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+:root{
+--bg:#f2f2f7;
+--card:rgba(255,255,255,0.85);
+--text:#000;
+--accent:#34c759;
+--danger:#ff3b30;
+}
+.dark{
+--bg:#121212;
+--card:#1c1c1e;
+--text:#fff;
+}
+body{
+background:var(--bg);
+font-family:-apple-system,BlinkMacSystemFont;
+color:var(--text);
+padding:10px;
+}
+.container{
+max-width:500px;
+margin:auto;
+}
+.card{
+background:var(--card);
+backdrop-filter: blur(10px);
+border-radius:20px;
+padding:15px;
+margin-bottom:10px;
+box-shadow:0 4px 15px rgba(0,0,0,0.1);
+}
+button,input,select{
+width:100%;
+padding:10px;
+margin:5px 0;
+border-radius:12px;
+border:none;
+}
+button{background:var(--accent);color:white;font-weight:bold;}
+.progress{
+background:#ddd;border-radius:10px;overflow:hidden;height:15px;
+}
+.progress-bar{
+background:var(--accent);height:100%;width:0%;
+}
+.alert{
+background:#ffeaa7;padding:10px;border-radius:12px;
+}
+.top{
+display:flex;justify-content:space-between;align-items:center;
+}
+.small{font-size:14px;}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="card top">
+<h2>💎 Budget Ultra Pro</h2>
+<button onclick="toggleDark()">🌙</button>
+</div>
+
+<div class="card alert" id="alert">Bienvenue 👋</div>
+
+<div class="card">
+<h3>🎯 Objectif d’épargne</h3>
+<input type="number" id="goal" placeholder="Objectif (ex: 1000 DT)">
+<button onclick="setGoal()">Définir objectif</button>
+<div class="progress"><div class="progress-bar" id="progress"></div></div>
+<p id="goalText"></p>
+</div>
+
+<div class="card">
+<select id="type">
+<option value="income">Dépôt (Revenu)</option>
+<option value="expense">Retrait (Dépense)</option>
+<option value="save">Épargne</option>
+</select>
+
+<select id="category">
+<option>Maison</option>
+<option>Nourriture</option>
+<option>Transport</option>
+<option>Santé</option>
+<option>Loisirs</option>
+</select>
+
+<input type="number" id="amount" placeholder="Montant">
+<input type="text" id="note" placeholder="Note">
+<button onclick="addTransaction()">Ajouter</button>
+</div>
+
+<div class="card">
+<p>💰 Revenus: <b id="income">0</b></p>
+<p>💸 Dépenses: <b id="expense">0</b></p>
+<p>🏦 Épargne: <b id="save">0</b></p>
+<p>📊 Solde: <b id="balance">0</b></p>
+</div>
+
+<div class="card">
+<h3>📜 Historique</h3>
+<ul id="list"></ul>
+</div>
+
+</div>
+
+<script>
+let data=JSON.parse(localStorage.getItem("budgetV2"))||[];
+let goal=localStorage.getItem("goal")||0;
+
+function toggleDark(){
+document.body.classList.toggle("dark");
+}
+
+function setGoal(){
+goal=document.getElementById("goal").value;
+localStorage.setItem("goal",goal);
+display();
+}
+
+function addTransaction(){
+let type=document.getElementById("type").value;
+let category=document.getElementById("category").value;
+let amount=parseFloat(document.getElementById("amount").value);
+let note=document.getElementById("note").value;
+if(!amount)return alert("Montant manquant");
+data.push({type,category,amount,note});
+localStorage.setItem("budgetV2",JSON.stringify(data));
+display();
+checkNotification();
+}
+
+function display(){
+let income=0,expense=0,save=0;
+let list=document.getElementById("list");
+list.innerHTML="";
+
+data.forEach(d=>{
+if(d.type=="income") income+=d.amount;
+if(d.type=="expense") expense+=d.amount;
+if(d.type=="save") save+=d.amount;
+list.innerHTML+=`<li>${d.category} - ${d.amount} DT (${d.note})</li>`;
+});
+
+document.getElementById("income").innerText=income;
+document.getElementById("expense").innerText=expense;
+document.getElementById("save").innerText=save;
+document.getElementById("balance").innerText=income-expense-save;
+
+let percent= goal>0 ? (save/goal)*100 : 0;
+if(percent>100) percent=100;
+document.getElementById("progress").style.width=percent+"%";
+document.getElementById("goalText").innerText=`Progression: ${Math.round(percent)}%`;
+
+let msg="👍 Bonne gestion";
+if(expense>income) msg="⚠️ Dépenses > revenus";
+if(percent>=100) msg="🎉 Objectif atteint ! Félicitations";
+
+document.getElementById("alert").innerText=msg;
+}
+
+function checkNotification(){
+if(Notification.permission==="granted"){
+new Notification("Budget Alert",{body:"Transaction ajoutée"});
+}else if(Notification.permission!=="denied"){
+Notification.requestPermission();
+}
+}
+
+display();
+</script>
+</body>
+</html>
