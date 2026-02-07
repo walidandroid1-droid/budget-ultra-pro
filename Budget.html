@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>💰 Budget Dinars - Gestion Mensuelle/Hebdo</title>
+    <title>💰 Budget Dinars Pro - Gestion Complète</title>
     <style>
         * {
             margin: 0;
@@ -30,7 +30,7 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
         }
 
@@ -89,16 +89,15 @@
             font-size: 0.9em;
         }
 
-        .input-group input {
-            padding: 15px;
+        .input-group input, .input-group select, .input-group textarea {
+            padding: 12px;
             border: 2px solid #e5e7eb;
             border-radius: 12px;
-            font-size: 1.1em;
-            font-weight: bold;
+            font-size: 1em;
             transition: all 0.3s ease;
         }
 
-        .input-group input:focus {
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
             outline: none;
             border-color: var(--primary);
             transform: scale(1.02);
@@ -191,45 +190,68 @@
 
         .envelopes-config {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
             margin-top: 20px;
         }
 
         .envelope-config {
             background: var(--light);
-            padding: 20px;
+            padding: 15px;
             border-radius: 15px;
-            border-left: 5px solid var(--color);
+            border-left: 5px solid var(--color, var(--primary));
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .envelope-config h4 {
-            margin-bottom: 15px;
+        .envelope-config-info h4 {
+            margin-bottom: 5px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
-        .percentage-input {
+        .envelope-config-inputs {
             display: flex;
-            align-items: center;
             gap: 10px;
-            margin-bottom: 10px;
+            align-items: center;
         }
 
-        .percentage-input input {
+        .envelope-config input[type="number"] {
             width: 80px;
-            padding: 10px;
+            padding: 8px;
             border: 2px solid #ddd;
             border-radius: 8px;
             text-align: center;
             font-weight: bold;
         }
 
-        .calc-result {
-            font-size: 0.9em;
-            color: #666;
-            margin-top: 5px;
+        .btn-icon {
+            background: none;
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
+            padding: 5px;
+            opacity: 0.6;
+            transition: all 0.3s;
+        }
+
+        .btn-icon:hover {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        .btn-icon.delete:hover {
+            color: var(--danger);
+        }
+
+        .add-envelope-form {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            border: 2px dashed var(--primary);
         }
 
         .weeks-tabs {
@@ -396,6 +418,12 @@
             color: white;
         }
 
+        .btn-history {
+            background: var(--primary);
+            color: white;
+            flex: 0.5;
+        }
+
         .btn:hover {
             transform: scale(1.05);
             opacity: 0.9;
@@ -415,6 +443,24 @@
             border-radius: 30px;
             margin-top: 20px;
             width: 100%;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 12px 30px;
+            font-size: 1em;
+            border-radius: 30px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
         }
 
         .borrowing-alert {
@@ -482,7 +528,9 @@
             padding: 30px;
             border-radius: 20px;
             width: 90%;
-            max-width: 400px;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
             animation: modalPop 0.3s ease;
         }
 
@@ -491,14 +539,18 @@
             color: var(--dark);
         }
 
-        .modal-content input {
+        .modal-content input, .modal-content textarea, .modal-content select {
             width: 100%;
-            padding: 15px;
-            font-size: 1.2em;
+            padding: 12px;
+            margin-bottom: 15px;
             border: 2px solid #e5e7eb;
             border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
+            font-size: 1em;
+        }
+
+        .modal-content textarea {
+            min-height: 80px;
+            resize: vertical;
         }
 
         .modal-buttons {
@@ -526,6 +578,52 @@
             color: var(--dark);
         }
 
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+
+        .history-item {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--color, var(--primary));
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .history-item-amount {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .history-item-amount.add {
+            color: var(--success);
+        }
+
+        .history-item-amount.remove {
+            color: var(--danger);
+        }
+
+        .history-item-date {
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .history-item-desc {
+            font-size: 0.9em;
+            color: #444;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
         .notification {
             position: fixed;
             top: 20px;
@@ -545,6 +643,25 @@
         .notification.error { border-left: 5px solid var(--danger); }
 
         .hidden { display: none !important; }
+
+        .total-check {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fef3c7;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .total-check.ok {
+            background: #d1fae5;
+            color: var(--success);
+        }
+
+        .total-check.error {
+            background: #fee2e2;
+            color: var(--danger);
+        }
 
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-30px); }
@@ -577,8 +694,8 @@
 <body>
     <div class="container">
         <header>
-            <h1>💰 Budget Dinars</h1>
-            <p class="subtitle">Gestion Mensuelle & Hebdomadaire</p>
+            <h1>💰 Budget Dinars Pro</h1>
+            <p class="subtitle">Gestion Complète avec Enveloppes Personnalisées</p>
         </header>
 
         <!-- ÉTAPE 1: Configuration Mensuelle -->
@@ -601,6 +718,13 @@
                         <input type="number" id="credit" value="700" placeholder="0">
                     </div>
                 </div>
+
+                <div class="input-group">
+                    <label>🏠 Grand Achats (Équipement/Maison)</label>
+                    <div class="currency">
+                        <input type="number" id="grandAchats" value="0" placeholder="0">
+                    </div>
+                </div>
                 
                 <div class="input-group">
                     <label>🏦 Épargne Disponible (Avant)</label>
@@ -610,7 +734,7 @@
                 </div>
                 
                 <div class="input-group">
-                    <label>📆 Mois (pour calcul semaines)</label>
+                    <label>📆 Mois</label>
                     <input type="month" id="monthYear" value="2025-02">
                 </div>
             </div>
@@ -620,11 +744,11 @@
                     <span>🏦 Épargne Objectif Ce Mois</span>
                     <span id="epargneValeur">500 د.ت</span>
                 </div>
-                <input type="range" id="epargneObjectif" min="0" max="1500" value="500" step="50">
+                <input type="range" id="epargneObjectif" min="0" max="2000" value="500" step="50">
                 <div style="display: flex; justify-content: space-between; font-size: 0.85em; color: #666; margin-top: 5px;">
                     <span>0</span>
-                    <span>750</span>
-                    <span>1500</span>
+                    <span>1000</span>
+                    <span>2000</span>
                 </div>
             </div>
 
@@ -644,57 +768,64 @@
             </div>
 
             <button class="btn btn-save" onclick="goToEnvelopesConfig()">
-                Continuer → Répartition des Enveloppes
+                Continuer → Configurer les Enveloppes
             </button>
         </div>
 
-        <!-- ÉTAPE 2: Configuration des Enveloppes Hebdo -->
+        <!-- ÉTAPE 2: Configuration des Enveloppes -->
         <div class="card hidden" id="envelopesConfigCard">
             <div class="card-title">
-                <span>📊</span> Répartition Hebdomadaire (Après Courses Fixe)
+                <span>📊</span> Répartition Hebdomadaire
+                <span style="font-size: 0.7em; color: #666; margin-left: auto;">Total: 180 د.ت fixes répartis</span>
             </div>
             
             <div style="background: #e0f2fe; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                <strong>🛒 Courses (Fixe):</strong> 180 د.ت/semaine × <span id="nbSemainesDisplay">4</span> = <span id="coursesTotal">720</span> د.ت/mois
+                <strong>🎯 Budget hebdo total:</strong> <span id="budgetHebdoDisplay">0</span> د.ت
                 <br>
-                <strong>Reste à répartir:</strong> <span id="resteApresCourses">0</span> د.ت/semaine
+                <small>Répartissez les 180 د._t de courses sur vos enveloppes + autres besoins</small>
             </div>
 
-            <div class="envelopes-config">
-                <div class="envelope-config" style="--color: #9C27B0;">
-                    <h4><span>👶</span> Enfants</h4>
-                    <div class="percentage-input">
-                        <input type="number" id="pctEnfants" value="25" min="0" max="100"> %
-                    </div>
-                    <div class="calc-result">
-                        → <span id="calcEnfants">0</span> د.ت/semaine
-                    </div>
-                </div>
-
-                <div class="envelope-config" style="--color: #2196F3;">
-                    <h4><span>⛽</span> Transport</h4>
-                    <div class="percentage-input">
-                        <input type="number" id="pctTransport" value="25" min="0" max="100"> %
-                    </div>
-                    <div class="calc-result">
-                        → <span id="calcTransport">0</span> د.ت/semaine
-                    </div>
-                </div>
-
-                <div class="envelope-config" style="--color: #FF9800;">
-                    <h4><span>👕</span> Habits/Maison</h4>
-                    <div class="percentage-input">
-                        <input type="number" id="pctHabits" value="50" min="0" max="100"> %
-                    </div>
-                    <div class="calc-result">
-                        → <span id="calcHabits">0</span> د.ت/semaine
-                    </div>
-                </div>
+            <div class="envelopes-config" id="envelopesConfigList">
+                <!-- Généré par JS -->
             </div>
 
-            <div style="margin-top: 20px; padding: 15px; background: #fef3c7; border-radius: 10px; text-align: center;" id="totalCheck">
-                Total: <span id="totalPercentage">100</span>% 
-                <span id="percentageWarning" style="color: var(--danger); display: none;">⚠️ Doit être = 100%</span>
+            <div class="add-envelope-form">
+                <h4 style="margin-bottom: 15px;">➕ Ajouter une Enveloppe</h4>
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>Nom</label>
+                        <input type="text" id="newEnvName" placeholder="Ex: Sport">
+                    </div>
+                    <div class="input-group">
+                        <label>Icône (emoji)</label>
+                        <input type="text" id="newEnvIcon" placeholder="🏃" maxlength="2">
+                    </div>
+                    <div class="input-group">
+                        <label>Couleur</label>
+                        <select id="newEnvColor">
+                            <option value="#4CAF50">Vert</option>
+                            <option value="#2196F3">Bleu</option>
+                            <option value="#9C27B0">Violet</option>
+                            <option value="#FF9800">Orange</option>
+                            <option value="#E91E63">Rose</option>
+                            <option value="#00BCD4">Cyan</option>
+                            <option value="#795548">Marron</option>
+                            <option value="#607D8B">Gris</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Montant Hebdo (د.ت)</label>
+                        <input type="number" id="newEnvAmount" placeholder="0">
+                    </div>
+                </div>
+                <button class="btn-secondary" onclick="addEnvelope()" style="width: 100%; margin-top: 15px;">
+                    Ajouter cette Enveloppe
+                </button>
+            </div>
+
+            <div class="total-check" id="totalCheck">
+                Total configuré: <span id="totalConfigured">0</span> / <span id="totalTarget">0</span> د.ت
+                <div id="totalMessage" style="margin-top: 5px; font-size: 0.9em;"></div>
             </div>
 
             <button class="btn btn-save" onclick="startBudget()" id="btnStart">
@@ -713,7 +844,7 @@
             </div>
 
             <div class="borrowing-alert" id="borrowingAlert">
-                ⚠️ <strong>Emprunt activé</strong>: Cette semaine utilise des fonds de la semaine suivante.
+                ⚠️ <strong>Emprunt activé</strong>: Cette semaine utilise des fonds d'autres semaines.
                 <div id="borrowingDetails" style="margin-top: 5px; font-size: 0.9em;"></div>
             </div>
 
@@ -728,20 +859,39 @@
                 </div>
             </div>
 
-            <button class="btn btn-save" onclick="resetMonth()" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
-                🔄 Nouveau Mois
-            </button>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-save" onclick="resetMonth()" style="flex: 1; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                    🔄 Nouveau Mois
+                </button>
+                <button class="btn btn-save" onclick="exportData()" style="flex: 1; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                    📥 Exporter
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- Modal Transaction -->
+    <!-- Modal Transaction avec Description -->
     <div class="modal" id="transactionModal">
         <div class="modal-content">
             <h2 id="modalTitle">Transaction</h2>
-            <input type="number" id="transactionAmount" placeholder="0.00" step="0.01">
+            <input type="number" id="transactionAmount" placeholder="Montant (د.ت)" step="0.01">
+            <textarea id="transactionDesc" placeholder="Description (obligatoire) - Ex: Courses hebdo, Essence, etc."></textarea>
             <div class="modal-buttons">
                 <button class="modal-btn modal-confirm" onclick="confirmTransaction()">Confirmer</button>
                 <button class="modal-btn modal-cancel" onclick="closeModal()">Annuler</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Historique -->
+    <div class="modal" id="historyModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <h2 id="historyTitle">Historique</h2>
+            <div class="history-list" id="historyList">
+                <!-- Généré par JS -->
+            </div>
+            <div class="modal-buttons" style="margin-top: 20px;">
+                <button class="modal-btn modal-cancel" onclick="closeHistoryModal()" style="flex: 1;">Fermer</button>
             </div>
         </div>
     </div>
@@ -756,20 +906,23 @@
         let config = {
             revenu: 2671,
             credit: 700,
+            grandAchats: 0,
             epargneAvant: 750,
             epargneObjectif: 500,
             monthYear: '2025-02',
             nbSemaines: 4,
-            budgetHebdoTotal: 0,
-            resteApresCourses: 0
+            budgetHebdoTotal: 0
         };
 
-        let envelopesConfig = {
-            courses: { fixed: 180, color: '#4CAF50', icon: '🛒', name: 'Courses' },
-            enfants: { pct: 25, color: '#9C27B0', icon: '👶', name: 'Enfants' },
-            transport: { pct: 25, color: '#2196F3', icon: '⛽', name: 'Transport' },
-            habits: { pct: 50, color: '#FF9800', icon: '👕', name: 'Habits/Maison' }
-        };
+        // Enveloppes par défaut (modifiables)
+        let envelopesTemplate = [
+            { id: 'courses', name: 'Courses Général', icon: '🛒', color: '#4CAF50', amount: 60 },
+            { id: 'nourriture', name: 'Nourriture', icon: '🍽️', color: '#E91E63', amount: 60 },
+            { id: 'enfants', name: 'Enfants', icon: '👶', color: '#9C27B0', amount: 30 },
+            { id: 'transport', name: 'Transport', icon: '⛽', color: '#2196F3', amount: 20 },
+            { id: 'habits', name: 'Habits/Maison', icon: '👕', color: '#FF9800', amount: 10 },
+            { id: 'personnel', name: 'Dépenses Personnelles', icon: '💅', color: '#00BCD4', amount: 0 }
+        ];
 
         let weeksData = [];
         let currentWeek = 1;
@@ -784,54 +937,40 @@
         });
 
         function setupEventListeners() {
-            // Inputs config
-            ['revenu', 'credit', 'epargneAvant'].forEach(id => {
+            ['revenu', 'credit', 'grandAchats', 'epargneAvant'].forEach(id => {
                 document.getElementById(id).addEventListener('input', calculateBudget);
             });
 
-            // Slider épargne
             const slider = document.getElementById('epargneObjectif');
             slider.addEventListener('input', (e) => {
                 document.getElementById('epargneValeur').textContent = e.target.value + ' د.ت';
                 calculateBudget();
             });
 
-            // Mois
             document.getElementById('monthYear').addEventListener('change', calculateBudget);
-
-            // Pourcentages enveloppes
-            ['pctEnfants', 'pctTransport', 'pctHabits'].forEach(id => {
-                document.getElementById(id).addEventListener('input', calculateEnvelopes);
-            });
         }
 
         function calculateBudget() {
             config.revenu = parseFloat(document.getElementById('revenu').value) || 0;
             config.credit = parseFloat(document.getElementById('credit').value) || 0;
+            config.grandAchats = parseFloat(document.getElementById('grandAchats').value) || 0;
             config.epargneAvant = parseFloat(document.getElementById('epargneAvant').value) || 0;
             config.epargneObjectif = parseFloat(document.getElementById('epargneObjectif').value) || 0;
             config.monthYear = document.getElementById('monthYear').value;
 
-            // Calcul nombre de semaines dans le mois
             config.nbSemaines = getWeeksInMonth(config.monthYear);
             document.getElementById('nbSemaines').textContent = config.nbSemaines;
 
-            // Calcul reste global
-            const resteGlobal = config.revenu - config.credit + config.epargneAvant - config.epargneObjectif;
+            // Calcul: Revenu - Crédit - Grand Achats + Épargne dispo - Épargne objectif
+            const resteGlobal = config.revenu - config.credit - config.grandAchats + config.epargneAvant - config.epargneObjectif;
             document.getElementById('resteGlobal').textContent = resteGlobal.toFixed(0) + ' د.ت';
 
-            // Budget hebdo total
             config.budgetHebdoTotal = resteGlobal / config.nbSemaines;
             document.getElementById('budgetHebdo').textContent = config.budgetHebdoTotal.toFixed(0) + ' د.ت';
+            document.getElementById('budgetHebdoDisplay').textContent = config.budgetHebdoTotal.toFixed(0);
 
-            // Mise à jour affichage config enveloppes
-            document.getElementById('nbSemainesDisplay').textContent = config.nbSemaines;
-            document.getElementById('coursesTotal').textContent = (180 * config.nbSemaines).toFixed(0);
-            
-            config.resteApresCourses = config.budgetHebdoTotal - 180;
-            document.getElementById('resteApresCourses').textContent = config.resteApresCourses.toFixed(0);
-
-            calculateEnvelopes();
+            renderEnvelopesConfig();
+            checkTotal();
             saveData();
         }
 
@@ -841,7 +980,6 @@
             const lastDay = new Date(year, month, 0);
             const daysInMonth = lastDay.getDate();
             
-            // Compter les semaines complètes ou partielles
             let weeks = 0;
             let currentDay = 1;
             
@@ -850,50 +988,120 @@
                 currentDay += 7;
             }
             
-            return Math.min(weeks, 5); // Max 5 semaines
+            return Math.min(weeks, 5);
         }
 
-        function calculateEnvelopes() {
-            const pctEnfants = parseFloat(document.getElementById('pctEnfants').value) || 0;
-            const pctTransport = parseFloat(document.getElementById('pctTransport').value) || 0;
-            const pctHabits = parseFloat(document.getElementById('pctHabits').value) || 0;
-            
-            const total = pctEnfants + pctTransport + pctHabits;
-            document.getElementById('totalPercentage').textContent = total;
-            
-            const warning = document.getElementById('percentageWarning');
-            const btnStart = document.getElementById('btnStart');
-            
-            if (total !== 100) {
-                warning.style.display = 'inline';
-                btnStart.disabled = true;
-                btnStart.style.opacity = '0.5';
-            } else {
-                warning.style.display = 'none';
-                btnStart.disabled = false;
-                btnStart.style.opacity = '1';
+        function renderEnvelopesConfig() {
+            const container = document.getElementById('envelopesConfigList');
+            container.innerHTML = '';
+
+            envelopesTemplate.forEach((env, index) => {
+                const div = document.createElement('div');
+                div.className = 'envelope-config';
+                div.style.setProperty('--color', env.color);
+                div.innerHTML = `
+                    <div class="envelope-config-info">
+                        <h4><span>${env.icon}</span> ${env.name}</h4>
+                        <small style="color: #666;">Hebdo: <span id="display-${env.id}">${env.amount}</span> د.ت</small>
+                    </div>
+                    <div class="envelope-config-inputs">
+                        <input type="number" 
+                               value="${env.amount}" 
+                               min="0" 
+                               onchange="updateEnvelopeAmount('${env.id}', this.value)"
+                               title="Montant hebdomadaire">
+                        <button class="btn-icon delete" onclick="deleteEnvelope('${env.id}')" title="Supprimer">🗑️</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function updateEnvelopeAmount(id, value) {
+            const env = envelopesTemplate.find(e => e.id === id);
+            if (env) {
+                env.amount = parseFloat(value) || 0;
+                document.getElementById(`display-${id}`).textContent = env.amount;
+                checkTotal();
+                saveData();
+            }
+        }
+
+        function deleteEnvelope(id) {
+            if (envelopesTemplate.length <= 1) {
+                showNotification('Il doit rester au moins une enveloppe !', 'error');
+                return;
+            }
+            if (confirm('Supprimer cette enveloppe ?')) {
+                envelopesTemplate = envelopesTemplate.filter(e => e.id !== id);
+                renderEnvelopesConfig();
+                checkTotal();
+                saveData();
+            }
+        }
+
+        function addEnvelope() {
+            const name = document.getElementById('newEnvName').value.trim();
+            const icon = document.getElementById('newEnvIcon').value.trim() || '📦';
+            const color = document.getElementById('newEnvColor').value;
+            const amount = parseFloat(document.getElementById('newEnvAmount').value) || 0;
+
+            if (!name) {
+                showNotification('Veuillez donner un nom à l\'enveloppe', 'error');
+                return;
             }
 
-            // Calcul montants
-            const reste = config.resteApresCourses;
-            document.getElementById('calcEnfants').textContent = (reste * pctEnfants / 100).toFixed(0);
-            document.getElementById('calcTransport').textContent = (reste * pctTransport / 100).toFixed(0);
-            document.getElementById('calcHabits').textContent = (reste * pctHabits / 100).toFixed(0);
+            const id = 'env_' + Date.now();
+            envelopesTemplate.push({ id, name, icon, color, amount });
 
-            // Mise à jour config
-            envelopesConfig.enfants.pct = pctEnfants;
-            envelopesConfig.transport.pct = pctTransport;
-            envelopesConfig.habits.pct = pctHabits;
+            // Reset form
+            document.getElementById('newEnvName').value = '';
+            document.getElementById('newEnvIcon').value = '';
+            document.getElementById('newEnvAmount').value = '';
+
+            renderEnvelopesConfig();
+            checkTotal();
+            saveData();
+            showNotification('Enveloppe ajoutée !', 'success');
+        }
+
+        function checkTotal() {
+            const total = envelopesTemplate.reduce((sum, e) => sum + e.amount, 0);
+            const target = config.budgetHebdoTotal;
+            
+            document.getElementById('totalConfigured').textContent = total.toFixed(0);
+            document.getElementById('totalTarget').textContent = target.toFixed(0);
+
+            const checkDiv = document.getElementById('totalCheck');
+            const message = document.getElementById('totalMessage');
+            const btn = document.getElementById('btnStart');
+
+            if (Math.abs(total - target) < 0.01) {
+                checkDiv.className = 'total-check ok';
+                message.textContent = '✅ Parfait ! Le budget est équilibré.';
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            } else if (total < target) {
+                checkDiv.className = 'total-check error';
+                message.textContent = `⚠️ Il reste ${(target - total).toFixed(0)} د.ت à répartir`;
+                btn.disabled = true;
+                btn.style.opacity = '0.5';
+            } else {
+                checkDiv.className = 'total-check error';
+                message.textContent = `⚠️ Dépassement de ${(total - target).toFixed(0)} د._t ! Réduisez des montants.`;
+                btn.disabled = true;
+                btn.style.opacity = '0.5';
+            }
         }
 
         function goToEnvelopesConfig() {
             document.getElementById('configCard').classList.add('hidden');
             document.getElementById('envelopesConfigCard').classList.remove('hidden');
-            calculateEnvelopes();
+            renderEnvelopesConfig();
+            checkTotal();
         }
 
         function startBudget() {
-            // Initialisation des semaines
             initializeWeeks();
             
             document.getElementById('envelopesConfigCard').classList.add('hidden');
@@ -909,15 +1117,19 @@
         function initializeWeeks() {
             weeksData = [];
             for (let i = 1; i <= config.nbSemaines; i++) {
+                const weekEnvelopes = {};
+                envelopesTemplate.forEach(env => {
+                    weekEnvelopes[env.id] = {
+                        budget: env.amount,
+                        current: env.amount,
+                        history: []
+                    };
+                });
+
                 weeksData.push({
                     week: i,
-                    envelopes: {
-                        courses: { budget: 180, current: 180, history: [] },
-                        enfants: { budget: (config.resteApresCourses * envelopesConfig.enfants.pct / 100), current: (config.resteApresCourses * envelopesConfig.enfants.pct / 100), history: [] },
-                        transport: { budget: (config.resteApresCourses * envelopesConfig.transport.pct / 100), current: (config.resteApresCourses * envelopesConfig.transport.pct / 100), history: [] },
-                        habits: { budget: (config.resteApresCourses * envelopesConfig.habits.pct / 100), current: (config.resteApresCourses * envelopesConfig.habits.pct / 100), history: [] }
-                    },
-                    borrowing: { from: 0, to: 0 } // Emprunt reçu/donné
+                    envelopes: weekEnvelopes,
+                    borrowing: { from: 0, to: 0 }
                 });
             }
             saveData();
@@ -927,12 +1139,11 @@
             const container = document.getElementById('weeksTabs');
             container.innerHTML = '';
             
-            weeksData.forEach((week, index) => {
+            weeksData.forEach((week) => {
                 const tab = document.createElement('div');
                 tab.className = 'week-tab' + (week.week === currentWeek ? ' active' : '');
                 tab.textContent = 'S' + week.week;
                 
-                // Indicateur d'emprunt
                 if (week.borrowing.from > 0 || week.borrowing.to > 0) {
                     tab.classList.add('borrowing');
                 }
@@ -955,14 +1166,13 @@
             
             container.innerHTML = '';
             
-            Object.keys(weekData.envelopes).forEach(key => {
-                const env = weekData.envelopes[key];
-                const config = envelopesConfig[key];
+            envelopesTemplate.forEach(template => {
+                const env = weekData.envelopes[template.id];
                 const percentage = (env.current / env.budget) * 100;
                 
                 const card = document.createElement('div');
                 card.className = 'envelope-card';
-                card.style.setProperty('--color', config.color);
+                card.style.setProperty('--color', template.color);
                 
                 let statusClass = 'good';
                 let statusText = '✅ OK';
@@ -978,8 +1188,8 @@
                 card.innerHTML = `
                     <div class="envelope-header">
                         <div class="envelope-title">
-                            <span>${config.icon}</span>
-                            ${config.name}
+                            <span>${template.icon}</span>
+                            ${template.name}
                         </div>
                         <div class="budget-info">
                             <div>Budget: ${env.budget.toFixed(0)} د.ت</div>
@@ -990,7 +1200,7 @@
                     <div class="progress-container">
                         <div class="progress-bar-bg">
                             <div class="progress-bar-fill ${percentage <= 20 ? 'danger' : percentage <= 50 ? 'warning' : ''}" 
-                                 style="width: ${Math.max(0, Math.min(100, percentage))}%; background: ${config.color}">
+                                 style="width: ${Math.max(0, Math.min(100, percentage))}%; background: ${template.color}">
                                 ${percentage.toFixed(0)}%
                             </div>
                         </div>
@@ -1002,8 +1212,9 @@
                     </div>
                     
                     <div class="controls">
-                        <button class="btn btn-add" onclick="openTransaction('${key}', 'add')">+ Ajouter</button>
-                        <button class="btn btn-remove" onclick="openTransaction('${key}', 'remove')" ${env.current <= 0 ? 'disabled' : ''}>- Dépenser</button>
+                        <button class="btn btn-add" onclick="openTransaction('${template.id}', 'add')">+ Ajouter</button>
+                        <button class="btn btn-remove" onclick="openTransaction('${template.id}', 'remove')" ${env.current <= 0 ? 'disabled' : ''}>- Dépenser</button>
+                        <button class="btn btn-history" onclick="showHistory('${template.id}')">📋</button>
                     </div>
                 `;
                 
@@ -1011,14 +1222,15 @@
             });
         }
 
-        function openTransaction(envelopeKey, action) {
-            currentEnvelope = envelopeKey;
+        function openTransaction(envelopeId, action) {
+            currentEnvelope = envelopeId;
             currentAction = action;
             
-            const envConfig = envelopesConfig[envelopeKey];
+            const template = envelopesTemplate.find(e => e.id === envelopeId);
             document.getElementById('modalTitle').textContent = 
-                action === 'add' ? `Ajouter à ${envConfig.name}` : `Dépenser de ${envConfig.name}`;
+                action === 'add' ? `Ajouter à ${template.name}` : `Dépenser de ${template.name}`;
             document.getElementById('transactionAmount').value = '';
+            document.getElementById('transactionDesc').value = '';
             document.getElementById('transactionModal').style.display = 'flex';
         }
 
@@ -1030,25 +1242,36 @@
 
         function confirmTransaction() {
             const amount = parseFloat(document.getElementById('transactionAmount').value);
+            const description = document.getElementById('transactionDesc').value.trim();
+            
             if (isNaN(amount) || amount <= 0) {
-                showNotification('Montant invalide', 'error');
+                showNotification('Veuillez entrer un montant valide', 'error');
+                return;
+            }
+            
+            if (!description) {
+                showNotification('Veuillez ajouter une description', 'error');
                 return;
             }
 
             const weekData = weeksData[currentWeek - 1];
             const env = weekData.envelopes[currentEnvelope];
+            const template = envelopesTemplate.find(e => e.id === currentEnvelope);
 
             if (currentAction === 'add') {
                 env.current += amount;
-                env.history.push({ type: 'add', amount, date: new Date().toLocaleDateString('fr-FR') });
-                showNotification(`+${amount.toFixed(2)} د.ت ajouté`, 'success');
+                env.history.push({
+                    type: 'add',
+                    amount: amount,
+                    description: description,
+                    date: new Date().toLocaleDateString('fr-FR')
+                });
+                showNotification(`+${amount.toFixed(2)} د.ت ajouté à ${template.name}`, 'success');
             } else {
-                // Gestion avec emprunt
                 if (amount > env.current) {
-                    const deficit = amount - env.current;
-                    
-                    // Emprunter à la semaine suivante si possible
+                    // Emprunt à la semaine suivante
                     if (currentWeek < config.nbSemaines) {
+                        const deficit = amount - env.current;
                         const nextWeek = weeksData[currentWeek];
                         const availableInNext = Math.min(deficit, nextWeek.envelopes[currentEnvelope].current);
                         
@@ -1057,13 +1280,28 @@
                             nextWeek.borrowing.from += availableInNext;
                             weekData.borrowing.to += availableInNext;
                             
+                            // Transaction dans semaine actuelle
+                            if (env.current > 0) {
+                                env.history.push({
+                                    type: 'remove',
+                                    amount: env.current,
+                                    description: description + ' (partiel)',
+                                    date: new Date().toLocaleDateString('fr-FR')
+                                });
+                            }
                             env.current = 0;
-                            env.history.push({ type: 'remove', amount: env.current, date: new Date().toLocaleDateString('fr-FR'), note: 'Partiel' });
-                            env.history.push({ type: 'remove', amount: availableInNext, date: new Date().toLocaleDateString('fr-FR'), note: 'Emprunt S' + (currentWeek + 1) });
                             
-                            showNotification(`⚠️ Emprunt de ${availableInNext.toFixed(2)} د.ت à la semaine ${currentWeek + 1}`, 'warning');
+                            // Transaction emprunt
+                            env.history.push({
+                                type: 'remove',
+                                amount: availableInNext,
+                                description: description + ` [Emprunt S${currentWeek + 1}]`,
+                                date: new Date().toLocaleDateString('fr-FR')
+                            });
+                            
+                            showNotification(`⚠️ Emprunt de ${availableInNext.toFixed(2)} د._t à S${currentWeek + 1}`, 'warning');
                         } else {
-                            showNotification('Fonds insuffisants même avec emprunt', 'error');
+                            showNotification('Fonds insuffisants dans les semaines suivantes', 'error');
                             return;
                         }
                     } else {
@@ -1072,8 +1310,13 @@
                     }
                 } else {
                     env.current -= amount;
-                    env.history.push({ type: 'remove', amount, date: new Date().toLocaleDateString('fr-FR') });
-                    showNotification(`-${amount.toFixed(2)} د.ت retiré`, 'warning');
+                    env.history.push({
+                        type: 'remove',
+                        amount: amount,
+                        description: description,
+                        date: new Date().toLocaleDateString('fr-FR')
+                    });
+                    showNotification(`-${amount.toFixed(2)} د.ت: ${description}`, 'warning');
                 }
             }
 
@@ -1085,6 +1328,48 @@
             closeModal();
         }
 
+        function showHistory(envelopeId) {
+            const template = envelopesTemplate.find(e => e.id === envelopeId);
+            document.getElementById('historyTitle').textContent = `📋 Historique - ${template.name}`;
+            
+            const list = document.getElementById('historyList');
+            list.innerHTML = '';
+            
+            let hasHistory = false;
+            
+            weeksData.forEach(week => {
+                const env = week.envelopes[envelopeId];
+                if (env.history.length > 0) {
+                    hasHistory = true;
+                    env.history.forEach(h => {
+                        const item = document.createElement('div');
+                        item.className = 'history-item';
+                        item.style.setProperty('--color', template.color);
+                        item.innerHTML = `
+                            <div class="history-item-header">
+                                <span class="history-item-amount ${h.type}">
+                                    ${h.type === 'add' ? '+' : '-'}${h.amount.toFixed(2)} د.ت
+                                </span>
+                                <span class="history-item-date">S${week.week} - ${h.date}</span>
+                            </div>
+                            <div class="history-item-desc">${h.description}</div>
+                        `;
+                        list.appendChild(item);
+                    });
+                }
+            });
+            
+            if (!hasHistory) {
+                list.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">Aucune transaction pour le moment</div>';
+            }
+            
+            document.getElementById('historyModal').style.display = 'flex';
+        }
+
+        function closeHistoryModal() {
+            document.getElementById('historyModal').style.display = 'none';
+        }
+
         function updateBorrowingAlert() {
             const weekData = weeksData[currentWeek - 1];
             const alert = document.getElementById('borrowingAlert');
@@ -1094,10 +1379,10 @@
                 alert.classList.add('show');
                 let text = '';
                 if (weekData.borrowing.from > 0) {
-                    text += `Reçu ${weekData.borrowing.from.toFixed(2)} د.ت de la semaine ${currentWeek - 1}. `;
+                    text += `Reçu ${weekData.borrowing.from.toFixed(2)} د.ت de S${currentWeek - 1}. `;
                 }
                 if (weekData.borrowing.to > 0) {
-                    text += `Prêté ${weekData.borrowing.to.toFixed(2)} د.ت à la semaine ${currentWeek + 1}.`;
+                    text += `Prêté ${weekData.borrowing.to.toFixed(2)} د.ت à S${currentWeek + 1}.`;
                 }
                 details.textContent = text;
             } else {
@@ -1134,7 +1419,11 @@
                     <div class="value" style="color: var(--success)">${totalCurrent.toFixed(0)} د.ت</div>
                 </div>
                 <div class="recap-item">
-                    <div class="label">Épargne Prévue</div>
+                    <div class="label">Grand Achats</div>
+                    <div class="value" style="color: var(--warning)">${config.grandAchats.toFixed(0)} د.ت</div>
+                </div>
+                <div class="recap-item">
+                    <div class="label">Épargne</div>
                     <div class="value" style="color: var(--primary)">${config.epargneObjectif.toFixed(0)} د.ت</div>
                 </div>
             `;
@@ -1143,8 +1432,26 @@
         function resetMonth() {
             if (!confirm('Nouveau mois? Toutes les données seront réinitialisées.')) return;
             
-            localStorage.removeItem('budgetDinarsData');
+            localStorage.removeItem('budgetDinarsProData');
             location.reload();
+        }
+
+        function exportData() {
+            const data = {
+                config,
+                envelopesTemplate,
+                weeksData,
+                exportDate: new Date().toLocaleString('fr-FR')
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `budget_${config.monthYear}.json`;
+            a.click();
+            
+            showNotification('📥 Données exportées !', 'success');
         }
 
         function showNotification(message, type) {
@@ -1161,38 +1468,33 @@
         function saveData() {
             const data = {
                 config,
-                envelopesConfig,
+                envelopesTemplate,
                 weeksData,
                 currentWeek
             };
-            localStorage.setItem('budgetDinarsData', JSON.stringify(data));
+            localStorage.setItem('budgetDinarsProData', JSON.stringify(data));
         }
 
         function loadData() {
-            const saved = localStorage.getItem('budgetDinarsData');
+            const saved = localStorage.getItem('budgetDinarsProData');
             if (saved) {
                 const data = JSON.parse(saved);
                 config = data.config || config;
-                envelopesConfig = data.envelopesConfig || envelopesConfig;
+                envelopesTemplate = data.envelopesTemplate || envelopesTemplate;
                 weeksData = data.weeksData || [];
                 currentWeek = data.currentWeek || 1;
                 
-                // Restaurer valeurs dans les inputs
+                // Restaurer valeurs
                 document.getElementById('revenu').value = config.revenu;
                 document.getElementById('credit').value = config.credit;
+                document.getElementById('grandAchats').value = config.grandAchats || 0;
                 document.getElementById('epargneAvant').value = config.epargneAvant;
-                document.getElementById('epargneObjectif').value = config.epargneObjectif;
                 document.getElementById('monthYear').value = config.monthYear;
+                document.getElementById('epargneObjectif').value = config.epargneObjectif;
                 document.getElementById('epargneValeur').textContent = config.epargneObjectif + ' د.ت';
                 
-                document.getElementById('pctEnfants').value = envelopesConfig.enfants.pct;
-                document.getElementById('pctTransport').value = envelopesConfig.transport.pct;
-                document.getElementById('pctHabits').value = envelopesConfig.habits.pct;
-                
-                // Si des données de semaines existent, aller directement au suivi
                 if (weeksData.length > 0) {
                     document.getElementById('configCard').classList.add('hidden');
-                    document.getElementById('envelopesConfigCard').classList.add('hidden');
                     document.getElementById('trackingCard').classList.remove('hidden');
                     renderWeeksTabs();
                     renderEnvelopes();
@@ -1201,9 +1503,12 @@
             }
         }
 
-        // Fermer modal avec Escape
+        // Fermer modals avec Escape
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
+            if (e.key === 'Escape') {
+                closeModal();
+                closeHistoryModal();
+            }
             if (e.key === 'Enter' && document.getElementById('transactionModal').style.display === 'flex') {
                 confirmTransaction();
             }
@@ -1211,3 +1516,4 @@
     </script>
 </body>
 </html>'''
+
