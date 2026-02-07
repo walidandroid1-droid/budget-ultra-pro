@@ -2,53 +2,47 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Budget Widget</title>
+<title>Budget Widget V2</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
+@media (prefers-color-scheme: dark){
+body{background:#000;color:#fff;}
+.card{background:#1c1c1e;}
+}
 body{
 margin:0;
 font-family:-apple-system,BlinkMacSystemFont;
-background:linear-gradient(135deg,#34c759,#5ac8fa);
-color:white;
+background:#f2f2f7;
 display:flex;
 justify-content:center;
 align-items:center;
 height:100vh;
 }
-.widget{
-width:300px;
-padding:15px;
+.card{
+background:#fff;
 border-radius:25px;
-background:rgba(0,0,0,0.25);
-backdrop-filter:blur(10px);
-box-shadow:0 4px 15px rgba(0,0,0,0.3);
+padding:15px;
+width:320px;
+box-shadow:0 4px 15px rgba(0,0,0,0.2);
 }
+.small{width:180px;}
+.medium{width:280px;}
+.large{width:340px;}
+.line{display:flex;justify-content:space-between;margin:5px 0;}
+.progress{background:#ddd;border-radius:10px;overflow:hidden;height:12px;}
+.bar{background:#34c759;height:100%;width:0%;}
 h2{text-align:center;margin:5px 0;}
-.line{display:flex;justify-content:space-between;margin:6px 0;}
-.progress{
-background:rgba(255,255,255,0.3);
-border-radius:10px;
-overflow:hidden;
-height:12px;
-}
-.bar{
-background:white;
-height:100%;
-width:0%;
-}
-.small{font-size:13px;text-align:center;margin-top:5px;}
 </style>
 </head>
 <body>
 
-<div class="widget">
+<div class="card medium" id="widget">
 <h2>💰 Budget</h2>
 <div class="line"><span>Solde</span><b id="balance">0</b></div>
 <div class="line"><span>Épargne</span><b id="save">0</b></div>
 <div class="line"><span>Objectif</span><b id="goal">0</b></div>
-
 <div class="progress"><div class="bar" id="bar"></div></div>
-<div class="small" id="percent">0%</div>
+<p id="percent" style="text-align:center">0%</p>
 </div>
 
 <script>
