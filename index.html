@@ -2,20 +2,16 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Budget Ultra Pro V2</title>
+<title>Budget Ultra Pro V4 – Dark Blue & Suggestions</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 :root{
---bg:#f2f2f7;
---card:rgba(255,255,255,0.85);
---text:#000;
---accent:#34c759;
---danger:#ff3b30;
-}
-.dark{
---bg:#121212;
---card:#1c1c1e;
---text:#fff;
+--bg:#0d1b2a;
+--card:#1b263b;
+--text:#e0e1dd;
+--accent:#3d5a80;
+--accent-light:#98c1d9;
+--danger:#e63946;
 }
 body{
 background:var(--bg);
@@ -23,17 +19,13 @@ font-family:-apple-system,BlinkMacSystemFont;
 color:var(--text);
 padding:10px;
 }
-.container{
-max-width:500px;
-margin:auto;
-}
+.container{max-width:500px;margin:auto;}
 .card{
 background:var(--card);
-backdrop-filter: blur(10px);
 border-radius:20px;
 padding:15px;
 margin-bottom:10px;
-box-shadow:0 4px 15px rgba(0,0,0,0.1);
+box-shadow:0 4px 15px rgba(0,0,0,0.4);
 }
 button,input,select{
 width:100%;
@@ -41,39 +33,43 @@ padding:10px;
 margin:5px 0;
 border-radius:12px;
 border:none;
+font-size:14px;
 }
 button{background:var(--accent);color:white;font-weight:bold;}
-.progress{
-background:#ddd;border-radius:10px;overflow:hidden;height:15px;
+button.danger{background:var(--danger);}
+.line{display:flex;justify-content:space-between;margin:5px 0;}
+.progress{background:#274156;border-radius:10px;overflow:hidden;height:12px;}
+.bar{background:var(--accent-light);height:100%;width:0%;}
+small{font-size:12px;color:#98c1d9;}
+select#filter{margin-bottom:10px;}
+.suggestions{
+background:#274156;
+border-radius:15px;
+padding:10px;
+margin-top:10px;
+color:#fff;
 }
-.progress-bar{
-background:var(--accent);height:100%;width:0%;
+.suggestions h4{
+margin:0 0 5px 0;
+color:#98c1d9;
 }
-.alert{
-background:#ffeaa7;padding:10px;border-radius:12px;
-}
-.top{
-display:flex;justify-content:space-between;align-items:center;
-}
-.small{font-size:14px;}
 </style>
 </head>
 <body>
 
 <div class="container">
 
-<div class="card top">
-<h2>💎 Budget Ultra Pro</h2>
-<button onclick="toggleDark()">🌙</button>
+<div class="card" style="display:flex;justify-content:space-between;align-items:center">
+<h2>💎 Budget Ultra Pro V4</h2>
 </div>
 
-<div class="card alert" id="alert">Bienvenue 👋</div>
+<div class="card" id="alert">Bienvenue 👋</div>
 
 <div class="card">
 <h3>🎯 Objectif d’épargne</h3>
-<input type="number" id="goal" placeholder="Objectif (ex: 1000 DT)">
+<input type="number" id="goalInput" placeholder="Objectif (ex: 1000 DT)">
 <button onclick="setGoal()">Définir objectif</button>
-<div class="progress"><div class="progress-bar" id="progress"></div></div>
+<div class="progress"><div class="bar" id="progress"></div></div>
 <p id="goalText"></p>
 </div>
 
@@ -90,6 +86,7 @@ display:flex;justify-content:space-between;align-items:center;
 <option>Transport</option>
 <option>Santé</option>
 <option>Loisirs</option>
+<option>Autre</option>
 </select>
 
 <input type="number" id="amount" placeholder="Montant">
@@ -106,21 +103,33 @@ display:flex;justify-content:space-between;align-items:center;
 
 <div class="card">
 <h3>📜 Historique</h3>
+<label>Filtrer par catégorie :</label>
+<select id="filter" onchange="display()">
+<option value="all">Toutes</option>
+<option>Maison</option>
+<option>Nourriture</option>
+<option>Transport</option>
+<option>Santé</option>
+<option>Loisirs</option>
+<option>Autre</option>
+</select>
 <ul id="list"></ul>
+</div>
+
+<div class="card suggestions" id="suggestions">
+<h4>💡 Suggestions intelligentes</h4>
+<ul id="suggestionsList"></ul>
 </div>
 
 </div>
 
 <script>
-let data=JSON.parse(localStorage.getItem("budgetV2"))||[];
+let data=JSON.parse(localStorage.getItem("budgetV4"))||[];
 let goal=localStorage.getItem("goal")||0;
-
-function toggleDark(){
-document.body.classList.toggle("dark");
-}
+let editingIndex=null;
 
 function setGoal(){
-goal=document.getElementById("goal").value;
+goal=document.getElementById("goalInput").value;
 localStorage.setItem("goal",goal);
 display();
 }
@@ -130,11 +139,26 @@ let type=document.getElementById("type").value;
 let category=document.getElementById("category").value;
 let amount=parseFloat(document.getElementById("amount").value);
 let note=document.getElementById("note").value;
-if(!amount)return alert("Montant manquant");
-data.push({type,category,amount,note});
-localStorage.setItem("budgetV2",JSON.stringify(data));
+if(!amount) return alert("Montant manquant");
+
+let now=new Date();
+let dateTime=now.toLocaleDateString("fr-FR")+" "+now.toLocaleTimeString("fr-FR");
+
+if(editingIndex!==null){
+  data[editingIndex]={type,category,amount,note,dateTime};
+  editingIndex=null;
+}else{
+  data.push({type,category,amount,note,dateTime});
+}
+
+localStorage.setItem("budgetV4",JSON.stringify(data));
+clearInputs();
 display();
-checkNotification();
+}
+
+function clearInputs(){
+document.getElementById("amount").value="";
+document.getElementById("note").value="";
 }
 
 function display(){
@@ -142,11 +166,21 @@ let income=0,expense=0,save=0;
 let list=document.getElementById("list");
 list.innerHTML="";
 
-data.forEach(d=>{
+let filterCat=document.getElementById("filter").value;
+
+data.forEach((d,i)=>{
 if(d.type=="income") income+=d.amount;
 if(d.type=="expense") expense+=d.amount;
 if(d.type=="save") save+=d.amount;
-list.innerHTML+=`<li>${d.category} - ${d.amount} DT (${d.note})</li>`;
+
+if(filterCat=="all" || d.category==filterCat){
+let li=document.createElement("li");
+li.innerHTML=`<b>${d.category}</b> - ${d.amount} DT (${d.note}) <br>
+<small>🕒 ${d.dateTime}</small><br>
+<button onclick="editTransaction(${i})">Modifier</button>
+<button class="danger" onclick="deleteTransaction(${i})">Supprimer</button>`;
+list.appendChild(li);
+}
 });
 
 document.getElementById("income").innerText=income;
@@ -154,24 +188,66 @@ document.getElementById("expense").innerText=expense;
 document.getElementById("save").innerText=save;
 document.getElementById("balance").innerText=income-expense-save;
 
-let percent= goal>0 ? (save/goal)*100 : 0;
+let percent=goal>0 ? (save/goal)*100:0;
 if(percent>100) percent=100;
 document.getElementById("progress").style.width=percent+"%";
 document.getElementById("goalText").innerText=`Progression: ${Math.round(percent)}%`;
 
 let msg="👍 Bonne gestion";
 if(expense>income) msg="⚠️ Dépenses > revenus";
-if(percent>=100) msg="🎉 Objectif atteint ! Félicitations";
-
+if(percent>=100) msg="🎉 Objectif atteint !";
 document.getElementById("alert").innerText=msg;
+
+generateSuggestions(income,expense,save);
 }
 
-function checkNotification(){
-if(Notification.permission==="granted"){
-new Notification("Budget Alert",{body:"Transaction ajoutée"});
-}else if(Notification.permission!=="denied"){
-Notification.requestPermission();
+function editTransaction(i){
+let t=data[i];
+document.getElementById("type").value=t.type;
+document.getElementById("category").value=t.category;
+document.getElementById("amount").value=t.amount;
+document.getElementById("note").value=t.note;
+editingIndex=i;
 }
+
+function deleteTransaction(i){
+if(confirm("Supprimer cette transaction ?")){
+data.splice(i,1);
+localStorage.setItem("budgetV4",JSON.stringify(data));
+display();
+}
+}
+
+// 🔹 Suggestions intelligentes
+function generateSuggestions(income,expense,save){
+let suggestions=[];
+if(data.length==0){
+suggestions.push("Aucune transaction pour l'instant.");
+} else {
+let lastTrans=data[data.length-1];
+if(lastTrans.amount>0.3*(income-expense-save)){
+suggestions.push(`⚠️ Attention, la dernière transaction (${lastTrans.category}) est importante !`);
+}
+
+if(goal>0 && save<goal*0.5){
+let reste=Math.round(goal-save);
+suggestions.push(`💡 Il est conseillé d'épargner encore ${reste} DT pour atteindre votre objectif.`);
+}
+
+let categoriesCount={};
+data.forEach(d=>{
+categoriesCount[d.category]=(categoriesCount[d.category]||0)+d.amount;
+});
+let maxCat=Object.keys(categoriesCount).reduce((a,b)=>categoriesCount[a]>categoriesCount[b]?a:b,"");
+suggestions.push(`📊 Catégorie la plus dépensée : ${maxCat} (${categoriesCount[maxCat]} DT)`);
+
+let lastDate=lastTrans.dateTime;
+suggestions.push(`🕒 Dernière transaction : ${lastTrans.category} - ${lastTrans.amount} DT (${lastDate})`);
+}
+
+let ul=document.getElementById("suggestionsList");
+ul.innerHTML="";
+suggestions.forEach(s=>{let li=document.createElement("li"); li.innerText=s; ul.appendChild(li);});
 }
 
 display();
