@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Budget Ultra Pro</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+--bg:#f2f2f7;
+--card:#ffffff;
+--text:#000;
+--accent:#34c759;
+}
+.dark{
+--bg:#121212;
+--card:#1c1c1e;
+--text:#fff;
+}
+body{
+background:var(--bg);
+font-family:-apple-system,BlinkMacSystemFont;
+color:var(--text);
+padding:10px;
+}
+.container{
+max-width:500px;
+margin:auto;
+background:var(--card);
+padding:15px;
+border-radius:20px;
+box-shadow:0 4px 15px rgba(0,0,0,0.1);
+}
+button,input,select{
+width:100%;
+padding:10px;
+margin:5px 0;
+border-radius:12px;
+border:none;
+}
+button{background:var(--accent);color:white;font-weight:bold;}
+.summary{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:10px;
+}
+.card{
+background:#eee;
+padding:10px;
+border-radius:15px;
+text-align:center;
+}
+.dark .card{background:#333;}
+.alert{background:#ffeaa7;padding:10px;border-radius:12px;margin-bottom:10px;}
+.list{max-height:200px;overflow:auto;}
+li{border-bottom:1px solid #ccc;padding:5px;}
+.topbar{display:flex;justify-content:space-between;}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="topbar">
+<h2>💎 Budget Ultra Pro</h2>
+<button onclick="toggleDark()">🌙</button>
+</div>
+
+<div class="alert" id="suggestion">Suggestions...</div>
+
+<select id="month"></select>
+
+<select id="type">
+<option value="income">Dépôt (Revenu)</option>
+<option value="expense">Retrait (Dépense)</option>
+<option value="save">Épargne</option>
+</select>
+
+<select id="category"></select>
+<input id="newCat" placeholder="Nouvelle catégorie">
+<button onclick="addCategory()">➕ Catégorie</button>
+
+<input type="number" id="amount" placeholder="Montant">
+<input type="text" id="note" placeholder="Note">
+<button onclick="addTransaction()">Ajouter</button>
+
+<div class="summary">
+<div class="card">Revenus<br><span id="incomeTotal">0</span></div>
+<div class="card">Dépenses<br><span id="expenseTotal">0</span></div>
+<div class="card">Épargne<br><span id="saveTotal">0</span></div>
+<div class="card">Solde<br><span id="balance">0</span></div>
+</div>
+
+<canvas id="pieChart"></canvas>
+<canvas id="barChart"></canvas>
+
+<input id="search" placeholder="Recherche..." oninput="display()">
+
+<button onclick="exportCSV()">📤 Export Excel</button>
+
+<ul id="list" class="list"></ul>
+
+</div>
+
+<script>
+let data=JSON.parse(localStorage.getItem("budgetUltra"))||[];
+let categories=JSON.parse(localStorage.getItem("catsUltra"))||["Maison","Nourriture","Transport","Santé"];
+let chart1,chart2;
+
+let months=["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+let monthSel=document.getElementById("month");
+months.forEach((m,i)=>monthSel.innerHTML+=`<option value="${i}">${m}</option>`);
+
+function toggleDark(){
+document.body.classList.toggle("dark");
+}
+
+function loadCategories(){
+let s=document.getElementById("category");
+s.innerHTML="";
+categories.forEach(c=>s.innerHTML+=`<option>${c}</option>`);
+localStorage.setItem("catsUltra",JSON.stringify(categories));
+}
+loadCategories();
+
+function addCategory(){
+let c=document.getElementById("newCat").value;
+if(c){
+categories.push(c);
+document.getElementById("newCat").value="";
+loadCategories();
+}
+}
+
+function addTransaction(){
+let type=document.getElementById("type").value;
+let category=document.getElementById("category").value;
+let amount=parseFloat(document.getElementById("amount").value);
+let note=document.getElementById("note").value;
+let month=monthSel.value;
+if(!amount)return alert("Montant ?");
+data.push({type,category,amount,note,month});
+localStorage.setItem("budgetUltra",JSON.stringify(data));
+display();
+}
+
+function display(){
+let income=0,expense=0,save=0;
+let catSum={};
+let list=document.getElementById("list");
+let search=document.getElementById("search").value.toLowerCase();
+list.innerHTML="";
+
+data.filter(d=>d.month==monthSel.value)
+.filter(d=>d.category.toLowerCase().includes(search)||d.note.toLowerCase().includes(search))
+.forEach(d=>{
+if(d.type=="income") income+=d.amount;
+if(d.type=="expense") expense+=d.amount;
+if(d.type=="save") save+=d.amount;
+if(d.type=="expense") catSum[d.category]=(catSum[d.category]||0)+d.amount;
+list.innerHTML+=`<li>${d.category} | ${d.amount} DT | ${d.note}</li>`;
+});
+
+document.getElementById("incomeTotal").innerText=income;
+document.getElementById("expenseTotal").innerText=expense;
+document.getElementById("saveTotal").innerText=save;
+document.getElementById("balance").innerText=income-expense-save;
+
+suggestion(income,expense);
+drawCharts(catSum);
+}
+
+function suggestion(income,expense){
+let msg="👍 Bonne gestion";
+if(expense>income) msg="⚠️ Dépenses supérieures aux revenus";
+document.getElementById("suggestion").innerText=msg;
+}
+
+function drawCharts(catSum){
+let ctx1=document.getElementById("pieChart");
+let ctx2=document.getElementById("barChart");
+if(chart1) chart1.destroy();
+if(chart2) chart2.destroy();
+chart1=new Chart(ctx1,{type:'pie',data:{labels:Object.keys(catSum),datasets:[{data:Object.values(catSum)}]}});
+chart2=new Chart(ctx2,{type:'bar',data:{labels:Object.keys(catSum),datasets:[{data:Object.values(catSum)}]}});
+}
+
+function exportCSV(){
+let csv="Type,Catégorie,Montant,Note,Mois\n";
+data.forEach(d=>{
+csv+=`${d.type},${d.category},${d.amount},${d.note},${months[d.month]}\n`;
+});
+let blob=new Blob([csv],{type:"text/csv"});
+let a=document.createElement("a");
+a.href=URL.createObjectURL(blob);
+a.download="budget.csv";
+a.click();
+}
+
+display();
+</script>
+</body>
+</html>
