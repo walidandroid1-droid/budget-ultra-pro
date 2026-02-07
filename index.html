@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Budget Ultra Pro V4 – Dark Blue & Suggestions</title>
+<title>Budget Ultra Pro V4 – Widget</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 :root{
@@ -37,11 +37,23 @@ font-size:14px;
 }
 button{background:var(--accent);color:white;font-weight:bold;}
 button.danger{background:var(--danger);}
-.line{display:flex;justify-content:space-between;margin:5px 0;}
 .progress{background:#274156;border-radius:10px;overflow:hidden;height:12px;}
 .bar{background:var(--accent-light);height:100%;width:0%;}
 small{font-size:12px;color:#98c1d9;}
 select#filter{margin-bottom:10px;}
+.widget{
+display:flex;
+justify-content:space-around;
+flex-wrap:wrap;
+background:#274156;
+border-radius:15px;
+padding:15px;
+margin-bottom:15px;
+color:#fff;
+text-align:center;
+}
+.widget div{margin:5px 0; flex:1; min-width:120px;}
+.widget h4{margin:0 0 5px 0;color:#98c1d9;}
 .suggestions{
 background:#274156;
 border-radius:15px;
@@ -59,8 +71,28 @@ color:#98c1d9;
 
 <div class="container">
 
-<div class="card" style="display:flex;justify-content:space-between;align-items:center">
+<div class="card">
 <h2>💎 Budget Ultra Pro V4</h2>
+</div>
+
+<!-- ✅ Widget résumé en haut -->
+<div class="widget" id="widget">
+<div>
+<h4>💰 Solde</h4>
+<span id="w_balance">0 DT</span>
+</div>
+<div>
+<h4>🏦 Épargne</h4>
+<span id="w_save">0 DT</span>
+</div>
+<div>
+<h4>🎯 Objectif</h4>
+<span id="w_goal">0 DT</span>
+</div>
+<div>
+<h4>🕒 Dernière transaction</h4>
+<span id="w_last">Aucune</span>
+</div>
 </div>
 
 <div class="card" id="alert">Bienvenue 👋</div>
@@ -124,7 +156,7 @@ color:#98c1d9;
 </div>
 
 <script>
-let data=JSON.parse(localStorage.getItem("budgetV4"))||[];
+let data=JSON.parse(localStorage.getItem("budgetWidget"))||[];
 let goal=localStorage.getItem("goal")||0;
 let editingIndex=null;
 
@@ -151,7 +183,7 @@ if(editingIndex!==null){
   data.push({type,category,amount,note,dateTime});
 }
 
-localStorage.setItem("budgetV4",JSON.stringify(data));
+localStorage.setItem("budgetWidget",JSON.stringify(data));
 clearInputs();
 display();
 }
@@ -186,7 +218,8 @@ list.appendChild(li);
 document.getElementById("income").innerText=income;
 document.getElementById("expense").innerText=expense;
 document.getElementById("save").innerText=save;
-document.getElementById("balance").innerText=income-expense-save;
+let balance=income-expense-save;
+document.getElementById("balance").innerText=balance;
 
 let percent=goal>0 ? (save/goal)*100:0;
 if(percent>100) percent=100;
@@ -198,24 +231,18 @@ if(expense>income) msg="⚠️ Dépenses > revenus";
 if(percent>=100) msg="🎉 Objectif atteint !";
 document.getElementById("alert").innerText=msg;
 
+// 🔹 Widget mise à jour
+document.getElementById("w_balance").innerText=balance+" DT";
+document.getElementById("w_save").innerText=save+" DT";
+document.getElementById("w_goal").innerText=goal+" DT";
+if(data.length>0){
+let last=data[data.length-1];
+document.getElementById("w_last").innerText=`${last.category} - ${last.amount} DT`;
+}else{
+document.getElementById("w_last").innerText="Aucune";
+}
+
 generateSuggestions(income,expense,save);
-}
-
-function editTransaction(i){
-let t=data[i];
-document.getElementById("type").value=t.type;
-document.getElementById("category").value=t.category;
-document.getElementById("amount").value=t.amount;
-document.getElementById("note").value=t.note;
-editingIndex=i;
-}
-
-function deleteTransaction(i){
-if(confirm("Supprimer cette transaction ?")){
-data.splice(i,1);
-localStorage.setItem("budgetV4",JSON.stringify(data));
-display();
-}
 }
 
 // 🔹 Suggestions intelligentes
@@ -248,6 +275,23 @@ suggestions.push(`🕒 Dernière transaction : ${lastTrans.category} - ${lastTra
 let ul=document.getElementById("suggestionsList");
 ul.innerHTML="";
 suggestions.forEach(s=>{let li=document.createElement("li"); li.innerText=s; ul.appendChild(li);});
+}
+
+function editTransaction(i){
+let t=data[i];
+document.getElementById("type").value=t.type;
+document.getElementById("category").value=t.category;
+document.getElementById("amount").value=t.amount;
+document.getElementById("note").value=t.note;
+editingIndex=i;
+}
+
+function deleteTransaction(i){
+if(confirm("Supprimer cette transaction ?")){
+data.splice(i,1);
+localStorage.setItem("budgetWidget",JSON.stringify(data));
+display();
+}
 }
 
 display();
