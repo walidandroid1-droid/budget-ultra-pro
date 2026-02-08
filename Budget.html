@@ -430,9 +430,10 @@
         }
 
         .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
+            opacity: 0.5 !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+            filter: grayscale(100%);
         }
 
         .btn-save {
@@ -443,6 +444,15 @@
             border-radius: 30px;
             margin-top: 20px;
             width: 100%;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-save:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
         }
 
         .btn-secondary {
@@ -651,16 +661,29 @@
             border-radius: 10px;
             text-align: center;
             font-weight: bold;
+            transition: all 0.3s ease;
         }
 
         .total-check.ok {
             background: #d1fae5;
             color: var(--success);
+            border: 2px solid var(--success);
         }
 
         .total-check.error {
             background: #fee2e2;
             color: var(--danger);
+            border: 2px solid var(--danger);
+        }
+
+        .debug-info {
+            background: #f3f4f6;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 0.85em;
+            color: #666;
         }
 
         @keyframes fadeInDown {
@@ -708,28 +731,28 @@
                 <div class="input-group">
                     <label>💵 Revenu Principal</label>
                     <div class="currency">
-                        <input type="number" id="revenu" value="2671" placeholder="0">
+                        <input type="number" id="revenu" value="2671" placeholder="0" step="0.01">
                     </div>
                 </div>
                 
                 <div class="input-group">
                     <label>💳 Crédit à Rembourser</label>
                     <div class="currency">
-                        <input type="number" id="credit" value="700" placeholder="0">
+                        <input type="number" id="credit" value="700" placeholder="0" step="0.01">
                     </div>
                 </div>
 
                 <div class="input-group">
                     <label>🏠 Grand Achats (Équipement/Maison)</label>
                     <div class="currency">
-                        <input type="number" id="grandAchats" value="0" placeholder="0">
+                        <input type="number" id="grandAchats" value="0" placeholder="0" step="0.01">
                     </div>
                 </div>
                 
                 <div class="input-group">
                     <label>🏦 Épargne Disponible (Avant)</label>
                     <div class="currency">
-                        <input type="number" id="epargneAvant" value="750" placeholder="0">
+                        <input type="number" id="epargneAvant" value="750" placeholder="0" step="0.01">
                     </div>
                 </div>
                 
@@ -776,13 +799,12 @@
         <div class="card hidden" id="envelopesConfigCard">
             <div class="card-title">
                 <span>📊</span> Répartition Hebdomadaire
-                <span style="font-size: 0.7em; color: #666; margin-left: auto;">Total: 180 د.ت fixes répartis</span>
             </div>
             
             <div style="background: #e0f2fe; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                <strong>🎯 Budget hebdo total:</strong> <span id="budgetHebdoDisplay">0</span> د.ت
+                <strong>🎯 Budget hebdo total à répartir:</strong> <span id="budgetHebdoDisplay">0</span> د.ت
                 <br>
-                <small>Répartissez les 180 د._t de courses sur vos enveloppes + autres besoins</small>
+                <small>Ajustez les montants ci-dessous pour atteindre exactement ce budget</small>
             </div>
 
             <div class="envelopes-config" id="envelopesConfigList">
@@ -815,7 +837,7 @@
                     </div>
                     <div class="input-group">
                         <label>Montant Hebdo (د.ت)</label>
-                        <input type="number" id="newEnvAmount" placeholder="0">
+                        <input type="number" id="newEnvAmount" placeholder="0" step="0.01">
                     </div>
                 </div>
                 <button class="btn-secondary" onclick="addEnvelope()" style="width: 100%; margin-top: 15px;">
@@ -826,9 +848,10 @@
             <div class="total-check" id="totalCheck">
                 Total configuré: <span id="totalConfigured">0</span> / <span id="totalTarget">0</span> د.ت
                 <div id="totalMessage" style="margin-top: 5px; font-size: 0.9em;"></div>
+                <div class="debug-info" id="debugInfo" style="display: none;"></div>
             </div>
 
-            <button class="btn btn-save" onclick="startBudget()" id="btnStart">
+            <button class="btn btn-save" onclick="startBudget()" id="btnStart" disabled>
                 🚀 Démarrer le Suivi
             </button>
         </div>
@@ -914,7 +937,7 @@
             budgetHebdoTotal: 0
         };
 
-        // Enveloppes par défaut (modifiables)
+        // Enveloppes par défaut
         let envelopesTemplate = [
             { id: 'courses', name: 'Courses Général', icon: '🛒', color: '#4CAF50', amount: 60 },
             { id: 'nourriture', name: 'Nourriture', icon: '🍽️', color: '#E91E63', amount: 60 },
@@ -963,14 +986,18 @@
 
             // Calcul: Revenu - Crédit - Grand Achats + Épargne dispo - Épargne objectif
             const resteGlobal = config.revenu - config.credit - config.grandAchats + config.epargneAvant - config.epargneObjectif;
-            document.getElementById('resteGlobal').textContent = resteGlobal.toFixed(0) + ' د.ت';
+            document.getElementById('resteGlobal').textContent = resteGlobal.toFixed(2) + ' د.ت';
 
             config.budgetHebdoTotal = resteGlobal / config.nbSemaines;
-            document.getElementById('budgetHebdo').textContent = config.budgetHebdoTotal.toFixed(0) + ' د.ت';
-            document.getElementById('budgetHebdoDisplay').textContent = config.budgetHebdoTotal.toFixed(0);
+            document.getElementById('budgetHebdo').textContent = config.budgetHebdoTotal.toFixed(2) + ' د.ت';
+            document.getElementById('budgetHebdoDisplay').textContent = config.budgetHebdoTotal.toFixed(2);
 
-            renderEnvelopesConfig();
-            checkTotal();
+            // Si on est sur la page de config des enveloppes, mettre à jour
+            if (!document.getElementById('envelopesConfigCard').classList.contains('hidden')) {
+                renderEnvelopesConfig();
+                checkTotal();
+            }
+
             saveData();
         }
 
@@ -1002,12 +1029,14 @@
                 div.innerHTML = `
                     <div class="envelope-config-info">
                         <h4><span>${env.icon}</span> ${env.name}</h4>
-                        <small style="color: #666;">Hebdo: <span id="display-${env.id}">${env.amount}</span> د.ت</small>
+                        <small style="color: #666;">Hebdo: <span id="display-${env.id}">${parseFloat(env.amount).toFixed(2)}</span> د.ت</small>
                     </div>
                     <div class="envelope-config-inputs">
                         <input type="number" 
-                               value="${env.amount}" 
+                               id="input-${env.id}"
+                               value="${parseFloat(env.amount).toFixed(2)}" 
                                min="0" 
+                               step="0.01"
                                onchange="updateEnvelopeAmount('${env.id}', this.value)"
                                title="Montant hebdomadaire">
                         <button class="btn-icon delete" onclick="deleteEnvelope('${env.id}')" title="Supprimer">🗑️</button>
@@ -1021,7 +1050,13 @@
             const env = envelopesTemplate.find(e => e.id === id);
             if (env) {
                 env.amount = parseFloat(value) || 0;
-                document.getElementById(`display-${id}`).textContent = env.amount;
+                
+                // Mettre à jour l'affichage
+                const displayEl = document.getElementById(`display-${id}`);
+                if (displayEl) {
+                    displayEl.textContent = env.amount.toFixed(2);
+                }
+                
                 checkTotal();
                 saveData();
             }
@@ -1066,37 +1101,52 @@
         }
 
         function checkTotal() {
-            const total = envelopesTemplate.reduce((sum, e) => sum + e.amount, 0);
+            const total = envelopesTemplate.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
             const target = config.budgetHebdoTotal;
+            const difference = total - target;
             
-            document.getElementById('totalConfigured').textContent = total.toFixed(0);
-            document.getElementById('totalTarget').textContent = target.toFixed(0);
+            document.getElementById('totalConfigured').textContent = total.toFixed(2);
+            document.getElementById('totalTarget').textContent = target.toFixed(2);
+
+            // Debug info
+            const debugEl = document.getElementById('debugInfo');
+            debugEl.style.display = 'block';
+            debugEl.textContent = `Différence: ${difference.toFixed(4)} | Total arrondi: ${Math.round(total * 100) / 100} | Cible arrondie: ${Math.round(target * 100) / 100}`;
 
             const checkDiv = document.getElementById('totalCheck');
             const message = document.getElementById('totalMessage');
             const btn = document.getElementById('btnStart');
 
-            if (Math.abs(total - target) < 0.01) {
+            // Tolérance de 0.01 pour les erreurs de virgule flottante
+            const isEqual = Math.abs(difference) < 0.01;
+
+            if (isEqual) {
                 checkDiv.className = 'total-check ok';
                 message.textContent = '✅ Parfait ! Le budget est équilibré.';
+                message.style.color = 'var(--success)';
                 btn.disabled = false;
-                btn.style.opacity = '1';
+                console.log('Bouton activé - Total:', total, 'Cible:', target, 'Diff:', difference);
             } else if (total < target) {
                 checkDiv.className = 'total-check error';
-                message.textContent = `⚠️ Il reste ${(target - total).toFixed(0)} د.ت à répartir`;
+                message.textContent = `⚠️ Il reste ${(target - total).toFixed(2)} د.ت à répartir`;
+                message.style.color = 'var(--danger)';
                 btn.disabled = true;
-                btn.style.opacity = '0.5';
+                console.log('Bouton désactivé (manque) - Total:', total, 'Cible:', target);
             } else {
                 checkDiv.className = 'total-check error';
-                message.textContent = `⚠️ Dépassement de ${(total - target).toFixed(0)} د._t ! Réduisez des montants.`;
+                message.textContent = `⚠️ Dépassement de ${(total - target).toFixed(2)} د.ت ! Réduisez des montants.`;
+                message.style.color = 'var(--danger)';
                 btn.disabled = true;
-                btn.style.opacity = '0.5';
+                console.log('Bouton désactivé (trop) - Total:', total, 'Cible:', target);
             }
         }
 
         function goToEnvelopesConfig() {
             document.getElementById('configCard').classList.add('hidden');
             document.getElementById('envelopesConfigCard').classList.remove('hidden');
+            
+            // Recalculer et afficher
+            calculateBudget();
             renderEnvelopesConfig();
             checkTotal();
         }
@@ -1120,8 +1170,8 @@
                 const weekEnvelopes = {};
                 envelopesTemplate.forEach(env => {
                     weekEnvelopes[env.id] = {
-                        budget: env.amount,
-                        current: env.amount,
+                        budget: parseFloat(env.amount) || 0,
+                        current: parseFloat(env.amount) || 0,
                         history: []
                     };
                 });
@@ -1168,7 +1218,7 @@
             
             envelopesTemplate.forEach(template => {
                 const env = weekData.envelopes[template.id];
-                const percentage = (env.current / env.budget) * 100;
+                const percentage = env.budget > 0 ? (env.current / env.budget) * 100 : 0;
                 
                 const card = document.createElement('div');
                 card.className = 'envelope-card';
@@ -1192,7 +1242,7 @@
                             ${template.name}
                         </div>
                         <div class="budget-info">
-                            <div>Budget: ${env.budget.toFixed(0)} د.ت</div>
+                            <div>Budget: ${env.budget.toFixed(2)} د.ت</div>
                             <div class="weekly">Reste: ${env.current.toFixed(2)} د.ت</div>
                         </div>
                     </div>
@@ -1299,7 +1349,7 @@
                                 date: new Date().toLocaleDateString('fr-FR')
                             });
                             
-                            showNotification(`⚠️ Emprunt de ${availableInNext.toFixed(2)} د._t à S${currentWeek + 1}`, 'warning');
+                            showNotification(`⚠️ Emprunt de ${availableInNext.toFixed(2)} د.ت à S${currentWeek + 1}`, 'warning');
                         } else {
                             showNotification('Fonds insuffisants dans les semaines suivantes', 'error');
                             return;
