@@ -1,0 +1,1887 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💰 Budget Familial Pro - Achats Mensuels + Suivi Hebdo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f3f4f6;
+            --man: #3b82f6;
+            --woman: #ec4899;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .card-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .input-group input, .input-group select, .input-group textarea {
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            transform: scale(1.02);
+        }
+
+        .currency {
+            position: relative;
+        }
+
+        .currency::after {
+            content: 'د.ت';
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            font-weight: bold;
+        }
+
+        .slider-container {
+            margin: 20px 0;
+            padding: 20px;
+            background: var(--light);
+            border-radius: 15px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.5);
+        }
+
+        .summary-box {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .summary-amount {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .weeks-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-item .value {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .info-item .label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        /* ACHATS MENSUELS */
+        .monthly-purchases {
+            background: #fef3c7;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .purchase-item {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .purchase-info h4 {
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .purchase-amount {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--danger);
+        }
+
+        .purchase-meta {
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .add-purchase-form {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            border: 2px dashed var(--warning);
+        }
+
+        .person-selector {
+            display: flex;
+            gap: 15px;
+            margin: 10px 0;
+        }
+
+        .person-option {
+            flex: 1;
+            padding: 15px;
+            border: 3px solid #e5e7eb;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 2em;
+        }
+
+        .person-option:hover {
+            transform: scale(1.05);
+        }
+
+        .person-option.selected {
+            border-color: var(--primary);
+            background: #eef2ff;
+        }
+
+        .person-option.man.selected {
+            border-color: var(--man);
+            background: #dbeafe;
+        }
+
+        .person-option.woman.selected {
+            border-color: var(--woman);
+            background: #fce7f3;
+        }
+
+        .person-label {
+            font-size: 0.9rem;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        /* ENVELOPPES */
+        .envelopes-config {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .envelope-config {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 15px;
+            border-left: 5px solid var(--color, var(--primary));
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .envelope-config-info h4 {
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .envelope-config-inputs {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .envelope-config input[type="number"] {
+            width: 80px;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
+            padding: 5px;
+            opacity: 0.6;
+            transition: all 0.3s;
+        }
+
+        .btn-icon:hover {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        .btn-icon.delete:hover {
+            color: var(--danger);
+        }
+
+        .add-envelope-form {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            border: 2px dashed var(--primary);
+        }
+
+        .weeks-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .week-tab {
+            padding: 15px 25px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .week-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .week-tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .week-tab.borrowing::after {
+            content: '↔';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--warning);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .envelope-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border-left: 5px solid var(--color);
+            transition: all 0.3s ease;
+        }
+
+        .envelope-card:hover {
+            transform: translateX(5px);
+        }
+
+        .envelope-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .envelope-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .budget-info {
+            text-align: right;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .budget-info .weekly {
+            font-weight: bold;
+            color: var(--dark);
+            font-size: 1.2em;
+        }
+
+        .progress-container {
+            margin: 15px 0;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 25px;
+            background: #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--color);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .progress-bar-fill.warning {
+            background: var(--warning);
+        }
+
+        .progress-bar-fill.danger {
+            background: var(--danger);
+        }
+
+        .envelope-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .status-text {
+            font-weight: bold;
+        }
+
+        .status-text.good { color: var(--success); }
+        .status-text.warning { color: var(--warning); }
+        .status-text.danger { color: var(--danger); }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+        }
+
+        .btn-add {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-remove {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-history {
+            background: var(--primary);
+            color: white;
+            flex: 0.5;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+
+        .btn:disabled {
+            opacity: 0.5 !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+            filter: grayscale(100%);
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 30px;
+            margin-top: 20px;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-save:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 12px 30px;
+            font-size: 1em;
+            border-radius: 30px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .borrowing-alert {
+            background: #fef3c7;
+            border: 2px solid var(--warning);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            display: none;
+        }
+
+        .borrowing-alert.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        .monthly-recap {
+            background: var(--light);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .recap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .recap-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .recap-item .label {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .recap-item .value {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: modalPop 0.3s ease;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .modal-content input, .modal-content textarea, .modal-content select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1em;
+        }
+
+        .modal-content textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+        }
+
+        .modal-confirm {
+            background: var(--primary);
+            color: white;
+        }
+
+        .modal-cancel {
+            background: #e5e7eb;
+            color: var(--dark);
+        }
+
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+
+        .history-item {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--color, var(--primary));
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .history-item-amount {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .history-item-amount.add {
+            color: var(--success);
+        }
+
+        .history-item-amount.remove {
+            color: var(--danger);
+        }
+
+        .history-item-date {
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .history-item-desc {
+            font-size: 0.9em;
+            color: #444;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .history-item-person {
+            font-size: 1.2em;
+            margin-left: 5px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: none;
+            animation: slideIn 0.5s ease;
+            z-index: 2000;
+            max-width: 300px;
+        }
+
+        .notification.success { border-left: 5px solid var(--success); }
+        .notification.warning { border-left: 5px solid var(--warning); }
+        .notification.error { border-left: 5px solid var(--danger); }
+
+        .hidden { display: none !important; }
+
+        .total-check {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fef3c7;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .total-check.ok {
+            background: #d1fae5;
+            color: var(--success);
+            border: 2px solid var(--success);
+        }
+
+        .total-check.error {
+            background: #fee2e2;
+            color: var(--danger);
+            border: 2px solid var(--danger);
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .step {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            color: white;
+            font-size: 0.9em;
+            opacity: 0.6;
+        }
+
+        .step.active {
+            opacity: 1;
+            background: rgba(255,255,255,0.9);
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.6em; }
+            .form-grid { grid-template-columns: 1fr; }
+            .envelopes-config { grid-template-columns: 1fr; }
+            .weeks-tabs { justify-content: flex-start; }
+            .purchase-item { flex-direction: column; align-items: flex-start; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💰 Budget Familial Pro</h1>
+            <p class="subtitle">Achats Mensuels + Suivi Hebdomadaire</p>
+            
+            <div class="step-indicator" id="stepIndicator">
+                <div class="step active" id="step1">1. Config</div>
+                <div class="step" id="step2">2. Achats Mensuels</div>
+                <div class="step" id="step3">3. Enveloppes</div>
+                <div class="step" id="step4">4. Suivi</div>
+            </div>
+        </header>
+
+        <!-- ÉTAPE 1: Configuration Mensuelle -->
+        <div class="card" id="configCard">
+            <div class="card-title">
+                <span>📅</span> Configuration du Mois
+            </div>
+            
+            <div class="form-grid">
+                <div class="input-group">
+                    <label>💵 Revenu Principal</label>
+                    <div class="currency">
+                        <input type="number" id="revenu" value="2671" placeholder="0" step="0.01">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label>💳 Crédit à Rembourser</label>
+                    <div class="currency">
+                        <input type="number" id="credit" value="700" placeholder="0" step="0.01">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label>🏦 Épargne Disponible (Avant)</label>
+                    <div class="currency">
+                        <input type="number" id="epargneAvant" value="750" placeholder="0" step="0.01">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label>📆 Mois</label>
+                    <input type="month" id="monthYear" value="2025-02">
+                </div>
+            </div>
+
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span>🏦 Épargne Objectif Ce Mois</span>
+                    <span id="epargneValeur">500 د.ت</span>
+                </div>
+                <input type="range" id="epargneObjectif" min="0" max="2000" value="500" step="50">
+                <div style="display: flex; justify-content: space-between; font-size: 0.85em; color: #666; margin-top: 5px;">
+                    <span>0</span>
+                    <span>1000</span>
+                    <span>2000</span>
+                </div>
+            </div>
+
+            <div class="summary-box">
+                <div>Budget Disponible (avant achats)</div>
+                <div class="summary-amount" id="budgetDisponible">0 د.ت</div>
+                <div style="font-size: 0.9em; opacity: 0.9; margin-top: 10px;">
+                    Revenu - Crédit + Épargne dispo - Épargne objectif
+                </div>
+            </div>
+
+            <button class="btn btn-save" onclick="goToMonthlyPurchases()">
+                Continuer → Achats Mensuels
+            </button>
+        </div>
+
+        <!-- ÉTAPE 2: Achats Mensuels -->
+        <div class="card hidden" id="monthlyPurchasesCard">
+            <div class="card-title">
+                <span>🛒</span> Achats Mensuels (Avant répartition)
+                <span style="margin-left: auto; font-size: 0.8em; color: #666;">Budget restant: <span id="budgetRestantMensuel">0</span> د.ت</span>
+            </div>
+            
+            <div class="monthly-purchases">
+                <p style="margin-bottom: 15px; color: #666;">
+                    💡 <strong>Astuce :</strong> Ici, saisissez les grosses dépenses du mois 
+                    (grandes courses, équipement, factures exceptionnelles...). 
+                    Le reste sera réparti sur les semaines.
+                </p>
+                
+                <div id="purchasesList">
+                    <!-- Liste des achats -->
+                </div>
+            </div>
+
+            <div class="add-purchase-form">
+                <h4 style="margin-bottom: 15px;">➕ Ajouter un Achat Mensuel</h4>
+                
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>Description</label>
+                        <input type="text" id="purchaseDesc" placeholder="Ex: Grande course Carrefour">
+                    </div>
+                    <div class="input-group">
+                        <label>Montant (د.ت)</label>
+                        <input type="number" id="purchaseAmount" placeholder="0" step="0.01">
+                    </div>
+                </div>
+                
+                <div style="margin: 15px 0;">
+                    <label style="font-weight: 600; color: #666; font-size: 0.9em; display: block; margin-bottom: 8px;">
+                        Qui fait cette dépense ?
+                    </label>
+                    <div class="person-selector">
+                        <div class="person-option man" onclick="selectPerson('man')">
+                            👨
+                            <div class="person-label">Homme</div>
+                        </div>
+                        <div class="person-option woman" onclick="selectPerson('woman')">
+                            👩
+                            <div class="person-label">Femme</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn-secondary" onclick="addMonthlyPurchase()" style="width: 100%;">
+                    Ajouter cet Achat
+                </button>
+            </div>
+
+            <div class="summary-box" style="margin-top: 20px;">
+                <div>Reste à répartir en hebdomadaire</div>
+                <div class="summary-amount" id="resteHebdo">0 د.ت</div>
+                <div class="weeks-info">
+                    <div class="info-item">
+                        <div class="value" id="nbSemainesMensuel">4</div>
+                        <div class="label">Semaines</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="value" id="budgetHebdoMensuel">0 د.ت</div>
+                        <div class="label">/semaine</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-save" onclick="goToEnvelopesConfig()" id="btnContinuerEnvelopes" disabled>
+                Continuer → Répartition Hebdo
+            </button>
+        </div>
+
+        <!-- ÉTAPE 3: Configuration des Enveloppes -->
+        <div class="card hidden" id="envelopesConfigCard">
+            <div class="card-title">
+                <span>📊</span> Répartition Hebdomadaire
+            </div>
+            
+            <div style="background: #e0f2fe; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                <strong>🎯 Budget hebdo à répartir:</strong> <span id="budgetHebdoDisplay">0</span> د.ت
+            </div>
+
+            <div class="envelopes-config" id="envelopesConfigList">
+                <!-- Généré par JS -->
+            </div>
+
+            <div class="add-envelope-form">
+                <h4 style="margin-bottom: 15px;">➕ Ajouter une Enveloppe</h4>
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>Nom</label>
+                        <input type="text" id="newEnvName" placeholder="Ex: Sport">
+                    </div>
+                    <div class="input-group">
+                        <label>Icône (emoji)</label>
+                        <input type="text" id="newEnvIcon" placeholder="🏃" maxlength="2">
+                    </div>
+                    <div class="input-group">
+                        <label>Couleur</label>
+                        <select id="newEnvColor">
+                            <option value="#4CAF50">Vert</option>
+                            <option value="#2196F3">Bleu</option>
+                            <option value="#9C27B0">Violet</option>
+                            <option value="#FF9800">Orange</option>
+                            <option value="#E91E63">Rose</option>
+                            <option value="#00BCD4">Cyan</option>
+                            <option value="#795548">Marron</option>
+                            <option value="#607D8B">Gris</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Montant Hebdo (د.ت)</label>
+                        <input type="number" id="newEnvAmount" placeholder="0" step="0.01">
+                    </div>
+                </div>
+                <button class="btn-secondary" onclick="addEnvelope()" style="width: 100%; margin-top: 15px;">
+                    Ajouter cette Enveloppe
+                </button>
+            </div>
+
+            <div class="total-check" id="totalCheck">
+                Total configuré: <span id="totalConfigured">0</span> / <span id="totalTarget">0</span> د.ت
+                <div id="totalMessage" style="margin-top: 5px; font-size: 0.9em;"></div>
+            </div>
+
+            <button class="btn btn-save" onclick="startBudget()" id="btnStart" disabled>
+                🚀 Démarrer le Suivi
+            </button>
+        </div>
+
+        <!-- ÉTAPE 4: Suivi Hebdomadaire -->
+        <div class="card hidden" id="trackingCard">
+            <div class="card-title">
+                <span>📆</span> Suivi par Semaine
+            </div>
+
+            <div class="weeks-tabs" id="weeksTabs">
+                <!-- Généré par JS -->
+            </div>
+
+            <div class="borrowing-alert" id="borrowingAlert">
+                ⚠️ <strong>Emprunt activé</strong>: Cette semaine utilise des fonds d'autres semaines.
+                <div id="borrowingDetails" style="margin-top: 5px; font-size: 0.9em;"></div>
+            </div>
+
+            <div id="envelopesContainer">
+                <!-- Généré par JS -->
+            </div>
+
+            <div class="monthly-recap">
+                <h3 style="margin-bottom: 15px;">📊 Récapitulatif Mensuel</h3>
+                <div class="recap-grid" id="monthlyRecap">
+                    <!-- Généré par JS -->
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-save" onclick="resetMonth()" style="flex: 1; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                    🔄 Nouveau Mois
+                </button>
+                <button class="btn btn-save" onclick="exportData()" style="flex: 1; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                    📥 Exporter
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Transaction avec Description et Personne -->
+    <div class="modal" id="transactionModal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Transaction</h2>
+            <input type="number" id="transactionAmount" placeholder="Montant (د.ت)" step="0.01">
+            <textarea id="transactionDesc" placeholder="Description (obligatoire)"></textarea>
+            
+            <div style="margin: 15px 0;">
+                <label style="font-weight: 600; color: #666; font-size: 0.9em; display: block; margin-bottom: 8px;">
+                    Qui fait cette dépense ?
+                </label>
+                <div class="person-selector">
+                    <div class="person-option man" id="modalMan" onclick="selectModalPerson('man')">
+                        👨
+                        <div class="person-label">Homme</div>
+                    </div>
+                    <div class="person-option woman" id="modalWoman" onclick="selectModalPerson('woman')">
+                        👩
+                        <div class="person-label">Femme</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="modal-btn modal-confirm" onclick="confirmTransaction()">Confirmer</button>
+                <button class="modal-btn modal-cancel" onclick="closeModal()">Annuler</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Historique -->
+    <div class="modal" id="historyModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <h2 id="historyTitle">Historique</h2>
+            <div class="history-list" id="historyList">
+                <!-- Généré par JS -->
+            </div>
+            <div class="modal-buttons" style="margin-top: 20px;">
+                <button class="modal-btn modal-cancel" onclick="closeHistoryModal()" style="flex: 1;">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <span id="notificationText"></span>
+    </div>
+
+    <script>
+        // Données globales
+        let config = {
+            revenu: 2671,
+            credit: 700,
+            epargneAvant: 750,
+            epargneObjectif: 500,
+            monthYear: '2025-02',
+            nbSemaines: 4,
+            budgetHebdoTotal: 0
+        };
+
+        let monthlyPurchases = [];
+        let selectedPerson = null;
+        let selectedModalPerson = null;
+
+        // Enveloppes par défaut
+        let envelopesTemplate = [
+            { id: 'courses', name: 'Courses Hebdo', icon: '🛒', color: '#4CAF50', amount: 50 },
+            { id: 'nourriture', name: 'Nourriture', icon: '🍽️', color: '#E91E63', amount: 40 },
+            { id: 'enfants', name: 'Enfants', icon: '👶', color: '#9C27B0', amount: 30 },
+            { id: 'transport', name: 'Transport', icon: '⛽', color: '#2196F3', amount: 25 },
+            { id: 'habits', name: 'Habits/Maison', icon: '👕', color: '#FF9800', amount: 20 },
+            { id: 'personnel', name: 'Dépenses Personnelles', icon: '💅', color: '#00BCD4', amount: 15 }
+        ];
+
+        let weeksData = [];
+        let currentWeek = 1;
+        let currentEnvelope = null;
+        let currentAction = null;
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            setupEventListeners();
+            calculateInitialBudget();
+        });
+
+        function setupEventListeners() {
+            ['revenu', 'credit', 'epargneAvant'].forEach(id => {
+                document.getElementById(id).addEventListener('input', calculateInitialBudget);
+            });
+
+            const slider = document.getElementById('epargneObjectif');
+            slider.addEventListener('input', (e) => {
+                document.getElementById('epargneValeur').textContent = e.target.value + ' د.ت';
+                calculateInitialBudget();
+            });
+
+            document.getElementById('monthYear').addEventListener('change', calculateInitialBudget);
+        }
+
+        function calculateInitialBudget() {
+            config.revenu = parseFloat(document.getElementById('revenu').value) || 0;
+            config.credit = parseFloat(document.getElementById('credit').value) || 0;
+            config.epargneAvant = parseFloat(document.getElementById('epargneAvant').value) || 0;
+            config.epargneObjectif = parseFloat(document.getElementById('epargneObjectif').value) || 0;
+            config.monthYear = document.getElementById('monthYear').value;
+
+            config.nbSemaines = getWeeksInMonth(config.monthYear);
+
+            // Budget disponible avant achats mensuels
+            const budgetDisponible = config.revenu - config.credit + config.epargneAvant - config.epargneObjectif;
+            document.getElementById('budgetDisponible').textContent = budgetDisponible.toFixed(2) + ' د.ت';
+
+            // Calculer le reste après achats mensuels
+            calculateRemainingAfterPurchases();
+            
+            saveData();
+        }
+
+        function calculateRemainingAfterPurchases() {
+            const totalPurchases = monthlyPurchases.reduce((sum, p) => sum + p.amount, 0);
+            const budgetInitial = config.revenu - config.credit + config.epargneAvant - config.epargneObjectif;
+            const reste = budgetInitial - totalPurchases;
+
+            document.getElementById('budgetRestantMensuel').textContent = reste.toFixed(2);
+            document.getElementById('resteHebdo').textContent = reste.toFixed(2) + ' د.ت';
+            
+            config.budgetHebdoTotal = reste / config.nbSemaines;
+            document.getElementById('nbSemainesMensuel').textContent = config.nbSemaines;
+            document.getElementById('budgetHebdoMensuel').textContent = config.budgetHebdoTotal.toFixed(2) + ' د.ت';
+            document.getElementById('budgetHebdoDisplay').textContent = config.budgetHebdoTotal.toFixed(2);
+
+            // Activer le bouton si reste positif
+            document.getElementById('btnContinuerEnvelopes').disabled = reste <= 0;
+        }
+
+        function getWeeksInMonth(monthYear) {
+            const [year, month] = monthYear.split('-').map(Number);
+            const firstDay = new Date(year, month - 1, 1);
+            const lastDay = new Date(year, month, 0);
+            const daysInMonth = lastDay.getDate();
+            
+            let weeks = 0;
+            let currentDay = 1;
+            
+            while (currentDay <= daysInMonth) {
+                weeks++;
+                currentDay += 7;
+            }
+            
+            return Math.min(weeks, 5);
+        }
+
+        function selectPerson(person) {
+            selectedPerson = person;
+            document.querySelectorAll('.person-option').forEach(el => el.classList.remove('selected'));
+            document.querySelector(`.person-option.${person}`).classList.add('selected');
+        }
+
+        function selectModalPerson(person) {
+            selectedModalPerson = person;
+            document.getElementById('modalMan').classList.toggle('selected', person === 'man');
+            document.getElementById('modalWoman').classList.toggle('selected', person === 'woman');
+        }
+
+        function addMonthlyPurchase() {
+            const desc = document.getElementById('purchaseDesc').value.trim();
+            const amount = parseFloat(document.getElementById('purchaseAmount').value);
+
+            if (!desc || isNaN(amount) || amount <= 0) {
+                showNotification('Veuillez remplir tous les champs', 'error');
+                return;
+            }
+
+            if (!selectedPerson) {
+                showNotification('Veuillez sélectionner qui fait cette dépense (👨 ou 👩)', 'error');
+                return;
+            }
+
+            const budgetInitial = config.revenu - config.credit + config.epargneAvant - config.epargneObjectif;
+            const totalActuel = monthlyPurchases.reduce((sum, p) => sum + p.amount, 0);
+            
+            if (totalActuel + amount > budgetInitial) {
+                showNotification('Cet achat dépasse le budget disponible !', 'error');
+                return;
+            }
+
+            monthlyPurchases.push({
+                id: Date.now(),
+                desc,
+                amount,
+                person: selectedPerson,
+                date: new Date().toLocaleDateString('fr-FR')
+            });
+
+            // Reset form
+            document.getElementById('purchaseDesc').value = '';
+            document.getElementById('purchaseAmount').value = '';
+            selectedPerson = null;
+            document.querySelectorAll('.person-option').forEach(el => el.classList.remove('selected'));
+
+            renderPurchasesList();
+            calculateRemainingAfterPurchases();
+            saveData();
+            showNotification('Achat mensuel ajouté !', 'success');
+        }
+
+        function deletePurchase(id) {
+            monthlyPurchases = monthlyPurchases.filter(p => p.id !== id);
+            renderPurchasesList();
+            calculateRemainingAfterPurchases();
+            saveData();
+        }
+
+        function renderPurchasesList() {
+            const container = document.getElementById('purchasesList');
+            container.innerHTML = '';
+
+            if (monthlyPurchases.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Aucun achat mensuel enregistré</p>';
+                return;
+            }
+
+            monthlyPurchases.forEach(purchase => {
+                const item = document.createElement('div');
+                item.className = 'purchase-item';
+                item.innerHTML = `
+                    <div class="purchase-info">
+                        <h4>
+                            <span style="font-size: 1.5em;">${purchase.person === 'man' ? '👨' : '👩'}</span>
+                            ${purchase.desc}
+                        </h4>
+                        <div class="purchase-meta">${purchase.date}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="purchase-amount">-${purchase.amount.toFixed(2)} د.ت</div>
+                        <button class="btn-icon delete" onclick="deletePurchase(${purchase.id})" style="margin-top: 5px;">🗑️</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+
+            // Total
+            const total = monthlyPurchases.reduce((sum, p) => sum + p.amount, 0);
+            const totalDiv = document.createElement('div');
+            totalDiv.style.cssText = 'margin-top: 15px; padding-top: 15px; border-top: 2px solid #f59e0b; text-align: right; font-weight: bold; font-size: 1.2em;';
+            totalDiv.innerHTML = `Total achats mensuels: ${total.toFixed(2)} د.ت`;
+            container.appendChild(totalDiv);
+        }
+
+        function goToMonthlyPurchases() {
+            updateStepIndicator(2);
+            document.getElementById('configCard').classList.add('hidden');
+            document.getElementById('monthlyPurchasesCard').classList.remove('hidden');
+            renderPurchasesList();
+            calculateRemainingAfterPurchases();
+        }
+
+        function goToEnvelopesConfig() {
+            updateStepIndicator(3);
+            document.getElementById('monthlyPurchasesCard').classList.add('hidden');
+            document.getElementById('envelopesConfigCard').classList.remove('hidden');
+            renderEnvelopesConfig();
+            checkTotal();
+        }
+
+        function updateStepIndicator(step) {
+            document.querySelectorAll('.step').forEach((el, index) => {
+                el.classList.toggle('active', index + 1 === step);
+            });
+        }
+
+        function renderEnvelopesConfig() {
+            const container = document.getElementById('envelopesConfigList');
+            container.innerHTML = '';
+
+            envelopesTemplate.forEach((env) => {
+                const div = document.createElement('div');
+                div.className = 'envelope-config';
+                div.style.setProperty('--color', env.color);
+                div.innerHTML = `
+                    <div class="envelope-config-info">
+                        <h4><span>${env.icon}</span> ${env.name}</h4>
+                        <small style="color: #666;">Hebdo: <span id="display-${env.id}">${parseFloat(env.amount).toFixed(2)}</span> د.ت</small>
+                    </div>
+                    <div class="envelope-config-inputs">
+                        <input type="number" 
+                               id="input-${env.id}"
+                               value="${parseFloat(env.amount).toFixed(2)}" 
+                               min="0" 
+                               step="0.01"
+                               onchange="updateEnvelopeAmount('${env.id}', this.value)">
+                        <button class="btn-icon delete" onclick="deleteEnvelope('${env.id}')">🗑️</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function updateEnvelopeAmount(id, value) {
+            const env = envelopesTemplate.find(e => e.id === id);
+            if (env) {
+                env.amount = parseFloat(value) || 0;
+                const displayEl = document.getElementById(`display-${id}`);
+                if (displayEl) displayEl.textContent = env.amount.toFixed(2);
+                checkTotal();
+                saveData();
+            }
+        }
+
+        function deleteEnvelope(id) {
+            if (envelopesTemplate.length <= 1) {
+                showNotification('Il doit rester au moins une enveloppe !', 'error');
+                return;
+            }
+            if (confirm('Supprimer cette enveloppe ?')) {
+                envelopesTemplate = envelopesTemplate.filter(e => e.id !== id);
+                renderEnvelopesConfig();
+                checkTotal();
+                saveData();
+            }
+        }
+
+        function addEnvelope() {
+            const name = document.getElementById('newEnvName').value.trim();
+            const icon = document.getElementById('newEnvIcon').value.trim() || '📦';
+            const color = document.getElementById('newEnvColor').value;
+            const amount = parseFloat(document.getElementById('newEnvAmount').value) || 0;
+
+            if (!name) {
+                showNotification('Veuillez donner un nom à l\'enveloppe', 'error');
+                return;
+            }
+
+            const id = 'env_' + Date.now();
+            envelopesTemplate.push({ id, name, icon, color, amount });
+
+            document.getElementById('newEnvName').value = '';
+            document.getElementById('newEnvIcon').value = '';
+            document.getElementById('newEnvAmount').value = '';
+
+            renderEnvelopesConfig();
+            checkTotal();
+            saveData();
+            showNotification('Enveloppe ajoutée !', 'success');
+        }
+
+        function checkTotal() {
+            const total = envelopesTemplate.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+            const target = config.budgetHebdoTotal;
+            const difference = total - target;
+            
+            document.getElementById('totalConfigured').textContent = total.toFixed(2);
+            document.getElementById('totalTarget').textContent = target.toFixed(2);
+
+            const checkDiv = document.getElementById('totalCheck');
+            const message = document.getElementById('totalMessage');
+            const btn = document.getElementById('btnStart');
+
+            const isEqual = Math.abs(difference) < 0.01;
+
+            if (isEqual) {
+                checkDiv.className = 'total-check ok';
+                message.textContent = '✅ Parfait ! Le budget est équilibré.';
+                btn.disabled = false;
+            } else if (total < target) {
+                checkDiv.className = 'total-check error';
+                message.textContent = `⚠️ Il reste ${(target - total).toFixed(2)} د.ت à répartir`;
+                btn.disabled = true;
+            } else {
+                checkDiv.className = 'total-check error';
+                message.textContent = `⚠️ Dépassement de ${(total - target).toFixed(2)} د.ت !`;
+                btn.disabled = true;
+            }
+        }
+
+        function startBudget() {
+            updateStepIndicator(4);
+            initializeWeeks();
+            
+            document.getElementById('envelopesConfigCard').classList.add('hidden');
+            document.getElementById('trackingCard').classList.remove('hidden');
+            
+            renderWeeksTabs();
+            renderEnvelopes();
+            updateMonthlyRecap();
+            
+            showNotification('🎉 Budget démarré ! Bonne gestion.', 'success');
+        }
+
+        function initializeWeeks() {
+            weeksData = [];
+            for (let i = 1; i <= config.nbSemaines; i++) {
+                const weekEnvelopes = {};
+                envelopesTemplate.forEach(env => {
+                    weekEnvelopes[env.id] = {
+                        budget: parseFloat(env.amount) || 0,
+                        current: parseFloat(env.amount) || 0,
+                        history: []
+                    };
+                });
+
+                weeksData.push({
+                    week: i,
+                    envelopes: weekEnvelopes,
+                    borrowing: { from: 0, to: 0 }
+                });
+            }
+            saveData();
+        }
+
+        function renderWeeksTabs() {
+            const container = document.getElementById('weeksTabs');
+            container.innerHTML = '';
+            
+            weeksData.forEach((week) => {
+                const tab = document.createElement('div');
+                tab.className = 'week-tab' + (week.week === currentWeek ? ' active' : '');
+                tab.textContent = 'S' + week.week;
+                
+                if (week.borrowing.from > 0 || week.borrowing.to > 0) {
+                    tab.classList.add('borrowing');
+                }
+                
+                tab.onclick = () => switchWeek(week.week);
+                container.appendChild(tab);
+            });
+        }
+
+        function switchWeek(weekNum) {
+            currentWeek = weekNum;
+            renderWeeksTabs();
+            renderEnvelopes();
+            updateBorrowingAlert();
+        }
+
+        function renderEnvelopes() {
+            const container = document.getElementById('envelopesContainer');
+            const weekData = weeksData[currentWeek - 1];
+            
+            container.innerHTML = '';
+            
+            envelopesTemplate.forEach(template => {
+                const env = weekData.envelopes[template.id];
+                const percentage = env.budget > 0 ? (env.current / env.budget) * 100 : 0;
+                
+                const card = document.createElement('div');
+                card.className = 'envelope-card';
+                card.style.setProperty('--color', template.color);
+                
+                let statusClass = 'good';
+                let statusText = '✅ OK';
+                
+                if (percentage <= 20) {
+                    statusClass = 'danger';
+                    statusText = '⚠️ CRITIQUE';
+                } else if (percentage <= 50) {
+                    statusClass = 'warning';
+                    statusText = '⚡ Attention';
+                }
+                
+                card.innerHTML = `
+                    <div class="envelope-header">
+                        <div class="envelope-title">
+                            <span>${template.icon}</span>
+                            ${template.name}
+                        </div>
+                        <div class="budget-info">
+                            <div>Budget: ${env.budget.toFixed(2)} د.ت</div>
+                            <div class="weekly">Reste: ${env.current.toFixed(2)} د.ت</div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-container">
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill ${percentage <= 20 ? 'danger' : percentage <= 50 ? 'warning' : ''}" 
+                                 style="width: ${Math.max(0, Math.min(100, percentage))}%; background: ${template.color}">
+                                ${percentage.toFixed(0)}%
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="envelope-status">
+                        <span class="status-text ${statusClass}">${statusText}</span>
+                        <span>Dépensé: ${(env.budget - env.current).toFixed(2)} د.ت</span>
+                    </div>
+                    
+                    <div class="controls">
+                        <button class="btn btn-add" onclick="openTransaction('${template.id}', 'add')">+ Ajouter</button>
+                        <button class="btn btn-remove" onclick="openTransaction('${template.id}', 'remove')" ${env.current <= 0 ? 'disabled' : ''}>- Dépenser</button>
+                        <button class="btn btn-history" onclick="showHistory('${template.id}')">📋</button>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        function openTransaction(envelopeId, action) {
+            currentEnvelope = envelopeId;
+            currentAction = action;
+            selectedModalPerson = null;
+            
+            const template = envelopesTemplate.find(e => e.id === envelopeId);
+            document.getElementById('modalTitle').textContent = 
+                action === 'add' ? `Ajouter à ${template.name}` : `Dépenser de ${template.name}`;
+            document.getElementById('transactionAmount').value = '';
+            document.getElementById('transactionDesc').value = '';
+            document.getElementById('modalMan').classList.remove('selected');
+            document.getElementById('modalWoman').classList.remove('selected');
+            document.getElementById('transactionModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('transactionModal').style.display = 'none';
+            currentEnvelope = null;
+            currentAction = null;
+            selectedModalPerson = null;
+        }
+
+        function confirmTransaction() {
+            const amount = parseFloat(document.getElementById('transactionAmount').value);
+            const description = document.getElementById('transactionDesc').value.trim();
+            
+            if (isNaN(amount) || amount <= 0) {
+                showNotification('Veuillez entrer un montant valide', 'error');
+                return;
+            }
+            
+            if (!description) {
+                showNotification('Veuillez ajouter une description', 'error');
+                return;
+            }
+
+            if (!selectedModalPerson) {
+                showNotification('Veuillez sélectionner qui fait cette transaction (👨 ou 👩)', 'error');
+                return;
+            }
+
+            const weekData = weeksData[currentWeek - 1];
+            const env = weekData.envelopes[currentEnvelope];
+            const template = envelopesTemplate.find(e => e.id === currentEnvelope);
+
+            if (currentAction === 'add') {
+                env.current += amount;
+                env.history.push({
+                    type: 'add',
+                    amount: amount,
+                    description: description,
+                    person: selectedModalPerson,
+                    date: new Date().toLocaleDateString('fr-FR')
+                });
+                showNotification(`+${amount.toFixed(2)} د.ت ajouté`, 'success');
+            } else {
+                if (amount > env.current) {
+                    if (currentWeek < config.nbSemaines) {
+                        const deficit = amount - env.current;
+                        const nextWeek = weeksData[currentWeek];
+                        const availableInNext = Math.min(deficit, nextWeek.envelopes[currentEnvelope].current);
+                        
+                        if (availableInNext > 0) {
+                            nextWeek.envelopes[currentEnvelope].current -= availableInNext;
+                            nextWeek.borrowing.from += availableInNext;
+                            weekData.borrowing.to += availableInNext;
+                            
+                            if (env.current > 0) {
+                                env.history.push({
+                                    type: 'remove',
+                                    amount: env.current,
+                                    description: description + ' (partiel)',
+                                    person: selectedModalPerson,
+                                    date: new Date().toLocaleDateString('fr-FR')
+                                });
+                            }
+                            env.current = 0;
+                            
+                            env.history.push({
+                                type: 'remove',
+                                amount: availableInNext,
+                                description: description + ` [Emprunt S${currentWeek + 1}]`,
+                                person: selectedModalPerson,
+                                date: new Date().toLocaleDateString('fr-FR')
+                            });
+                            
+                            showNotification(`⚠️ Emprunt de ${availableInNext.toFixed(2)} د.ت`, 'warning');
+                        } else {
+                            showNotification('Fonds insuffisants', 'error');
+                            return;
+                        }
+                    } else {
+                        showNotification('Dernière semaine: impossible d\'emprunter', 'error');
+                        return;
+                    }
+                } else {
+                    env.current -= amount;
+                    env.history.push({
+                        type: 'remove',
+                        amount: amount,
+                        description: description,
+                        person: selectedModalPerson,
+                        date: new Date().toLocaleDateString('fr-FR')
+                    });
+                    showNotification(`-${amount.toFixed(2)} د.ت: ${description}`, 'warning');
+                }
+            }
+
+            saveData();
+            renderEnvelopes();
+            renderWeeksTabs();
+            updateBorrowingAlert();
+            updateMonthlyRecap();
+            closeModal();
+        }
+
+        function showHistory(envelopeId) {
+            const template = envelopesTemplate.find(e => e.id === envelopeId);
+            document.getElementById('historyTitle').textContent = `📋 Historique - ${template.name}`;
+            
+            const list = document.getElementById('historyList');
+            list.innerHTML = '';
+            
+            let hasHistory = false;
+            
+            weeksData.forEach(week => {
+                const env = week.envelopes[envelopeId];
+                if (env.history.length > 0) {
+                    hasHistory = true;
+                    env.history.forEach(h => {
+                        const item = document.createElement('div');
+                        item.className = 'history-item';
+                        item.style.setProperty('--color', template.color);
+                        item.innerHTML = `
+                            <div class="history-item-header">
+                                <span class="history-item-amount ${h.type}">
+                                    ${h.type === 'add' ? '+' : '-'}${h.amount.toFixed(2)} د.ت
+                                    <span class="history-item-person">${h.person === 'man' ? '👨' : '👩'}</span>
+                                </span>
+                                <span class="history-item-date">S${week.week} - ${h.date}</span>
+                            </div>
+                            <div class="history-item-desc">${h.description}</div>
+                        `;
+                        list.appendChild(item);
+                    });
+                }
+            });
+            
+            if (!hasHistory) {
+                list.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">Aucune transaction</div>';
+            }
+            
+            document.getElementById('historyModal').style.display = 'flex';
+        }
+
+        function closeHistoryModal() {
+            document.getElementById('historyModal').style.display = 'none';
+        }
+
+        function updateBorrowingAlert() {
+            const weekData = weeksData[currentWeek - 1];
+            const alert = document.getElementById('borrowingAlert');
+            const details = document.getElementById('borrowingDetails');
+            
+            if (weekData.borrowing.from > 0 || weekData.borrowing.to > 0) {
+                alert.classList.add('show');
+                let text = '';
+                if (weekData.borrowing.from > 0) {
+                    text += `Reçu ${weekData.borrowing.from.toFixed(2)} د.ت de S${currentWeek - 1}. `;
+                }
+                if (weekData.borrowing.to > 0) {
+                    text += `Prêté ${weekData.borrowing.to.toFixed(2)} د.ت à S${currentWeek + 1}.`;
+                }
+                details.textContent = text;
+            } else {
+                alert.classList.remove('show');
+            }
+        }
+
+        function updateMonthlyRecap() {
+            const recap = document.getElementById('monthlyRecap');
+            
+            // Calculer totaux mensuels
+            let totalBudgetHebdo = 0;
+            let totalSpentHebdo = 0;
+            let totalCurrentHebdo = 0;
+            
+            weeksData.forEach(week => {
+                Object.values(week.envelopes).forEach(env => {
+                    totalBudgetHebdo += env.budget;
+                    totalSpentHebdo += (env.budget - env.current);
+                    totalCurrentHebdo += env.current;
+                });
+            });
+
+            const totalMonthlyPurchases = monthlyPurchases.reduce((sum, p) => sum + p.amount, 0);
+
+            recap.innerHTML = `
+                <div class="recap-item">
+                    <div class="label">Achats Mensuels</div>
+                    <div class="value" style="color: var(--warning)">${totalMonthlyPurchases.toFixed(0)} د.ت</div>
+                </div>
+                <div class="recap-item">
+                    <div class="label">Budget Hebdo Total</div>
+                    <div class="value">${totalBudgetHebdo.toFixed(0)} د.ت</div>
+                </div>
+                <div class="recap-item">
+                    <div class="label">Dépensé Hebdo</div>
+                    <div class="value" style="color: var(--danger)">${totalSpentHebdo.toFixed(0)} د.ت</div>
+                </div>
+                <div class="recap-item">
+                    <div class="label">Reste Hebdo</div>
+                    <div class="value" style="color: var(--success)">${totalCurrentHebdo.toFixed(0)} د.ت</div>
+                </div>
+                <div class="recap-item">
+                    <div class="label">Épargne</div>
+                    <div class="value" style="color: var(--primary)">${config.epargneObjectif.toFixed(0)} د.ت</div>
+                </div>
+                <div class="recap-item" style="background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white;">
+                    <div class="label" style="color: rgba(255,255,255,0.9);">TOTAL DÉPENSÉ</div>
+                    <div class="value" style="color: white; font-size: 1.5em;">${(totalMonthlyPurchases + totalSpentHebdo).toFixed(0)} د.ت</div>
+                </div>
+            `;
+        }
+
+        function resetMonth() {
+            if (!confirm('Nouveau mois? Toutes les données seront réinitialisées.')) return;
+            localStorage.removeItem('budgetFamilialProData');
+            location.reload();
+        }
+
+        function exportData() {
+            const data = {
+                config,
+                monthlyPurchases,
+                envelopesTemplate,
+                weeksData,
+                exportDate: new Date().toLocaleString('fr-FR')
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `budget_familial_${config.monthYear}.json`;
+            a.click();
+            
+            showNotification('📥 Données exportées !', 'success');
+        }
+
+        function showNotification(message, type) {
+            const notif = document.getElementById('notification');
+            document.getElementById('notificationText').textContent = message;
+            notif.className = 'notification ' + type;
+            notif.style.display = 'block';
+            
+            setTimeout(() => {
+                notif.style.display = 'none';
+            }, 3000);
+        }
+
+        function saveData() {
+            const data = {
+                config,
+                monthlyPurchases,
+                envelopesTemplate,
+                weeksData,
+                currentWeek
+            };
+            localStorage.setItem('budgetFamilialProData', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('budgetFamilialProData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                config = data.config || config;
+                monthlyPurchases = data.monthlyPurchases || [];
+                envelopesTemplate = data.envelopesTemplate || envelopesTemplate;
+                weeksData = data.weeksData || [];
+                currentWeek = data.currentWeek || 1;
+                
+                // Restaurer valeurs
+                document.getElementById('revenu').value = config.revenu;
+                document.getElementById('credit').value = config.credit;
+                document.getElementById('epargneAvant').value = config.epargneAvant;
+                document.getElementById('monthYear').value = config.monthYear;
+                document.getElementById('epargneObjectif').value = config.epargneObjectif;
+                document.getElementById('epargneValeur').textContent = config.epargneObjectif + ' د.ت';
+                
+                // Déterminer quelle étape afficher
+                if (weeksData.length > 0) {
+                    // Étape 4: Suivi
+                    updateStepIndicator(4);
+                    document.getElementById('configCard').classList.add('hidden');
+                    document.getElementById('trackingCard').classList.remove('hidden');
+                    renderWeeksTabs();
+                    renderEnvelopes();
+                    updateMonthlyRecap();
+                } else if (monthlyPurchases.length > 0 || document.getElementById('monthlyPurchasesCard').classList.contains('was-shown')) {
+                    // Étape 2 ou 3
+                    calculateInitialBudget();
+                }
+            }
+        }
+
+        // Fermer modals avec Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeHistoryModal();
+            }
+            if (e.key === 'Enter' && document.getElementById('transactionModal').style.display === 'flex') {
+                confirmTransaction();
+            }
+        });
+    </script>
+</body>
+</html>'''
+
