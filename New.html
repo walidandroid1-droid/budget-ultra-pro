@@ -1,0 +1,1722 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#667eea">
+    <title>Budget Pro</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --dark: #0f172a;
+            --gray-900: #111827;
+            --gray-800: #1f2937;
+            --gray-700: #374151;
+            --gray-600: #4b5563;
+            --gray-500: #6b7280;
+            --gray-400: #9ca3af;
+            --gray-300: #d1d5db;
+            --gray-200: #e5e7eb;
+            --gray-100: #f3f4f6;
+            --gray-50: #f9fafb;
+            --white: #ffffff;
+            --man: #3b82f6;
+            --woman: #ec4899;
+            
+            --safe-top: env(safe-area-inset-top, 47px);
+            --safe-bottom: env(safe-area-inset-bottom, 34px);
+            --iphone-width: 393px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+            background: var(--gray-50);
+            color: var(--dark);
+            height: 100%;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            max-width: 430px;
+            margin: 0 auto;
+            left: 0;
+            right: 0;
+        }
+
+        /* App Container */
+        .app-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: calc(var(--safe-top) + 20px) 20px 20px;
+            color: white;
+            position: relative;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .header-title {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header-subtitle {
+            font-size: 15px;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        /* Step Indicator */
+        .step-bar {
+            display: flex;
+            padding: 15px 20px;
+            background: white;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .step-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: var(--gray-100);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-500);
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .step-item.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            transform: scale(1.05);
+        }
+
+        .step-item.completed {
+            background: var(--success);
+            color: white;
+        }
+
+        .step-number {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            padding: 20px;
+            padding-bottom: calc(var(--safe-bottom) + 100px);
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            border: 1px solid var(--gray-100);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+            color: white;
+        }
+
+        /* Big Amount Display */
+        .amount-display {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 24px;
+            color: white;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .amount-display::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .amount-label {
+            font-size: 14px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .amount-value {
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -2px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .amount-currency {
+            font-size: 24px;
+            opacity: 0.8;
+        }
+
+        .amount-detail {
+            font-size: 13px;
+            opacity: 0.8;
+            margin-top: 8px;
+        }
+
+        /* Input Groups */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 18px;
+            border: 2px solid var(--gray-200);
+            border-radius: 16px;
+            background: var(--gray-50);
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .input-currency {
+            position: relative;
+        }
+
+        .input-currency::after {
+            content: 'د.ت';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: 700;
+            color: var(--gray-500);
+            font-size: 16px;
+        }
+
+        .input-currency .input-field {
+            padding-right: 60px;
+        }
+
+        /* Slider */
+        .slider-container {
+            background: var(--gray-100);
+            padding: 24px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .slider-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        .slider-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--gray-300);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+            border: 3px solid white;
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 18px 24px;
+            border: none;
+            border-radius: 16px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:active::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        /* Person Selector */
+        .person-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .person-card {
+            padding: 20px;
+            border: 3px solid var(--gray-200);
+            border-radius: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .person-card:active {
+            transform: scale(0.98);
+        }
+
+        .person-card.selected-man {
+            border-color: var(--man);
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .person-card.selected-woman {
+            border-color: var(--woman);
+            background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+        }
+
+        .person-emoji {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+
+        .person-label {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--gray-700);
+        }
+
+        /* Purchase Items */
+        .purchase-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .purchase-item {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 2px solid var(--gray-100);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .purchase-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--danger);
+        }
+
+        .purchase-person {
+            width: 50px;
+            height: 50px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .purchase-person.man {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        }
+
+        .purchase-person.woman {
+            background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+        }
+
+        .purchase-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .purchase-desc {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .purchase-date {
+            font-size: 13px;
+            color: var(--gray-500);
+        }
+
+        .purchase-amount {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--danger);
+            flex-shrink: 0;
+        }
+
+        .purchase-delete {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--gray-100);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        /* Envelope Cards */
+        .envelope-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .envelope-card {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            border: 2px solid var(--gray-100);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .envelope-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--color, var(--primary));
+        }
+
+        .envelope-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .envelope-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            background: var(--color-bg, var(--gray-100));
+        }
+
+        .envelope-title-section {
+            flex: 1;
+        }
+
+        .envelope-name {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .envelope-budget {
+            font-size: 14px;
+            color: var(--gray-500);
+            font-weight: 600;
+        }
+
+        /* Circular Progress */
+        .progress-ring-container {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            flex-shrink: 0;
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-bg {
+            fill: none;
+            stroke: var(--gray-200);
+            stroke-width: 8;
+        }
+
+        .progress-ring-fill {
+            fill: none;
+            stroke: var(--color, var(--primary));
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--dark);
+        }
+
+        .envelope-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: var(--gray-50);
+            padding: 16px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray-500);
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--dark);
+        }
+
+        .stat-value.remaining {
+            color: var(--success);
+        }
+
+        .stat-value.spent {
+            color: var(--danger);
+        }
+
+        /* Action Buttons */
+        .envelope-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 10px;
+        }
+
+        .btn-action {
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-spend {
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .btn-history {
+            width: 50px;
+            background: var(--gray-100);
+            color: var(--gray-700);
+            font-size: 20px;
+        }
+
+        /* Week Tabs */
+        .week-tabs {
+            display: flex;
+            gap: 10px;
+            padding: 4px;
+            background: var(--gray-200);
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+
+        .week-tab {
+            flex: 1;
+            padding: 14px 8px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            background: transparent;
+            position: relative;
+        }
+
+        .week-tab.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .week-tab.borrowing::after {
+            content: '';
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            background: var(--warning);
+            border-radius: 50%;
+        }
+
+        /* Alert Banner */
+        .alert-banner {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px solid var(--warning);
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            color: #92400e;
+        }
+
+        .alert-banner.error {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border-color: var(--danger);
+            color: #991b1b;
+        }
+
+        .alert-banner.success {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-color: var(--success);
+            color: #065f46;
+        }
+
+        /* Summary Cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 2px solid var(--gray-100);
+        }
+
+        .summary-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin: 0 auto 12px;
+        }
+
+        .summary-card-label {
+            font-size: 12px;
+            color: var(--gray-500);
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .summary-card-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--dark);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: flex-end;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 32px 32px 0 0;
+            padding: 32px 24px calc(var(--safe-bottom) + 24px);
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .modal-close {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--gray-100);
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* History List */
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: var(--gray-50);
+            border-radius: 16px;
+        }
+
+        .history-person {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .history-info {
+            flex: 1;
+        }
+
+        .history-desc {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 2px;
+        }
+
+        .history-meta {
+            font-size: 13px;
+            color: var(--gray-500);
+        }
+
+        .history-amount {
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .history-amount.add {
+            color: var(--success);
+        }
+
+        .history-amount.remove {
+            color: var(--danger);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray-400);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in {
+            animation: fadeIn 0.4s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-title">💰 Budget Pro</div>
+            <div class="header-subtitle">Gestion familiale intelligente</div>
+        </div>
+
+        <!-- Step Indicator -->
+        <div class="step-bar" id="stepIndicator">
+            <div class="step-item active" data-step="1">
+                <div class="step-number">1</div>
+                <span>Config</span>
+            </div>
+            <div class="step-item" data-step="2">
+                <div class="step-number">2</div>
+                <span>Mensuel</span>
+            </div>
+            <div class="step-item" data-step="3">
+                <div class="step-number">3</div>
+                <span>Enveloppes</span>
+            </div>
+            <div class="step-item" data-step="4">
+                <div class="step-number">4</div>
+                <span>Suivi</span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <!-- ÉTAPE 1: Configuration -->
+            <div id="step1Content" class="animate-in">
+                <div class="amount-display">
+                    <div class="amount-label">Budget Disponible</div>
+                    <div class="amount-value">
+                        <span id="budgetDisplay">0</span>
+                        <span class="amount-currency">د.ت</span>
+                    </div>
+                    <div class="amount-detail">Avant achats mensuels</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">
+                        <div class="card-title-icon">💵</div>
+                        Revenus & Charges
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Revenu Principal</label>
+                        <div class="input-currency">
+                            <input type="number" class="input-field" id="revenu" value="2671" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Crédit à Rembourser</label>
+                        <div class="input-currency">
+                            <input type="number" class="input-field" id="credit" value="700" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Épargne Disponible</label>
+                        <div class="input-currency">
+                            <input type="number" class="input-field" id="epargneAvant" value="750" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Mois</label>
+                        <input type="month" class="input-field" id="monthYear" value="2025-02">
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-header">
+                        <span class="slider-label">Épargne Objectif</span>
+                        <span class="slider-value" id="epargneDisplay">500 د.ت</span>
+                    </div>
+                    <input type="range" id="epargneObjectif" min="0" max="2000" value="500" step="50">
+                </div>
+
+                <button class="btn btn-primary" onclick="goToStep(2)" style="margin-top: 10px;">
+                    Continuer →
+                </button>
+            </div>
+
+            <!-- ÉTAPE 2: Achats Mensuels -->
+            <div id="step2Content" class="hidden">
+                <div class="amount-display" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                    <div class="amount-label">Reste pour les semaines</div>
+                    <div class="amount-value">
+                        <span id="resteHebdoDisplay">0</span>
+                        <span class="amount-currency">د.ت</span>
+                    </div>
+                    <div class="amount-detail">Après achats mensuels</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">
+                        <div class="card-title-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">🛒</div>
+                        Achats Mensuels
+                    </div>
+
+                    <div id="purchasesList" class="purchase-list">
+                        <!-- Rempli par JS -->
+                    </div>
+
+                    <div style="background: var(--gray-100); padding: 20px; border-radius: 20px; margin-top: 20px;">
+                        <div class="input-group">
+                            <label class="input-label">Description</label>
+                            <input type="text" class="input-field" id="purchaseDesc" placeholder="Ex: Grande course Carrefour">
+                        </div>
+
+                        <div class="input-group">
+                            <label class="input-label">Montant</label>
+                            <div class="input-currency">
+                                <input type="number" class="input-field" id="purchaseAmount" placeholder="0" step="0.01">
+                            </div>
+                        </div>
+
+                        <label class="input-label">Qui dépense ?</label>
+                        <div class="person-selector">
+                            <div class="person-card" onclick="selectPerson('man')" id="pMan">
+                                <div class="person-emoji">👨</div>
+                                <div class="person-label">Homme</div>
+                            </div>
+                            <div class="person-card" onclick="selectPerson('woman')" id="pWoman">
+                                <div class="person-emoji">👩</div>
+                                <div class="person-label">Femme</div>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-secondary" onclick="addPurchase()" style="margin-top: 10px;">
+                            + Ajouter cet achat
+                        </button>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="goToStep(3)" id="btnStep3" disabled>
+                    Continuer →
+                </button>
+            </div>
+
+            <!-- ÉTAPE 3: Enveloppes -->
+            <div id="step3Content" class="hidden">
+                <div class="amount-display" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                    <div class="amount-label">Par semaine</div>
+                    <div class="amount-value">
+                        <span id="budgetHebdoDisplay">0</span>
+                        <span class="amount-currency">د.ت</span>
+                    </div>
+                    <div class="amount-detail">À répartir sur <span id="nbSemainesDisplay">4</span> semaines</div>
+                </div>
+
+                <div id="envelopesList">
+                    <!-- Rempli par JS -->
+                </div>
+
+                <div id="totalAlert" class="alert-banner error" style="margin-top: 20px;">
+                    ⚠️ Le total ne correspond pas au budget
+                </div>
+
+                <button class="btn btn-primary" onclick="goToStep(4)" id="btnStep4" disabled>
+                    🚀 Démarrer le suivi
+                </button>
+            </div>
+
+            <!-- ÉTAPE 4: Suivi -->
+            <div id="step4Content" class="hidden">
+                <div class="week-tabs" id="weekTabs">
+                    <!-- Rempli par JS -->
+                </div>
+
+                <div id="alertBanner" class="alert-banner hidden">
+                    ⚠️ Emprunt activé entre semaines
+                </div>
+
+                <div id="envelopesTracking">
+                    <!-- Rempli par JS -->
+                </div>
+
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="summary-card-icon" style="background: #dbeafe;">📊</div>
+                        <div class="summary-card-label">Total Budget</div>
+                        <div class="summary-card-value" id="totalBudget">0</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-card-icon" style="background: #fee2e2;">💸</div>
+                        <div class="summary-card-label">Dépensé</div>
+                        <div class="summary-card-value" id="totalSpent">0</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-card-icon" style="background: #d1fae5;">💰</div>
+                        <div class="summary-card-label">Reste</div>
+                        <div class="summary-card-value" id="totalRemaining">0</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-card-icon" style="background: #fce7f3;">🏦</div>
+                        <div class="summary-card-label">Épargne</div>
+                        <div class="summary-card-value" id="totalEpargne">0</div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px;">
+                    <button class="btn btn-danger" onclick="resetAll()">
+                        🔄 Reset
+                    </button>
+                    <button class="btn btn-success" onclick="exportData()">
+                        📥 Export
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Transaction -->
+    <div class="modal" id="transactionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Nouvelle transaction</div>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">Montant</label>
+                <div class="input-currency">
+                    <input type="number" class="input-field" id="modalAmount" placeholder="0" step="0.01">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">Description</label>
+                <input type="text" class="input-field" id="modalDesc" placeholder="Ex: Courses du jour">
+            </div>
+
+            <label class="input-label">Qui ?</label>
+            <div class="person-selector">
+                <div class="person-card" onclick="selectModalPerson('man')" id="modalMan">
+                    <div class="person-emoji">👨</div>
+                    <div class="person-label">Homme</div>
+                </div>
+                <div class="person-card" onclick="selectModalPerson('woman')" id="modalWoman">
+                    <div class="person-emoji">👩</div>
+                    <div class="person-label">Femme</div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="confirmTransaction()" style="margin-top: 20px;">
+                Confirmer
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal Historique -->
+    <div class="modal" id="historyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="historyTitle">Historique</div>
+                <button class="modal-close" onclick="closeHistoryModal()">✕</button>
+            </div>
+            <div class="history-list" id="historyList">
+                <!-- Rempli par JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Données
+        let currentStep = 1;
+        let config = { revenu: 2671, credit: 700, epargneAvant: 750, epargneObjectif: 500, monthYear: '2025-02', nbSemaines: 4 };
+        let monthlyPurchases = [];
+        let selectedPerson = null;
+        let selectedModalPerson = null;
+        let currentWeek = 1;
+        let currentEnvelope = null;
+        let currentAction = null;
+
+        let envelopes = [
+            { id: 'courses', name: 'Courses', icon: '🛒', color: '#10b981', colorBg: '#d1fae5', amount: 100 },
+            { id: 'nourriture', name: 'Nourriture', icon: '🍽️', color: '#f59e0b', colorBg: '#fef3c7', amount: 80 },
+            { id: 'enfants', name: 'Enfants', icon: '👶', color: '#8b5cf6', colorBg: '#ede9fe', amount: 60 },
+            { id: 'transport', name: 'Transport', icon: '⛽', color: '#3b82f6', colorBg: '#dbeafe', amount: 50 },
+            { id: 'loisirs', name: 'Loisirs', icon: '🎮', color: '#ec4899', colorBg: '#fce7f3', amount: 40 }
+        ];
+
+        let weeksData = [];
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            setupListeners();
+            calculateStep1();
+        });
+
+        function setupListeners() {
+            ['revenu', 'credit', 'epargneAvant'].forEach(id => {
+                document.getElementById(id).addEventListener('input', calculateStep1);
+            });
+            document.getElementById('monthYear').addEventListener('change', calculateStep1);
+            document.getElementById('epargneObjectif').addEventListener('input', (e) => {
+                document.getElementById('epargneDisplay').textContent = e.target.value + ' د.ت';
+                calculateStep1();
+            });
+        }
+
+        function calculateStep1() {
+            config.revenu = parseFloat(document.getElementById('revenu').value) || 0;
+            config.credit = parseFloat(document.getElementById('credit').value) || 0;
+            config.epargneAvant = parseFloat(document.getElementById('epargneAvant').value) || 0;
+            config.epargneObjectif = parseFloat(document.getElementById('epargneObjectif').value) || 0;
+            config.monthYear = document.getElementById('monthYear').value;
+            config.nbSemaines = getWeeksInMonth(config.monthYear);
+
+            const budget = config.revenu - config.credit + config.epargneAvant - config.epargneObjectif;
+            document.getElementById('budgetDisplay').textContent = budget.toFixed(0);
+            
+            calculateStep2();
+            saveData();
+        }
+
+        function getWeeksInMonth(monthYear) {
+            const [y, m] = monthYear.split('-').map(Number);
+            const days = new Date(y, m, 0).getDate();
+            return Math.min(Math.ceil(days / 7), 5);
+        }
+
+        function goToStep(step) {
+            document.getElementById(`step${currentStep}Content`).classList.add('hidden');
+            document.getElementById(`step${step}Content`).classList.remove('hidden');
+            document.getElementById(`step${step}Content`).classList.add('animate-in');
+            
+            // Update step indicator
+            document.querySelectorAll('.step-item').forEach((el, idx) => {
+                el.classList.remove('active', 'completed');
+                if (idx + 1 === step) el.classList.add('active');
+                else if (idx + 1 < step) el.classList.add('completed');
+            });
+
+            currentStep = step;
+
+            if (step === 2) calculateStep2();
+            if (step === 3) renderEnvelopesConfig();
+            if (step === 4) initTracking();
+        }
+
+        function calculateStep2() {
+            const totalPurchases = monthlyPurchases.reduce((s, p) => s + p.amount, 0);
+            const budgetInitial = config.revenu - config.credit + config.epargneAvant - config.epargneObjectif;
+            const reste = budgetInitial - totalPurchases;
+            
+            document.getElementById('resteHebdoDisplay').textContent = reste.toFixed(0);
+            document.getElementById('btnStep3').disabled = reste <= 0;
+            
+            renderPurchases();
+            saveData();
+        }
+
+        function selectPerson(person) {
+            selectedPerson = person;
+            document.getElementById('pMan').className = 'person-card' + (person === 'man' ? ' selected-man' : '');
+            document.getElementById('pWoman').className = 'person-card' + (person === 'woman' ? ' selected-woman' : '');
+        }
+
+        function addPurchase() {
+            const desc = document.getElementById('purchaseDesc').value.trim();
+            const amount = parseFloat(document.getElementById('purchaseAmount').value);
+            
+            if (!desc || !amount || amount <= 0 || !selectedPerson) {
+                alert('Veuillez remplir tous les champs');
+                return;
+            }
+
+            const budgetInitial = config.revenu - config.credit + config.epargneAvant - config.epargneObjectif;
+            const currentTotal = monthlyPurchases.reduce((s, p) => s + p.amount, 0);
+            
+            if (currentTotal + amount > budgetInitial) {
+                alert('Cet achat dépasse le budget !');
+                return;
+            }
+
+            monthlyPurchases.push({
+                id: Date.now(),
+                desc,
+                amount,
+                person: selectedPerson,
+                date: new Date().toLocaleDateString('fr-FR')
+            });
+
+            document.getElementById('purchaseDesc').value = '';
+            document.getElementById('purchaseAmount').value = '';
+            selectPerson(null);
+            
+            calculateStep2();
+        }
+
+        function deletePurchase(id) {
+            monthlyPurchases = monthlyPurchases.filter(p => p.id !== id);
+            calculateStep2();
+        }
+
+        function renderPurchases() {
+            const container = document.getElementById('purchasesList');
+            if (monthlyPurchases.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🛒</div>
+                        <div class="empty-state-text">Aucun achat mensuel</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = monthlyPurchases.map(p => `
+                <div class="purchase-item">
+                    <div class="purchase-person ${p.person}">${p.person === 'man' ? '👨' : '👩'}</div>
+                    <div class="purchase-info">
+                        <div class="purchase-desc">${p.desc}</div>
+                        <div class="purchase-date">${p.date}</div>
+                    </div>
+                    <div class="purchase-amount">-${p.amount.toFixed(0)}</div>
+                    <button class="purchase-delete" onclick="deletePurchase(${p.id})">🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        function renderEnvelopesConfig() {
+            const reste = parseFloat(document.getElementById('resteHebdoDisplay').textContent);
+            const parSemaine = reste / config.nbSemaines;
+            
+            document.getElementById('budgetHebdoDisplay').textContent = parSemaine.toFixed(0);
+            document.getElementById('nbSemainesDisplay').textContent = config.nbSemaines;
+
+            const container = document.getElementById('envelopesList');
+            container.innerHTML = envelopes.map((env, idx) => `
+                <div class="card" style="border-left: 4px solid ${env.color};">
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                        <div style="width: 50px; height: 50px; border-radius: 16px; background: ${env.colorBg}; 
+                                    display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                            ${env.icon}
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 18px; font-weight: 800;">${env.name}</div>
+                            <div style="font-size: 14px; color: var(--gray-500);">par semaine</div>
+                        </div>
+                    </div>
+                    <div class="input-currency">
+                        <input type="number" class="input-field" value="${env.amount}" 
+                               onchange="updateEnvelopeAmount(${idx}, this.value)" step="0.01">
+                    </div>
+                </div>
+            `).join('');
+
+            checkEnvelopesTotal();
+        }
+
+        function updateEnvelopeAmount(idx, value) {
+            envelopes[idx].amount = parseFloat(value) || 0;
+            checkEnvelopesTotal();
+            saveData();
+        }
+
+        function checkEnvelopesTotal() {
+            const total = envelopes.reduce((s, e) => s + e.amount, 0);
+            const target = parseFloat(document.getElementById('budgetHebdoDisplay').textContent);
+            const diff = Math.abs(total - target);
+            
+            const alert = document.getElementById('totalAlert');
+            const btn = document.getElementById('btnStep4');
+
+            if (diff < 0.01) {
+                alert.className = 'alert-banner success';
+                alert.innerHTML = '✅ Budget parfaitement équilibré !';
+                btn.disabled = false;
+            } else if (total < target) {
+                alert.className = 'alert-banner error';
+                alert.innerHTML = `⚠️ Il manque ${(target - total).toFixed(0)} د.ت`;
+                btn.disabled = true;
+            } else {
+                alert.className = 'alert-banner error';
+                alert.innerHTML = `⚠️ Dépassement de ${(total - target).toFixed(0)} د.ت`;
+                btn.disabled = true;
+            }
+        }
+
+        function initTracking() {
+            // Initialiser les semaines
+            weeksData = [];
+            for (let i = 1; i <= config.nbSemaines; i++) {
+                const weekEnvs = {};
+                envelopes.forEach(e => {
+                    weekEnvs[e.id] = {
+                        budget: e.amount,
+                        current: e.amount,
+                        history: []
+                    };
+                });
+                weeksData.push({ week: i, envelopes: weekEnvs, borrowing: { from: 0, to: 0 } });
+            }
+
+            renderWeekTabs();
+            renderTracking();
+            updateSummary();
+            saveData();
+        }
+
+        function renderWeekTabs() {
+            const container = document.getElementById('weekTabs');
+            container.innerHTML = weeksData.map(w => `
+                <button class="week-tab ${w.week === currentWeek ? 'active' : ''} ${w.borrowing.from > 0 || w.borrowing.to > 0 ? 'borrowing' : ''}"
+                        onclick="switchWeek(${w.week})">
+                    S${w.week}
+                </button>
+            `).join('');
+        }
+
+        function switchWeek(week) {
+            currentWeek = week;
+            renderWeekTabs();
+            renderTracking();
+            
+            const w = weeksData[week - 1];
+            const alert = document.getElementById('alertBanner');
+            if (w.borrowing.from > 0 || w.borrowing.to > 0) {
+                alert.classList.remove('hidden');
+                alert.innerHTML = w.borrowing.from > 0 
+                    ? `↙️ Reçu ${w.borrowing.from.toFixed(0)}د.ت de S${week-1}` 
+                    : `↗️ Prêté ${w.borrowing.to.toFixed(0)}د.ت à S${week+1}`;
+            } else {
+                alert.classList.add('hidden');
+            }
+        }
+
+        function renderTracking() {
+            const container = document.getElementById('envelopesTracking');
+            const weekData = weeksData[currentWeek - 1];
+
+            container.innerHTML = envelopes.map(env => {
+                const data = weekData.envelopes[env.id];
+                const percent = data.budget > 0 ? (data.current / data.budget) * 100 : 0;
+                const circumference = 2 * Math.PI * 36;
+                const offset = circumference - (percent / 100) * circumference;
+
+                return `
+                    <div class="envelope-card" style="--color: ${env.color}; --color-bg: ${env.colorBg};">
+                        <div class="envelope-header">
+                            <div class="envelope-icon" style="background: ${env.colorBg};">${env.icon}</div>
+                            <div class="envelope-title-section">
+                                <div class="envelope-name">${env.name}</div>
+                                <div class="envelope-budget">${data.budget.toFixed(0)} د.ت / semaine</div>
+                            </div>
+                            <div class="progress-ring-container">
+                                <svg class="progress-ring" width="80" height="80">
+                                    <circle class="progress-ring-bg" cx="40" cy="40" r="36"/>
+                                    <circle class="progress-ring-fill" cx="40" cy="40" r="36"
+                                            stroke-dasharray="${circumference} ${circumference}"
+                                            stroke-dashoffset="${offset}"
+                                            style="stroke: ${percent < 20 ? 'var(--danger)' : percent < 50 ? 'var(--warning)' : env.color};"/>
+                                </svg>
+                                <div class="progress-text">${percent.toFixed(0)}%</div>
+                            </div>
+                        </div>
+
+                        <div class="envelope-stats">
+                            <div class="stat-box">
+                                <div class="stat-label">Reste</div>
+                                <div class="stat-value remaining">${data.current.toFixed(0)}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Dépensé</div>
+                                <div class="stat-value spent">${(data.budget - data.current).toFixed(0)}</div>
+                            </div>
+                        </div>
+
+                        <div class="envelope-actions">
+                            <button class="btn-action btn-add" onclick="openTransaction('${env.id}', 'add')">+ Ajouter</button>
+                            <button class="btn-action btn-spend" onclick="openTransaction('${env.id}', 'remove')" ${data.current <= 0 ? 'disabled' : ''}>- Dépenser</button>
+                            <button class="btn-action btn-history" onclick="showHistory('${env.id}')">📋</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openTransaction(envId, action) {
+            currentEnvelope = envId;
+            currentAction = action;
+            selectedModalPerson = null;
+            document.getElementById('modalMan').className = 'person-card';
+            document.getElementById('modalWoman').className = 'person-card';
+            document.getElementById('modalAmount').value = '';
+            document.getElementById('modalDesc').value = '';
+            document.getElementById('modalTitle').textContent = action === 'add' ? 'Ajouter des fonds' : 'Nouvelle dépense';
+            document.getElementById('transactionModal').classList.add('show');
+        }
+
+        function selectModalPerson(person) {
+            selectedModalPerson = person;
+            document.getElementById('modalMan').className = 'person-card' + (person === 'man' ? ' selected-man' : '');
+            document.getElementById('modalWoman').className = 'person-card' + (person === 'woman' ? ' selected-woman' : '');
+        }
+
+        function closeModal() {
+            document.getElementById('transactionModal').classList.remove('show');
+        }
+
+        function confirmTransaction() {
+            const amount = parseFloat(document.getElementById('modalAmount').value);
+            const desc = document.getElementById('modalDesc').value.trim();
+
+            if (!amount || amount <= 0 || !desc || !selectedModalPerson) {
+                alert('Veuillez remplir tous les champs');
+                return;
+            }
+
+            const weekData = weeksData[currentWeek - 1];
+            const env = weekData.envelopes[currentEnvelope];
+
+            if (currentAction === 'add') {
+                env.current += amount;
+                env.history.push({ type: 'add', amount, desc, person: selectedModalPerson, date: new Date().toLocaleDateString('fr-FR') });
+            } else {
+                if (amount > env.current) {
+                    if (currentWeek < config.nbSemaines) {
+                        const deficit = amount - env.current;
+                        const nextWeek = weeksData[currentWeek];
+                        const available = Math.min(deficit, nextWeek.envelopes[currentEnvelope].current);
+                        
+                        if (available > 0) {
+                            nextWeek.envelopes[currentEnvelope].current -= available;
+                            nextWeek.borrowing.from += available;
+                            weekData.borrowing.to += available;
+                            
+                            if (env.current > 0) {
+                                env.history.push({ type: 'remove', amount: env.current, desc: desc + ' (partiel)', person: selectedModalPerson, date: new Date().toLocaleDateString('fr-FR') });
+                            }
+                            env.current = 0;
+                            env.history.push({ type: 'remove', amount: available, desc: desc + ` [Emprunt S${currentWeek+1}]`, person: selectedModalPerson, date: new Date().toLocaleDateString('fr-FR') });
+                        }
+                    } else {
+                        alert('Fonds insuffisants');
+                        return;
+                    }
+                } else {
+                    env.current -= amount;
+                    env.history.push({ type: 'remove', amount, desc, person: selectedModalPerson, date: new Date().toLocaleDateString('fr-FR') });
+                }
+            }
+
+            closeModal();
+            renderTracking();
+            renderWeekTabs();
+            updateSummary();
+            saveData();
+        }
+
+        function showHistory(envId) {
+            const env = envelopes.find(e => e.id === envId);
+            document.getElementById('historyTitle').textContent = env.name;
+            
+            let html = '';
+            weeksData.forEach(w => {
+                const data = w.envelopes[envId];
+                data.history.forEach(h => {
+                    html += `
+                        <div class="history-item">
+                            <div class="history-person ${h.person}">${h.person === 'man' ? '👨' : '👩'}</div>
+                            <div class="history-info">
+                                <div class="history-desc">${h.desc}</div>
+                                <div class="history-meta">S${w.week} • ${h.date}</div>
+                            </div>
+                            <div class="history-amount ${h.type}">${h.type === 'add' ? '+' : '-'}${h.amount.toFixed(0)}</div>
+                        </div>
+                    `;
+                });
+            });
+
+            document.getElementById('historyList').innerHTML = html || '<div class="empty-state">Aucune transaction</div>';
+            document.getElementById('historyModal').classList.add('show');
+        }
+
+        function closeHistoryModal() {
+            document.getElementById('historyModal').classList.remove('show');
+        }
+
+        function updateSummary() {
+            let totalBudget = 0, totalSpent = 0;
+            weeksData.forEach(w => {
+                Object.values(w.envelopes).forEach(e => {
+                    totalBudget += e.budget;
+                    totalSpent += (e.budget - e.current);
+                });
+            });
+
+            document.getElementById('totalBudget').textContent = totalBudget.toFixed(0);
+            document.getElementById('totalSpent').textContent = totalSpent.toFixed(0);
+            document.getElementById('totalRemaining').textContent = (totalBudget - totalSpent).toFixed(0);
+            document.getElementById('totalEpargne').textContent = config.epargneObjectif.toFixed(0);
+        }
+
+        function resetAll() {
+            if (confirm('Tout réinitialiser ?')) {
+                localStorage.removeItem('budgetProData');
+                location.reload();
+            }
+        }
+
+        function exportData() {
+            const data = { config, monthlyPurchases, envelopes, weeksData, exportDate: new Date().toISOString() };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `budget_${config.monthYear}.json`;
+            a.click();
+        }
+
+        function saveData() {
+            localStorage.setItem('budgetProData', JSON.stringify({ config, monthlyPurchases, envelopes, weeksData, currentStep, currentWeek }));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('budgetProData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                config = data.config || config;
+                monthlyPurchases = data.monthlyPurchases || [];
+                envelopes = data.envelopes || envelopes;
+                weeksData = data.weeksData || [];
+                currentStep = data.currentStep || 1;
+                currentWeek = data.currentWeek || 1;
+
+                // Restore inputs
+                document.getElementById('revenu').value = config.revenu;
+                document.getElementById('credit').value = config.credit;
+                document.getElementById('epargneAvant').value = config.epargneAvant;
+                document.getElementById('monthYear').value = config.monthYear;
+                document.getElementById('epargneObjectif').value = config.epargneObjectif;
+                document.getElementById('epargneDisplay').textContent = config.epargneObjectif + ' د.ت';
+
+                if (weeksData.length > 0) {
+                    goToStep(4);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
