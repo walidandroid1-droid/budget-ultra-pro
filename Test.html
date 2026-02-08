@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Budget Pro - Export CSV & Démarrage Rapide</title>
     <style>
         :root {
@@ -32,87 +31,105 @@
             margin: 0 auto;
             min-height: 100vh;
             padding: 20px;
-            padding-top: env(safe-area-inset-top, 20px);
-            padding-bottom: env(safe-area-inset-bottom, 20px);
+            padding-bottom: 40px;
         }
 
         .header {
             background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);
             color: white;
-            padding: 24px;
+            padding: 30px 20px;
             border-radius: 24px;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             text-align: center;
         }
 
         .header h1 {
-            font-size: 28px;
+            font-size: 32px;
             margin-bottom: 8px;
+            font-weight: 800;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
         }
 
         .card {
             background: white;
             border-radius: 20px;
             padding: 24px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
 
         .card-title {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 700;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .input-group {
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .input-label {
             display: block;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 600;
             color: var(--gray-700);
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .input-field {
             width: 100%;
-            padding: 14px 16px;
+            padding: 16px;
             border: 2px solid var(--gray-200);
             border-radius: 12px;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
+            transition: all 0.3s;
         }
 
         .input-field:focus {
             outline: none;
             border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
         }
 
         .btn {
             width: 100%;
-            padding: 16px;
+            padding: 18px 24px;
             border: none;
-            border-radius: 12px;
-            font-size: 16px;
+            border-radius: 14px;
+            font-size: 17px;
             font-weight: 700;
             cursor: pointer;
-            margin-top: 10px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
         }
 
         .btn-primary {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);
             color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
         }
 
         .btn-success {
-            background: var(--success);
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
             color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
 
         .btn-secondary {
@@ -120,53 +137,69 @@
             color: var(--dark);
         }
 
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
         .mode-selector {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 16px;
             margin-bottom: 20px;
         }
 
         .mode-card {
-            padding: 20px;
+            padding: 24px 16px;
             border: 3px solid var(--gray-200);
             border-radius: 16px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
+            background: white;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
         }
 
         .mode-card.selected {
             border-color: var(--primary);
-            background: #eef2ff;
+            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
         }
 
         .mode-icon {
-            font-size: 32px;
-            margin-bottom: 8px;
+            font-size: 40px;
+            margin-bottom: 12px;
         }
 
         .mode-title {
             font-weight: 700;
-            font-size: 14px;
+            font-size: 15px;
+            margin-bottom: 4px;
         }
 
         .mode-desc {
             font-size: 12px;
             color: var(--gray-700);
-            margin-top: 4px;
+            line-height: 1.4;
         }
 
         .suggestion-card {
             background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
             border-radius: 16px;
             padding: 20px;
-            margin-bottom: 16px;
+            margin: 20px 0;
+            border: 2px solid #93c5fd;
         }
 
         .suggestion-title {
             font-weight: 700;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
+            font-size: 16px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -175,52 +208,91 @@
         .suggestion-item {
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
+            padding: 12px 0;
             border-bottom: 1px solid rgba(0,0,0,0.1);
+            font-size: 15px;
         }
 
         .suggestion-item:last-child {
             border-bottom: none;
         }
 
-        .quick-start-info {
+        .suggestion-total {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 2px solid var(--primary);
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .info-box {
             background: #fef3c7;
             border-radius: 12px;
             padding: 16px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--warning);
+        }
+
+        .info-box strong {
+            color: #92400e;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 16px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th {
+            background: var(--gray-700);
+            color: white;
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 8px;
+            text-align: center;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        tr:hover {
+            background: var(--gray-100);
+        }
+
+        .positive { color: var(--success); font-weight: 700; }
+        .negative { color: var(--danger); font-weight: 700; }
+
+        .hidden { display: none !important; }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
             margin-bottom: 16px;
-            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-
-        .quick-start-info strong {
-            color: #92400e;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            margin-top: 16px;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid var(--gray-200);
-        }
-
-        th {
-            background: var(--gray-100);
-            font-weight: 700;
-        }
-
-        .month-row:hover {
-            background: var(--gray-100);
-        }
-
-        .positive { color: var(--success); font-weight: 700; }
-        .negative { color: var(--danger); font-weight: 700; }
-
-        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -229,481 +301,375 @@
         <p>Export CSV & Démarrage Rapide</p>
     </div>
 
-    <!-- SÉLECTION DU MODE -->
-    <div class="card" id="modeSelection">
-        <div class="card-title">🚀 Choisissez votre mode</div>
-        
-        <div class="mode-selector">
-            <div class="mode-card" onclick="selectMode('quick')">
-                <div class="mode-icon">⚡</div>
-                <div class="mode-title">Démarrage Rapide</div>
-                <div class="mode-desc">Je donne mon revenu, le système propose</div>
-            </div>
-            <div class="mode-card" onclick="selectMode('complete')">
-                <div class="mode-icon">⚙️</div>
-                <div class="mode-title">Configuration Complète</div>
-                <div class="mode-desc">Contrôle total de tous les paramètres</div>
+    <!-- PAGE 1: SÉLECTION DU MODE -->
+    <div id="page-mode" class="fade-in">
+        <div class="card">
+            <div class="card-title">🚀 Choisissez votre mode</div>
+            
+            <div class="mode-selector">
+                <div class="mode-card" id="btn-quick" onclick="goToQuickMode()">
+                    <div class="mode-icon">⚡</div>
+                    <div class="mode-title">Démarrage Rapide</div>
+                    <div class="mode-desc">Je donne mon revenu, le système propose tout</div>
+                </div>
+                <div class="mode-card" id="btn-complete" onclick="goToCompleteMode()">
+                    <div class="mode-icon">⚙️</div>
+                    <div class="mode-title">Configuration Complète</div>
+                    <div class="mode-desc">Contrôle total de tous les paramètres</div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- MODE DÉMARRAGE RAPIDE -->
-    <div id="quickMode" class="hidden">
+        <!-- EXPORT CSV (toujours visible) -->
         <div class="card">
-            <div class="card-title">⚡ Démarrage Rapide</div>
+            <div class="card-title">📊 Export CSV Annuel</div>
             
             <div class="input-group">
-                <label class="input-label">Votre revenu mensuel</label>
-                <input type="number" class="input-field" id="quickRevenu" placeholder="Ex: 2671" oninput="calculateQuickStart()">
+                <label class="input-label">Année à exporter</label>
+                <select class="input-field" id="export-year">
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                </select>
             </div>
 
-            <div class="input-group">
-                <label class="input-label">Quel jour sommes-nous ?</label>
-                <input type="date" class="input-field" id="quickDate" onchange="calculateQuickStart()">
-            </div>
+            <button class="btn btn-secondary" onclick="generateCSV()">
+                📋 Générer le tableau
+            </button>
 
-            <div id="quickSuggestion" class="hidden">
-                <div class="quick-start-info">
-                    <strong>📅 Analyse :</strong>
-                    <div id="quickAnalysis"></div>
+            <div id="csv-container" class="hidden" style="margin-top: 20px;">
+                <div style="overflow-x: auto; margin-bottom: 16px;">
+                    <table id="csv-table">
+                        <thead>
+                            <tr>
+                                <th>Mois</th>
+                                <th>Revenu</th>
+                                <th>Crédit</th>
+                                <th>Achats</th>
+                                <th>Hebdo</th>
+                                <th>Épargne</th>
+                                <th>Reste</th>
+                            </tr>
+                        </thead>
+                        <tbody id="csv-body"></tbody>
+                    </table>
                 </div>
-
-                <div class="suggestion-card">
-                    <div class="suggestion-title">💡 Proposition de répartition</div>
-                    <div id="suggestionList"></div>
-                </div>
-
-                <button class="btn btn-success" onclick="applyQuickStart()">
-                    ✅ Appliquer cette répartition
+                <button class="btn btn-success" onclick="downloadCSV()">
+                    💾 Télécharger CSV
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODE COMPLET (votre app existante) -->
-    <div id="completeMode" class="hidden">
-        <div class="card">
-            <div class="card-title">⚙️ Configuration Complète</div>
-            <p style="color: var(--gray-700); margin-bottom: 16px;">
-                Utilisez le mode complet pour un contrôle total de votre budget mensuel.
-            </p>
-            <button class="btn btn-primary" onclick="alert('Mode complet - Intégrez ici votre app existante')">
-                Continuer en mode complet
-            </button>
-        </div>
-    </div>
-
-    <!-- EXPORT CSV ANNUEL -->
-    <div class="card">
-        <div class="card-title">📊 Export CSV Annuel</div>
+    <!-- PAGE 2: DÉMARRAGE RAPIDE -->
+    <div id="page-quick" class="hidden">
+        <button class="back-btn" onclick="goBackToMode()">← Retour</button>
         
-        <div class="input-group">
-            <label class="input-label">Année à exporter</label>
-            <select class="input-field" id="exportYear">
-                <option value="2025">2025</option>
-                <option value="2024">2024</option>
-            </select>
-        </div>
-
-        <button class="btn btn-secondary" onclick="generateAnnualCSV()">
-            📥 Générer le CSV
-        </button>
-
-        <div id="csvPreview" class="hidden" style="margin-top: 20px;">
-            <div style="overflow-x: auto;">
-                <table id="previewTable">
-                    <thead>
-                        <tr>
-                            <th>Mois</th>
-                            <th>Revenu</th>
-                            <th>Crédit</th>
-                            <th>Achats Mensuels</th>
-                            <th>Dépenses Hebdo</th>
-                            <th>Épargne</th>
-                            <th>Total Dépensé</th>
-                            <th>Reste</th>
-                        </tr>
-                    </thead>
-                    <tbody id="previewBody"></tbody>
-                </table>
-            </div>
-            <button class="btn btn-success" onclick="downloadCSV()" style="margin-top: 16px;">
-                💾 Télécharger le fichier CSV
-            </button>
-        </div>
-    </div>
-
-    <script>
-        // Données exemple pour l'année (à remplacer par vos vraies données)
-        let annualData = {
-            2025: {
-                1: { revenu: 2671, credit: 700, mensuel: 450, hebdo: 1200, epargne: 500, total: 1650, reste: 1021 },
-                2: { revenu: 2671, credit: 700, mensuel: 300, hebdo: 1100, epargne: 500, total: 1400, reste: 1271 },
-                3: { revenu: 2700, credit: 700, mensuel: 200, hebdo: 1300, epargne: 600, total: 1500, reste: 1200 },
-                4: { revenu: 2671, credit: 700, mensuel: 500, hebdo: 1000, epargne: 500, total: 1500, reste: 1171 },
-                5: { revenu: 2671, credit: 700, mensuel: 350, hebdo: 1150, epargne: 500, total: 1500, reste: 1171 },
-                6: { revenu: 2800, credit: 700, mensuel: 400, hebdon            font-size: 14px;
-        }
-
-        .quick-start-info strong {
-            color: #92400e;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            margin-top: 16px;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid var(--gray-200);
-        }
-
-        th {
-            background: var(--gray-100);
-            font-weight: 700;
-        }
-
-        .month-row:hover {
-            background: var(--gray-100);
-        }
-
-        .positive { color: var(--success); font-weight: 700; }
-        .negative { color: var(--danger); font-weight: 700; }
-
-        .hidden { display: none !important; }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>💰 Budget Pro</h1>
-        <p>Export CSV & Démarrage Rapide</p>
-    </div>
-
-    <!-- SÉLECTION DU MODE -->
-    <div class="card" id="modeSelection">
-        <div class="card-title">🚀 Choisissez votre mode</div>
-        
-        <div class="mode-selector">
-            <div class="mode-card" onclick="selectMode('quick')">
-                <div class="mode-icon">⚡</div>
-                <div class="mode-title">Démarrage Rapide</div>
-                <div class="mode-desc">Je donne mon revenu, le système propose</div>
-            </div>
-            <div class="mode-card" onclick="selectMode('complete')">
-                <div class="mode-icon">⚙️</div>
-                <div class="mode-title">Configuration Complète</div>
-                <div class="mode-desc">Contrôle total de tous les paramètres</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODE DÉMARRAGE RAPIDE -->
-    <div id="quickMode" class="hidden">
         <div class="card">
             <div class="card-title">⚡ Démarrage Rapide</div>
             
             <div class="input-group">
-                <label class="input-label">Votre revenu mensuel</label>
-                <input type="number" class="input-field" id="quickRevenu" placeholder="Ex: 2671" oninput="calculateQuickStart()">
+                <label class="input-label">Votre revenu mensuel habituel</label>
+                <input type="number" class="input-field" id="quick-revenu" placeholder="Ex: 2671" oninput="calculateQuick()">
             </div>
 
             <div class="input-group">
                 <label class="input-label">Quel jour sommes-nous ?</label>
-                <input type="date" class="input-field" id="quickDate" onchange="calculateQuickStart()">
+                <input type="date" class="input-field" id="quick-date" onchange="calculateQuick()">
             </div>
 
-            <div id="quickSuggestion" class="hidden">
-                <div class="quick-start-info">
-                    <strong>📅 Analyse :</strong>
-                    <div id="quickAnalysis"></div>
+            <div id="quick-result" class="hidden">
+                <div class="info-box">
+                    <strong>📅 Analyse du mois</strong>
+                    <div id="quick-analysis"></div>
                 </div>
 
                 <div class="suggestion-card">
                     <div class="suggestion-title">💡 Proposition de répartition</div>
-                    <div id="suggestionList"></div>
+                    <div id="suggestion-list"></div>
                 </div>
 
                 <button class="btn btn-success" onclick="applyQuickStart()">
-                    ✅ Appliquer cette répartition
+                    ✅ Utiliser cette répartition
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODE COMPLET (votre app existante) -->
-    <div id="completeMode" class="hidden">
+    <!-- PAGE 3: CONFIGURATION COMPLÈTE -->
+    <div id="page-complete" class="hidden">
+        <button class="back-btn" onclick="goBackToMode()">← Retour</button>
+        
         <div class="card">
             <div class="card-title">⚙️ Configuration Complète</div>
-            <p style="color: var(--gray-700); margin-bottom: 16px;">
-                Utilisez le mode complet pour un contrôle total de votre budget mensuel.
+            <p style="margin-bottom: 20px; color: var(--gray-700);">
+                Cette section vous permet de configurer manuellement chaque aspect de votre budget.
             </p>
-            <button class="btn btn-primary" onclick="alert('Mode complet - Intégrez ici votre app existante')">
-                Continuer en mode complet
-            </button>
-        </div>
-    </div>
-
-    <!-- EXPORT CSV ANNUEL -->
-    <div class="card">
-        <div class="card-title">📊 Export CSV Annuel</div>
-        
-        <div class="input-group">
-            <label class="input-label">Année à exporter</label>
-            <select class="input-field" id="exportYear">
-                <option value="2025">2025</option>
-                <option value="2024">2024</option>
-            </select>
-        </div>
-
-        <button class="btn btn-secondary" onclick="generateAnnualCSV()">
-            📥 Générer le CSV
-        </button>
-
-        <div id="csvPreview" class="hidden" style="margin-top: 20px;">
-            <div style="overflow-x: auto;">
-                <table id="previewTable">
-                    <thead>
-                        <tr>
-                            <th>Mois</th>
-                            <th>Revenu</th>
-                            <th>Crédit</th>
-                            <th>Achats Mensuels</th>
-                            <th>Dépenses Hebdo</th>
-                            <th>Épargne</th>
-                            <th>Total Dépensé</th>
-                            <th>Reste</th>
-                        </tr>
-                    </thead>
-                    <tbody id="previewBody"></tbody>
-                </table>
+            
+            <div class="input-group">
+                <label class="input-label">Revenu Principal</label>
+                <input type="number" class="input-field" id="complete-revenu" placeholder="2671">
             </div>
-            <button class="btn btn-success" onclick="downloadCSV()" style="margin-top: 16px;">
-                💾 Télécharger le fichier CSV
+
+            <div class="input-group">
+                <label class="input-label">Crédit Mensuel</label>
+                <input type="number" class="input-field" id="complete-credit" placeholder="700">
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">Épargne Objectif</label>
+                <input type="number" class="input-field" id="complete-epargne" placeholder="500">
+            </div>
+
+            <button class="btn btn-primary" onclick="saveCompleteConfig()">
+                💾 Sauvegarder la configuration
             </button>
         </div>
     </div>
 
     <script>
-        // Données exemple pour l'année (à remplacer par vos vraies données)
-        let annualData = {
+        // Données globales
+        let currentCSV = '';
+        let quickData = null;
+
+        // Données exemple pour l'export CSV
+        const annualData = {
             2025: {
-                1: { revenu: 2671, credit: 700, mensuel: 450, hebdo: 1200, epargne: 500, total: 1650, reste: 1021 },
-                2: { revenu: 2671, credit: 700, mensuel: 300, hebdo: 1100, epargne: 500, total: 1400, reste: 1271 },
-                3: { revenu: 2700, credit: 700, mensuel: 200, hebdo: 1300, epargne: 600, total: 1500, reste: 1200 },
-                4: { revenu: 2671, credit: 700, mensuel: 500, hebdo: 1000, epargne: 500, total: 1500, reste: 1171 },
-                5: { revenu: 2671, credit: 700, mensuel: 350, hebdo: 1150, epargne: 500, total: 1500, reste: 1171 },
-                6: { revenu: 2800, credit: 700, mensuel: 400, hebdo: 1200, epargne: 700, total: 1600, reste: 1200 },
+                1: { revenu: 2671, credit: 700, mensuel: 450, hebdo: 1200, epargne: 500, reste: 1021 },
+                2: { revenu: 2671, credit: 700, mensuel: 300, hebdo: 1100, epargne: 500, reste: 1271 },
+                3: { revenu: 2700, credit: 700, mensuel: 200, hebdo: 1300, epargne: 600, reste: 1200 },
+                4: { revenu: 2671, credit: 700, mensuel: 500, hebdo: 1000, epargne: 500, reste: 1171 },
+                5: { revenu: 2671, credit: 700, mensuel: 350, hebdo: 1150, epargne: 500, reste: 1171 },
+                6: { revenu: 2800, credit: 700, mensuel: 400, hebdo: 1200, epargne: 700, reste: 1200 },
             }
         };
 
-        let currentMode = null;
-        let quickStartData = null;
-
-        function selectMode(mode) {
-            currentMode = mode;
-            document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
-            event.currentTarget.classList.add('selected');
-            
-            setTimeout(() => {
-                document.getElementById('modeSelection').classList.add('hidden');
-                if (mode === 'quick') {
-                    document.getElementById('quickMode').classList.remove('hidden');
-                    // Pré-remplir la date d'aujourd'hui
-                    document.getElementById('quickDate').valueAsDate = new Date();
-                } else {
-                    document.getElementById('completeMode').classList.remove('hidden');
-                }
-            }, 300);
+        // NAVIGATION
+        function showPage(pageId) {
+            document.querySelectorAll('[id^="page-"]').forEach(p => p.classList.add('hidden'));
+            document.getElementById(pageId).classList.remove('hidden');
+            document.getElementById(pageId).classList.add('fade-in');
         }
 
-        function calculateQuickStart() {
-            const revenu = parseFloat(document.getElementById('quickRevenu').value);
-            const dateInput = document.getElementById('quickDate').value;
+        function goToQuickMode() {
+            document.getElementById('btn-quick').classList.add('selected');
+            setTimeout(() => {
+                showPage('page-quick');
+                // Pré-remplir la date d'aujourd'hui
+                document.getElementById('quick-date').valueAsDate = new Date();
+            }, 200);
+        }
+
+        function goToCompleteMode() {
+            document.getElementById('btn-complete').classList.add('selected');
+            setTimeout(() => {
+                showPage('page-complete');
+            }, 200);
+        }
+
+        function goBackToMode() {
+            document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
+            showPage('page-mode');
+        }
+
+        // DÉMARRAGE RAPIDE
+        function calculateQuick() {
+            const revenu = parseFloat(document.getElementById('quick-revenu').value);
+            const dateStr = document.getElementById('quick-date').value;
             
-            if (!revenu || !dateInput) return;
+            if (!revenu || !dateStr) {
+                document.getElementById('quick-result').classList.add('hidden');
+                return;
+            }
             
-            const date = new Date(dateInput);
+            const date = new Date(dateStr);
             const day = date.getDate();
             const month = date.getMonth() + 1;
             const year = date.getFullYear();
             const daysInMonth = new Date(year, month, 0).getDate();
             const remainingDays = daysInMonth - day + 1;
-            const remainingWeeks = Math.ceil(remainingDays / 7);
+            const remainingWeeks = Math.max(1, Math.ceil(remainingDays / 7));
             
             // Calcul au prorata
             const ratio = remainingDays / daysInMonth;
             const adjustedRevenu = revenu * ratio;
             
-            // Suggestion de répartition (règle 50/30/20 adaptée)
-            const necessaires = adjustedRevenu * 0.50; // 50% besoins
-            const loisirs = adjustedRevenu * 0.30;     // 30% loisirs/envies
-            const epargne = adjustedRevenu * 0.20;     // 20% épargne
+            // Répartition 50/30/20
+            const necessaires = adjustedRevenu * 0.50;
+            const loisirs = adjustedRevenu * 0.30;
+            const epargne = adjustedRevenu * 0.20;
             
-            // Répartition des besoins par enveloppe
-            const courses = necessaires * 0.40;
-            const transport = necessaires * 0.25;
-            const enfants = necessaires * 0.20;
-            const divers = necessaires * 0.15;
+            // Détails des besoins
+            const courses = (necessaires * 0.40) / remainingWeeks;
+            const transport = (necessaires * 0.25) / remainingWeeks;
+            const enfants = (necessaires * 0.20) / remainingWeeks;
+            const divers = (necessaires * 0.15) / remainingWeeks;
+            const loisirsHebdo = loisirs / remainingWeeks;
             
-            quickStartData = {
-                revenu: adjustedRevenu,
-                day,
-                month,
-                year,
-                remainingDays,
-                remainingWeeks,
-                ratio,
-                repartition: {
-                    courses: courses / remainingWeeks,
-                    transport: transport / remainingWeeks,
-                    enfants: enfants / remainingWeeks,
-                    divers: divers / remainingWeeks,
-                    loisirs: loisirs / remainingWeeks,
-                    epargne: epargne
-                }
+            quickData = {
+                revenu, day, month, year, remainingDays, remainingWeeks,
+                adjustedRevenu, epargne,
+                repartition: { courses, transport, enfants, divers, loisirs: loisirsHebdo }
             };
             
-            // Afficher l'analyse
-            document.getElementById('quickAnalysis').innerHTML = `
-                <div style="margin-top: 8px;">
-                    • Nous sommes le <strong>${day}/${month}/${year}</strong><br>
-                    • Il reste <strong>${remainingDays} jours</strong> ce mois-ci<br>
-                    • Soit <strong>${remainingWeeks} semaines</strong> complètes<br>
-                    • Revenu ajusté (prorata): <strong>${adjustedRevenu.toFixed(0)} د.ت</strong>
+            // Afficher analyse
+            document.getElementById('quick-analysis').innerHTML = `
+                <div style="line-height: 1.8;">
+                    • Date: <strong>${day}/${month}/${year}</strong><br>
+                    • Jours restants: <strong>${remainingDays} jours</strong><br>
+                    • Semaines restantes: <strong>${remainingWeeks} semaines</strong><br>
+                    • Revenu ajusté: <strong style="color: var(--primary);">${adjustedRevenu.toFixed(0)} د.ت</strong>
                 </div>
             `;
             
-            // Afficher les suggestions
-            document.getElementById('suggestionList').innerHTML = `
+            // Afficher suggestions
+            document.getElementById('suggestion-list').innerHTML = `
                 <div class="suggestion-item">
-                    <span>🛒 Courses (par semaine)</span>
-                    <strong>${quickStartData.repartition.courses.toFixed(0)} د.ت</strong>
+                    <span>🛒 Courses / semaine</span>
+                    <strong>${courses.toFixed(0)} د.ت</strong>
                 </div>
                 <div class="suggestion-item">
-                    <span>⛽ Transport (par semaine)</span>
-                    <strong>${quickStartData.repartition.transport.toFixed(0)} د.ت</strong>
+                    <span>⛽ Transport / semaine</span>
+                    <strong>${transport.toFixed(0)} د.ت</strong>
                 </div>
                 <div class="suggestion-item">
-                    <span>👶 Enfants (par semaine)</span>
-                    <strong>${quickStartData.repartition.enfants.toFixed(0)} د.ت</strong>
+                    <span>👶 Enfants / semaine</span>
+                    <strong>${enfants.toFixed(0)} د.ت</strong>
                 </div>
                 <div class="suggestion-item">
-                    <span>🎮 Loisirs (par semaine)</span>
-                    <strong>${quickStartData.repartition.loisirs.toFixed(0)} د.ت</strong>
+                    <span>🎮 Loisirs / semaine</span>
+                    <strong>${loisirsHebdo.toFixed(0)} د.ت</strong>
                 </div>
                 <div class="suggestion-item">
-                    <span>📦 Divers (par semaine)</span>
-                    <strong>${quickStartData.repartition.divers.toFixed(0)} د.ت</strong>
+                    <span>📦 Divers / semaine</span>
+                    <strong>${divers.toFixed(0)} د.ت</strong>
                 </div>
-                <div class="suggestion-item" style="border-top: 2px solid var(--primary); margin-top: 8px; padding-top: 12px;">
-                    <span>🏦 Épargne (ce mois)</span>
-                    <strong style="color: var(--success);">${quickStartData.repartition.epargne.toFixed(0)} د.ت</strong>
+                <div class="suggestion-total">
+                    <span>🏦 Épargne ce mois</span>
+                    <strong style="color: var(--success);">${epargne.toFixed(0)} د.ت</strong>
                 </div>
             `;
             
-            document.getElementById('quickSuggestion').classList.remove('hidden');
+            document.getElementById('quick-result').classList.remove('hidden');
         }
 
         function applyQuickStart() {
-            if (!quickStartData) return;
+            if (!quickData) return;
             
-            // Sauvegarder dans localStorage pour utilisation
-            localStorage.setItem('quickStartConfig', JSON.stringify(quickStartData));
+            localStorage.setItem('budgetQuickStart', JSON.stringify(quickData));
             
-            alert(`✅ Configuration appliquée !\\n\\nBudget hebdomadaire: ${(quickStartData.revenu / quickStartData.remainingWeeks).toFixed(0)} د.ت\\nÉpargne prévue: ${quickStartData.repartition.epargne.toFixed(0)} د.ت\\n\\nVous pouvez maintenant utiliser le suivi hebdomadaire.`);
+            alert(`✅ Configuration sauvegardée !\\n\\n` +
+                  `Budget hebdomadaire: ${(quickData.adjustedRevenu / quickData.remainingWeeks).toFixed(0)} د.ت\\n` +
+                  `Épargne prévue: ${quickData.epargne.toFixed(0)} د.ت\\n\\n` +
+                  `Vous pouvez maintenant commencer votre suivi !`);
+        }
+
+        // CONFIGURATION COMPLÈTE
+        function saveCompleteConfig() {
+            const revenu = document.getElementById('complete-revenu').value;
+            const credit = document.getElementById('complete-credit').value;
+            const epargne = document.getElementById('complete-epargne').value;
             
-            // Ici, rediriger vers l'app de suivi avec ces paramètres
-            console.log('Quick start config:', quickStartData);
+            if (!revenu || !credit || !epargne) {
+                alert('Veuillez remplir tous les champs');
+                return;
+            }
+            
+            const config = { revenu: parseFloat(revenu), credit: parseFloat(credit), epargne: parseFloat(epargne) };
+            localStorage.setItem('budgetCompleteConfig', JSON.stringify(config));
+            
+            alert('✅ Configuration sauvegardée avec succès !');
         }
 
         // EXPORT CSV
-        let currentCSV = '';
-
-        function generateAnnualCSV() {
-            const year = document.getElementById('exportYear').value;
+        function generateCSV() {
+            const year = document.getElementById('export-year').value;
             const data = annualData[year] || {};
             
-            // Créer le CSV
-            let csv = 'Mois,Revenu,Crédit,Achats_Mensuels,Dépenses_Hebdo,Épargne,Total_Dépensé,Reste\\n';
+            const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+            
+            let csv = 'Mois,Revenu,Crédit,Achats_Mensuels,Dépenses_Hebdo,Épargne,Reste\\n';
             let html = '';
             
-            const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+            let totals = { revenu: 0, credit: 0, mensuel: 0, hebdo: 0, epargne: 0, reste: 0 };
             
             for (let i = 1; i <= 12; i++) {
-                const m = data[i] || { revenu: 0, credit: 0, mensuel: 0, hebdo: 0, epargne: 0, total: 0, reste: 0 };
+                const m = data[i] || { revenu: 0, credit: 0, mensuel: 0, hebdo: 0, epargne: 0, reste: 0 };
                 
-                csv += `${monthNames[i-1]},${m.revenu},${m.credit},${m.mensuel},${m.hebdo},${m.epargne},${m.total},${m.reste}\\n`;
+                csv += `${months[i-1]},${m.revenu},${m.credit},${m.mensuel},${m.hebdo},${m.epargne},${m.reste}\\n`;
                 
                 const resteClass = m.reste >= 0 ? 'positive' : 'negative';
                 html += `
-                    <tr class="month-row">
-                        <td><strong>${monthNames[i-1]}</strong></td>
-                        <td>${m.revenu.toFixed(0)}</td>
-                        <td>${m.credit.toFixed(0)}</td>
-                        <td>${m.mensuel.toFixed(0)}</td>
-                        <td>${m.hebdo.toFixed(0)}</td>
-                        <td>${m.epargne.toFixed(0)}</td>
-                        <td>${m.total.toFixed(0)}</td>
-                        <td class="${resteClass}">${m.reste >= 0 ? '+' : ''}${m.reste.toFixed(0)}</td>
+                    <tr>
+                        <td><strong>${months[i-1]}</strong></td>
+                        <td>${m.revenu}</td>
+                        <td>${m.credit}</td>
+                        <td>${m.mensuel}</td>
+                        <td>${m.hebdo}</td>
+                        <td>${m.epargne}</td>
+                        <td class="${resteClass}">${m.reste >= 0 ? '+' : ''}${m.reste}</td>
                     </tr>
                 `;
+                
+                totals.revenu += m.revenu;
+                totals.credit += m.credit;
+                totals.mensuel += m.mensuel;
+                totals.hebdo += m.hebdo;
+                totals.epargne += m.epargne;
+                totals.reste += m.reste;
             }
             
-            // Totaux annuels
-            const totals = Object.values(data).reduce((acc, m) => ({
-                revenu: acc.revenu + m.revenu,
-                credit: acc.credit + m.credit,
-                mensuel: acc.mensuel + m.mensuel,
-                hebdo: acc.hebdo + m.hebdo,
-                epargne: acc.epargne + m.epargne,
-                total: acc.total + m.total,
-                reste: acc.reste + m.reste
-            }), { revenu: 0, credit: 0, mensuel: 0, hebdo: 0, epargne: 0, total: 0, reste: 0 });
-            
-            csv += `TOTAL,${totals.revenu},${totals.credit},${totals.mensuel},${totals.hebdo},${totals.epargne},${totals.total},${totals.reste}\\n`;
-            
+            // Ligne de totaux
+            csv += `TOTAL,${totals.revenu},${totals.credit},${totals.mensuel},${totals.hebdo},${totals.epargne},${totals.reste}\\n`;
             html += `
-                <tr style="background: var(--gray-700); color: white; font-weight: 700;">
-                    <td>TOTAL ANNÉE</td>
-                    <td>${totals.revenu.toFixed(0)}</td>
-                    <td>${totals.credit.toFixed(0)}</td>
-                    <td>${totals.mensuel.toFixed(0)}</td>
-                    <td>${totals.hebdo.toFixed(0)}</td>
-                    <td>${totals.epargne.toFixed(0)}</td>
-                    <td>${totals.total.toFixed(0)}</td>
-                    <td>${totals.reste >= 0 ? '+' : ''}${totals.reste.toFixed(0)}</td>
+                <tr style="background: var(--dark); color: white; font-weight: 700;">
+                    <td>TOTAL</td>
+                    <td>${totals.revenu}</td>
+                    <td>${totals.credit}</td>
+                    <td>${totals.mensuel}</td>
+                    <td>${totals.hebdo}</td>
+                    <td>${totals.epargne}</td>
+                    <td>${totals.reste >= 0 ? '+' : ''}${totals.reste}</td>
                 </tr>
             `;
             
             currentCSV = csv;
-            document.getElementById('previewBody').innerHTML = html;
-            document.getElementById('csvPreview').classList.remove('hidden');
+            document.getElementById('csv-body').innerHTML = html;
+            document.getElementById('csv-container').classList.remove('hidden');
         }
 
         function downloadCSV() {
-            if (!currentCSV) return;
+            if (!currentCSV) {
+                alert('Veuillez d\'abord générer le tableau');
+                return;
+            }
             
-            const year = document.getElementById('exportYear').value;
+            const year = document.getElementById('export-year').value;
             const blob = new Blob([currentCSV], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
             link.download = `budget_${year}.csv`;
+            document.body.appendChild(link);
             link.click();
+            document.body.removeChild(link);
+            
+            alert('✅ Fichier CSV téléchargé !');
         }
 
-        // Charger les données sauvegardées
-        function loadSavedData() {
-            const saved = localStorage.getItem('annualData');
-            if (saved) {
-                annualData = JSON.parse(saved);
+        // Charger les données sauvegardées au démarrage
+        window.onload = function() {
+            const quick = localStorage.getItem('budgetQuickStart');
+            const complete = localStorage.getItem('budgetCompleteConfig');
+            
+            if (quick) {
+                console.log('Config rapide trouvée:', JSON.parse(quick));
             }
-        }
-
-        loadSavedData();
+            if (complete) {
+                const c = JSON.parse(complete);
+                document.getElementById('complete-revenu').value = c.revenu;
+                document.getElementById('complete-credit').value = c.credit;
+                document.getElementById('complete-epargne').value = c.epargne;
+            }
+        };
     </script>
 </body>
 </html>
