@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Hebdo - Gestion par Enveloppes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-light: #334155;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #475569;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+        }
+
+        .steps-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .step-dot {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--surface);
+            border-radius: 50px;
+            border: 2px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .step-dot.active {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .step-dot.completed {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .step-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .step-dot.active .step-number {
+            background: var(--primary);
+        }
+
+        .step-dot.completed .step-number {
+            background: var(--success);
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--surface-light);
+            color: var(--text);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .envelopes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .envelope-card {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .envelope-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .envelope-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .envelope-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .envelope-amount {
+            color: var(--success);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .envelope-card:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .weeks-container {
+            margin-top: 30px;
+        }
+
+        .week-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .week-tab {
+            padding: 15px 25px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .week-tab:hover {
+            border-color: var(--primary);
+        }
+
+        .week-tab.active {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .week-tab.completed {
+            border-color: var(--success);
+            opacity: 0.7;
+        }
+
+        .week-status {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .week-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .progress-ring-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 15px;
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .transaction-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .btn-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+
+        .btn-add {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-sub {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-history {
+            background: var(--info);
+            color: white;
+        }
+
+        .gender-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .gender-btn {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid var(--border);
+            background: var(--bg);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .gender-btn:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .gender-btn.selected {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.2);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+        }
+
+        .modal h3 {
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .transaction-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: var(--bg);
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .transaction-item.negative {
+            border-left-color: var(--danger);
+        }
+
+        .transaction-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .close-options {
+            display: grid;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .close-option {
+            padding: 20px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .close-option:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .close-option h4 {
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .close-option p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .summary-card {
+            background: var(--bg);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .summary-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .summary-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.8rem; }
+            .card { padding: 20px; }
+            .week-tab { padding: 10px 15px; min-width: 80px; }
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: var(--warning);
+            color: var(--warning);
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: var(--danger);
+        }
+
+        .emoji-picker {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .emoji-btn {
+            font-size: 1.5rem;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .emoji-btn:hover, .emoji-btn.selected {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.2);
+        }
+
+        .amount-input {
+            width: 100%;
+            padding: 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            text-align: center;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .close-month-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 20px 30px;
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4);
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .close-month-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.6);
+        }
+
+        .edit-amount-btn {
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+
+        .edit-amount-btn:hover {
+            border-color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Budget Hebdomadaire</h1>
+            <p>Gérez vos finances par enveloppes sur 4 semaines</p>
+        </div>
+
+        <div class="steps-indicator">
+            <div class="step-dot active" id="step1-dot">
+                <span class="step-number">1</span>
+                <span>Config</span>
+            </div>
+            <div class="step-dot" id="step2-dot">
+                <span class="step-number">2</span>
+                <span>Répartition</span>
+            </div>
+            <div class="step-dot" id="step3-dot">
+                <span class="step-number">3</span>
+                <span>Semaines</span>
+            </div>
+            <div class="step-dot" id="step4-dot">
+                <span class="step-number">4</span>
+                <span>Bilan</span>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 1: CONFIGURATION -->
+        <div id="step1" class="step-content">
+            <div class="card">
+                <h2>⚙️ Configuration Initiale</h2>
+                <div class="input-grid">
+                    <div class="form-group">
+                        <label>📅 Mois concerné</label>
+                        <input type="month" id="config-month" value="2024-01">
+                    </div>
+                    <div class="form-group">
+                        <label>💵 Revenu principal (€)</label>
+                        <input type="number" id="config-revenu" placeholder="2500" min="0" step="50">
+                    </div>
+                    <div class="form-group">
+                        <label>💳 Crédit à rembourser (€)</label>
+                        <input type="number" id="config-credit" placeholder="0" min="0" step="10">
+                    </div>
+                    <div class="form-group">
+                        <label>🏦 Épargne disponible (début)</label>
+                        <input type="number" id="config-epargne-start" placeholder="0" min="0" step="50">
+                    </div>
+                    <div class="form-group">
+                        <label>🎯 Objectif d'épargne ce mois</label>
+                        <input type="number" id="config-epargne-obj" placeholder="200" min="0" step="50">
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="goToStep2()">
+                        Continuer →
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 2: RÉPARTITION -->
+        <div id="step2" class="step-content hidden">
+            <div class="card">
+                <h2>📊 Répartition du Budget</h2>
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="summary-label">Budget mensuel net</div>
+                        <div class="summary-value" style="color: var(--success);" id="total-budget">0€</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-label">Budget hebdomadaire</div>
+                        <div class="summary-value" style="color: var(--info);" id="weekly-budget">0€</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-label">Nombre de semaines</div>
+                        <div class="summary-value">4</div>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning">
+                    💡 Le budget hebdomadaire est calculé automatiquement : (Revenu - Crédit - Objectif épargne) / 4 semaines
+                </div>
+
+                <h3 style="margin: 30px 0 15px; color: var(--primary);">📁 Vos Enveloppes (modifiables)</h3>
+                <div class="envelopes-grid" id="envelopes-container">
+                    <!-- Envelopes générées dynamiquement -->
+                </div>
+
+                <div style="margin-top: 30px; padding: 20px; background: var(--bg); border-radius: 12px;">
+                    <h4>➕ Ajouter une enveloppe</h4>
+                    <div class="input-grid" style="margin-top: 15px;">
+                        <div class="form-group">
+                            <label>Nom</label>
+                            <input type="text" id="new-env-name" placeholder="Ex: Santé">
+                        </div>
+                        <div class="form-group">
+                            <label>Icône</label>
+                            <div class="emoji-picker">
+                                <button class="emoji-btn selected" onclick="selectEmoji(this, '📦')">📦</button>
+                                <button class="emoji-btn" onclick="selectEmoji(this, '🛒')">🛒</button>
+                                <button class="emoji-btn" onclick="selectEmoji(this, '⛽')">⛽</button>
+                                <button class="emoji-btn" onclick="selectEmoji(this, '👶')">👶</button>
+                                <button class="emoji-btn" onclick="selectEmoji(this, '🎮')">🎮</button>
+                                <button class="emoji-btn" onclick="selectEmoji(this, '🏥')">🏥</button>
+                                <button class="emoji-btn" onclick="selectEmoji(this, '🍽️')">🍽️</button>
+                                <button class="emoji-btn" onclick="selectEmoji(this, '🚗')">🚗</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="addEnvelope()" style="margin-top: 15px;">
+                        Ajouter l'enveloppe
+                    </button>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="goToStep(1)">← Retour</button>
+                    <button class="btn btn-primary" onclick="goToStep3()">Continuer →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 3: SEMAINES -->
+        <div id="step3" class="step-content hidden">
+            <div class="card">
+                <h2>📅 Gestion Hebdomadaire</h2>
+                
+                <div class="week-tabs" id="week-tabs">
+                    <!-- Généré dynamiquement -->
+                </div>
+
+                <div id="week-content">
+                    <!-- Contenu de la semaine active -->
+                </div>
+            </div>
+            
+            <button class="close-month-btn" onclick="confirmCloseMonth()">
+                🔒 Clôturer le mois
+            </button>
+        </div>
+
+        <!-- ÉTAPE 4: BILAN -->
+        <div id="step4" class="step-content hidden">
+            <div class="card">
+                <h2>📈 Bilan du Mois</h2>
+                
+                <div class="summary-grid" id="final-summary">
+                    <!-- Résumé final -->
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <h3 style="color: var(--primary); margin-bottom: 15px;">📊 Détail par semaine</h3>
+                    <div id="weeks-detail"></div>
+                </div>
+
+                <div class="btn-group" style="margin-top: 30px;">
+                    <button class="btn btn-secondary" onclick="exportCSV()">📥 Export CSV</button>
+                    <button class="btn btn-primary" onclick="newMonth()">🔄 Nouveau mois</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Transaction -->
+    <div id="transaction-modal" class="modal-overlay hidden" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <h3>💳 Nouvelle Dépense</h3>
+            <div class="form-group">
+                <label>Montant (€)</label>
+                <input type="number" id="trans-amount" placeholder="0" min="0" step="0.01">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <input type="text" id="trans-desc" placeholder="Ex: Courses Lidl">
+            </div>
+            <div class="form-group">
+                <label>Par qui ?</label>
+                <div class="gender-buttons">
+                    <button class="gender-btn" onclick="selectGender('👨')" id="btn-homme">👨 Homme</button>
+                    <button class="gender-btn" onclick="selectGender('👩')" id="btn-femme">👩 Femme</button>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+                <button class="btn btn-primary" onclick="saveTransaction()">Valider</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Clôture Semaine -->
+    <div id="close-modal" class="modal-overlay hidden" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <h3>🔒 Clôturer la Semaine</h3>
+            <p style="margin-bottom: 20px; color: var(--text-muted);">
+                Il reste <strong id="close-remaining" style="color: var(--success);">0€</strong> dans cette enveloppe.
+                Que souhaitez-vous faire ?
+            </p>
+            <div class="close-options">
+                <div class="close-option" onclick="closeWeekAction('epargne')">
+                    <h4>💰 Vers l'épargne</h4>
+                    <p>Ajouter le reste à votre épargne du mois</p>
+                </div>
+                <div class="close-option" onclick="closeWeekAction('next')">
+                    <h4>🔄 Emprunt S+1</h4>
+                    <p>Transférer à la semaine suivante (même enveloppe)</p>
+                </div>
+                <div class="close-option" onclick="closeWeekAction('keep')">
+                    <h4>💵 Garder</h4>
+                    <p>Conserver dans l'enveloppe pour plus tard</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Emprunt Spécifique -->
+    <div id="borrow-modal" class="modal-overlay hidden" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <h3>🆘 Emprunter de S+1</h3>
+            <p style="margin-bottom: 20px;">
+                Dépassement dans <strong id="borrow-envelope-name" style="color: var(--primary);"></strong>
+            </p>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">
+                Il manque <strong id="borrow-amount" style="color: var(--danger);"></strong>.
+                Emprunter depuis la même enveloppe de la semaine prochaine ?
+            </p>
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+                <button class="btn btn-warning" onclick="confirmSpecificBorrow()">🔄 Emprunter de S+1</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Historique -->
+    <div id="history-modal" class="modal-overlay hidden" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <h3>📋 Historique</h3>
+            <div class="transaction-list" id="history-list"></div>
+            <button class="btn btn-secondary" onclick="closeModal()" style="margin-top: 15px; width: 100%;">Fermer</button>
+        </div>
+    </div>
+
+    <!-- Modal Edit Montant -->
+    <div id="edit-amount-modal" class="modal-overlay hidden" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <h3>✏️ Modifier le montant</h3>
+            <div class="form-group">
+                <label>Nouveau montant hebdomadaire (€)</label>
+                <input type="number" id="edit-amount-input" step="0.01" min="0">
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+                <button class="btn btn-primary" onclick="saveEnvelopeAmount()">Valider</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let state = {
+            config: {},
+            envelopes: [
+                { id: 1, name: 'Courses', icon: '🛒', amount: 0 },
+                { id: 2, name: 'Transport', icon: '⛽', amount: 0 },
+                { id: 3, name: 'Enfants', icon: '👶', amount: 0 },
+                { id: 4, name: 'Loisirs', icon: '🎮', amount: 0 },
+                { id: 5, name: 'Divers', icon: '📦', amount: 0 }
+            ],
+            weeks: [],
+            currentWeek: 0,
+            currentEnvelope: null,
+            selectedGender: null,
+            editingEnvelope: null,
+            selectedEmoji: '📦'
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date();
+            document.getElementById('config-month').value = today.toISOString().slice(0, 7);
+        });
+
+        function goToStep(step) {
+            document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`step${step}`).classList.remove('hidden');
+            
+            document.querySelectorAll('.step-dot').forEach((el, idx) => {
+                el.classList.remove('active', 'completed');
+                if (idx + 1 < step) el.classList.add('completed');
+                else if (idx + 1 === step) el.classList.add('active');
+            });
+        }
+
+        function goToStep2() {
+            const revenu = parseFloat(document.getElementById('config-revenu').value) || 0;
+            const credit = parseFloat(document.getElementById('config-credit').value) || 0;
+            const epargneObj = parseFloat(document.getElementById('config-epargne-obj').value) || 0;
+            
+            if (revenu <= 0) {
+                alert('Veuillez entrer un revenu valide');
+                return;
+            }
+
+            const month = document.getElementById('config-month').value;
+            const budgetNet = revenu - credit - epargneObj;
+            const weeklyBudget = budgetNet / 4;
+
+            state.config = {
+                month,
+                revenu,
+                credit,
+                epargneStart: parseFloat(document.getElementById('config-epargne-start').value) || 0,
+                epargneObj,
+                epargneCurrent: parseFloat(document.getElementById('config-epargne-start').value) || 0,
+                weeksInMonth: 4,
+                budgetNet,
+                weeklyBudget
+            };
+
+            document.getElementById('total-budget').textContent = budgetNet.toFixed(2) + '€';
+            document.getElementById('weekly-budget').textContent = weeklyBudget.toFixed(2) + '€';
+
+            updateEnvelopesDisplay();
+            goToStep(2);
+        }
+
+        function updateEnvelopesDisplay() {
+            const container = document.getElementById('envelopes-container');
+            container.innerHTML = '';
+            
+            const baseAmount = state.config.weeklyBudget / state.envelopes.length;
+            
+            state.envelopes.forEach((env, idx) => {
+                if (env.amount === 0) env.amount = baseAmount;
+                
+                const div = document.createElement('div');
+                div.className = 'envelope-card';
+                div.innerHTML = `
+                    <button class="delete-btn" onclick="deleteEnvelope(${idx})">×</button>
+                    <div class="envelope-icon">${env.icon}</div>
+                    <div class="envelope-name">${env.name}</div>
+                    <input type="number" class="amount-input" value="${env.amount.toFixed(2)}" 
+                           onchange="updateEnvelopeAmount(${idx}, this.value)" step="0.01">
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">€ par semaine</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function updateEnvelopeAmount(idx, value) {
+            const amount = parseFloat(value) || 0;
+            state.envelopes[idx].amount = amount;
+            
+            const total = state.envelopes.reduce((sum, env) => sum + env.amount, 0);
+            if (total > state.config.weeklyBudget) {
+                alert(`Attention : Le total (${total.toFixed(2)}€) dépasse le budget hebdomadaire (${state.config.weeklyBudget.toFixed(2)}€)`);
+            }
+        }
+
+        function selectEmoji(btn, emoji) {
+            document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            state.selectedEmoji = emoji;
+        }
+
+        function addEnvelope() {
+            const name = document.getElementById('new-env-name').value.trim();
+            if (!name) return;
+            
+            state.envelopes.push({
+                id: Date.now(),
+                name,
+                icon: state.selectedEmoji,
+                amount: 0
+            });
+            
+            document.getElementById('new-env-name').value = '';
+            updateEnvelopesDisplay();
+        }
+
+        function deleteEnvelope(index) {
+            if (state.envelopes.length <= 1) {
+                alert('Il faut au moins une enveloppe');
+                return;
+            }
+            state.envelopes.splice(index, 1);
+            updateEnvelopesDisplay();
+        }
+
+        function goToStep3() {
+            initWeeks();
+            renderWeekTabs();
+            renderWeekContent();
+            goToStep(3);
+        }
+
+        function initWeeks() {
+            state.weeks = [];
+            for (let i = 0; i < 4; i++) {
+                const weekEnvelopes = state.envelopes.map(env => ({
+                    ...env,
+                    initialAmount: env.amount,
+                    currentAmount: env.amount,
+                    transactions: [],
+                    closed: false
+                }));
+                
+                state.weeks.push({
+                    number: i + 1,
+                    envelopes: weekEnvelopes,
+                    borrowedFromNext: 0
+                });
+            }
+        }
+
+        function renderWeekTabs() {
+            const container = document.getElementById('week-tabs');
+            container.innerHTML = '';
+            
+            state.weeks.forEach((week, idx) => {
+                const tab = document.createElement('div');
+                tab.className = `week-tab ${idx === state.currentWeek ? 'active' : ''} ${week.closed ? 'completed' : ''}`;
+                tab.onclick = () => switchWeek(idx);
+                
+                let status = '○';
+                if (week.closed) status = '✅';
+                else if (idx === state.currentWeek) status = '✓';
+                else if (idx < state.currentWeek) status = '✓';
+                
+                tab.innerHTML = `
+                    <div class="week-status">${status}</div>
+                    <div class="week-label">S${week.number}</div>
+                `;
+                container.appendChild(tab);
+            });
+        }
+
+        function switchWeek(index) {
+            state.currentWeek = index;
+            renderWeekTabs();
+            renderWeekContent();
+        }
+
+        function renderWeekContent() {
+            const week = state.weeks[state.currentWeek];
+            const container = document.getElementById('week-content');
+            
+            let html = `
+                <div style="margin-bottom: 20px; padding: 15px; background: var(--bg); border-radius: 8px;">
+                    <strong>Semaine ${week.number}</strong> - 
+                    Budget total: <span style="color: var(--success);">${state.config.weeklyBudget.toFixed(2)}€</span>
+                    ${week.borrowedFromNext > 0 ? `<br><small style="color: var(--warning);">⚠️ Emprunté de S+1: ${week.borrowedFromNext.toFixed(2)}€</small>` : ''}
+                </div>
+                <div class="envelopes-grid">
+            `;
+            
+            week.envelopes.forEach((env, idx) => {
+                const percent = env.initialAmount > 0 ? (env.currentAmount / env.initialAmount) * 100 : 0;
+                const circumference = 2 * Math.PI * 50;
+                const offset = circumference - (Math.max(0, percent) / 100) * circumference;
+                const isOver = env.currentAmount < 0;
+                
+                html += `
+                    <div class="envelope-card ${isOver ? 'pulse' : ''}" style="${isOver ? 'border-color: var(--danger);' : ''}">
+                        <div class="progress-ring-container">
+                            <svg class="progress-ring" width="120" height="120">
+                                <circle cx="60" cy="60" r="50" fill="none" stroke="var(--surface-light)" stroke-width="10"/>
+                                <circle class="progress-ring-circle" cx="60" cy="60" r="50" fill="none" 
+                                    stroke="${isOver ? 'var(--danger)' : percent > 50 ? 'var(--success)' : percent > 25 ? 'var(--warning)' : 'var(--danger)'}" 
+                                    stroke-width="10" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round"/>
+                            </svg>
+                            <div class="progress-text" style="color: ${isOver ? 'var(--danger)' : 'var(--text)'};">
+                                ${Math.round(Math.max(0, percent))}%
+                            </div>
+                        </div>
+                        <div class="envelope-icon">${env.icon}</div>
+                        <div class="envelope-name">${env.name}</div>
+                        <div style="font-size: 1.1rem; font-weight: bold; color: ${isOver ? 'var(--danger)' : 'var(--success)'};">
+                            ${env.currentAmount.toFixed(2)}€
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">
+                            sur ${env.initialAmount.toFixed(2)}€
+                        </div>
+                        
+                        ${!week.closed ? `
+                            <div class="transaction-controls">
+                                <button class="btn-circle btn-sub" onclick="openTransaction(${idx})">−</button>
+                                <button class="btn-circle btn-history" onclick="showHistory(${idx})">📋</button>
+                            </div>
+                        ` : '<div style="margin-top: 10px; color: var(--success); font-size: 0.9rem;">✅ Clôturée</div>'}
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            
+            // Alertes d'emprunt spécifique
+            const overEnvelopes = week.envelopes.filter(env => env.currentAmount < 0);
+            if (overEnvelopes.length > 0 && !week.closed && state.currentWeek < 3) {
+                html += `
+                    <div class="alert alert-danger" style="margin-top: 20px;">
+                        ⚠️ Dépassement détecté ! 
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function openTransaction(envelopeIdx) {
+            state.currentEnvelope = envelopeIdx;
+            state.selectedGender = null;
+            document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('selected'));
+            document.getElementById('trans-amount').value = '';
+            document.getElementById('trans-desc').value = '';
+            document.getElementById('transaction-modal').classList.remove('hidden');
+        }
+
+        function selectGender(gender) {
+            state.selectedGender = gender;
+            document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('selected'));
+            document.getElementById(gender === '👨' ? 'btn-homme' : 'btn-femme').classList.add('selected');
+        }
+
+        function saveTransaction() {
+            const amount = parseFloat(document.getElementById('trans-amount').value);
+            const desc = document.getElementById('trans-desc').value || 'Sans description';
+            
+            if (!amount || amount <= 0) {
+                alert('Veuillez entrer un montant valide');
+                return;
+            }
+            
+            if (!state.selectedGender) {
+                alert('Veuillez sélectionner qui a fait la dépense');
+                return;
+            }
+            
+            const week = state.weeks[state.currentWeek];
+            const env = week.envelopes[state.currentEnvelope];
+            
+            const transaction = {
+                id: Date.now(),
+                amount: -amount,
+                desc,
+                who: state.selectedGender,
+                date: new Date().toLocaleString('fr-FR')
+            };
+            
+            env.transactions.push(transaction);
+            env.currentAmount -= amount;
+            
+            closeModal();
+            
+            // Vérifier si dépassement et proposer emprunt
+            if (env.currentAmount < 0 && state.currentWeek < 3) {
+                setTimeout(() => openBorrowModal(state.currentEnvelope), 300);
+            } else {
+                renderWeekContent();
+            }
+        }
+
+        function openBorrowModal(envelopeIdx) {
+            const week = state.weeks[state.currentWeek];
+            const env = week.envelopes[envelopeIdx];
+            const missing = Math.abs(env.currentAmount);
+            
+            state.currentEnvelope = envelopeIdx;
+            document.getElementById('borrow-envelope-name').textContent = env.name;
+            document.getElementById('borrow-amount').textContent = missing.toFixed(2) + '€';
+            document.getElementById('borrow-modal').classList.remove('hidden');
+        }
+
+        function confirmSpecificBorrow() {
+            const week = state.weeks[state.currentWeek];
+            const nextWeek = state.weeks[state.currentWeek + 1];
+            const env = week.envelopes[state.currentEnvelope];
+            const missing = Math.abs(env.currentAmount);
+            
+            if (!nextWeek) return;
+            
+            const nextEnv = nextWeek.envelopes[state.currentEnvelope];
+            
+            if (nextEnv.initialAmount < missing) {
+                alert('La semaine suivante n\'a pas assez de fonds dans cette enveloppe');
+                closeModal();
+                renderWeekContent();
+                return;
+            }
+            
+            // Emprunter de la même enveloppe de S+1
+            nextEnv.initialAmount -= missing;
+            nextEnv.currentAmount -= missing;
+            nextWeek.borrowedFromNext += missing;
+            
+            // Régler le dépassement
+            env.currentAmount = 0;
+            
+            // Ajouter transaction d'emprunt
+            env.transactions.push({
+                id: Date.now(),
+                amount: missing,
+                desc: `Emprunt S${state.currentWeek + 2} - ${nextEnv.name}`,
+                who: '🔄',
+                date: new Date().toLocaleString('fr-FR')
+            });
+            
+            closeModal();
+            renderWeekContent();
+        }
+
+        function showHistory(envelopeIdx) {
+            const week = state.weeks[state.currentWeek];
+            const env = week.envelopes[envelopeIdx];
+            const list = document.getElementById('history-list');
+            
+            if (env.transactions.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Aucune transaction</p>';
+            } else {
+                list.innerHTML = env.transactions.map(t => `
+                    <div class="transaction-item ${t.amount < 0 ? 'negative' : ''}">
+                        <div>
+                            <div>${t.desc}</div>
+                            <div class="transaction-meta">${t.who} • ${t.date}</div>
+                        </div>
+                        <div style="font-weight: bold; color: ${t.amount < 0 ? 'var(--danger)' : 'var(--success)'};">
+                            ${t.amount > 0 ? '+' : ''}${t.amount.toFixed(2)}€
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            document.getElementById('history-modal').classList.remove('hidden');
+        }
+
+        function closeModal(e) {
+            if (e && e.target !== e.currentTarget) return;
+            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.add('hidden'));
+        }
+
+        function confirmCloseMonth() {
+            const allWeeksClosed = state.weeks.every(w => w.closed);
+            if (!allWeeksClosed) {
+                if (!confirm('Toutes les semaines ne sont pas clôturées. Voulez-vous quand même voir le bilan ?')) {
+                    return;
+                }
+            }
+            goToStep4();
+        }
+
+        function goToStep4() {
+            const totalSpent = state.weeks.reduce((sum, week) => {
+                return sum + week.envelopes.reduce((envSum, env) => {
+                    return envSum + env.transactions
+                        .filter(t => t.amount < 0)
+                        .reduce((tSum, t) => tSum + Math.abs(t.amount), 0);
+                }, 0);
+            }, 0);
+            
+            const totalSaved = state.config.epargneCurrent - state.config.epargneStart;
+            const remaining = state.config.budgetNet - totalSpent;
+            
+            document.getElementById('final-summary').innerHTML = `
+                <div class="summary-card">
+                    <div class="summary-label">💰 Total dépensé</div>
+                    <div class="summary-value" style="color: var(--danger);">${totalSpent.toFixed(2)}€</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">🏦 Épargne réalisée</div>
+                    <div class="summary-value" style="color: var(--success);">${totalSaved.toFixed(2)}€</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">💵 Reste disponible</div>
+                    <div class="summary-value" style="color: ${remaining >= 0 ? 'var(--success)' : 'var(--danger)'};">${remaining.toFixed(2)}€</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">📊 Objectif épargne</div>
+                    <div class="summary-value" style="color: ${totalSaved >= state.config.epargneObj ? 'var(--success)' : 'var(--warning)'};">
+                        ${totalSaved >= state.config.epargneObj ? '✅' : '⚠️'} ${state.config.epargneObj}€
+                    </div>
+                </div>
+            `;
+            
+            let detailHtml = '';
+            state.weeks.forEach(week => {
+                const weekSpent = week.envelopes.reduce((sum, env) => {
+                    return sum + env.transactions
+                        .filter(t => t.amount < 0)
+                        .reduce((tSum, t) => tSum + Math.abs(t.amount), 0);
+                }, 0);
+                
+                detailHtml += `
+                    <div style="margin-bottom: 15px; padding: 15px; background: var(--bg); border-radius: 8px;">
+                        <strong>Semaine ${week.number}</strong> - ${weekSpent.toFixed(2)}€ dépensés
+                        ${week.closed ? '<span style="color: var(--success); float: right;">✅ Clôturée</span>' : ''}
+                        <div style="margin-top: 10px; font-size: 0.9rem; color: var(--text-muted);">
+                            ${week.envelopes.map(env => `${env.icon} ${env.name}: ${env.currentAmount.toFixed(2)}€`).join(' | ')}
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('weeks-detail').innerHTML = detailHtml;
+            
+            goToStep(4);
+        }
+
+        function exportCSV() {
+            let csv = 'Semaine,Enveloppe,Transaction,Montant,Par,Date\n';
+            
+            state.weeks.forEach(week => {
+                week.envelopes.forEach(env => {
+                    env.transactions.forEach(t => {
+                        csv += `S${week.number},${env.name},${t.desc},${t.amount},${t.who},${t.date}\n`;
+                    });
+                });
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `budget_${state.config.month}.csv`;
+            link.click();
+        }
+
+        function newMonth() {
+            if (confirm('Voulez-vous démarrer un nouveau mois ? Les données actuelles seront perdues.')) {
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
