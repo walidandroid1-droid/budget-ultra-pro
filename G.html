@@ -3,23 +3,12 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Budget Complet - Gestion Semaines & Clôture</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f172a">
+    <title>Budget Hebdo</title>
     <style>
-        :root {
-            --primary: #6366f1;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --info: #3b82f6;
-            --dark: #0f172a;
-            --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-700: #374151;
-            --man: #3b82f6;
-            --woman: #ec4899;
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -27,273 +16,305 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-light: #334155;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #475569;
+            --safe-top: env(safe-area-inset-top, 59px);
+            --safe-bottom: env(safe-area-inset-bottom, 34px);
+            --safe-left: env(safe-area-inset-left, 0px);
+            --safe-right: env(safe-area-inset-right, 0px);
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: var(--gray-100);
-            color: var(--dark);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5;
+            overflow-x: hidden;
+            padding-top: var(--safe-top);
+            padding-bottom: var(--safe-bottom);
+            padding-left: var(--safe-left);
+            padding-right: var(--safe-right);
+        }
+
+        .app-container {
             max-width: 430px;
             margin: 0 auto;
-            min-height: 100vh;
-            padding: 20px;
-            padding-bottom: 100px;
+            padding: 0 16px;
+            position: relative;
+        }
+
+        /* Dynamic Island / Notch spacing */
+        .notch-spacer {
+            height: 12px;
+            width: 100%;
         }
 
         .header {
-            background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);
-            color: white;
-            padding: 30px 20px;
-            border-radius: 24px;
-            margin-bottom: 20px;
             text-align: center;
+            padding: 20px 0 15px;
             position: sticky;
-            top: 20px;
+            top: var(--safe-top);
+            background: var(--bg);
             z-index: 100;
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
         }
 
         .header h1 {
             font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-
-        .step-indicator {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 16px;
-            flex-wrap: wrap;
-        }
-
-        .step {
-            padding: 8px 16px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            opacity: 0.7;
-        }
-
-        .step.active {
-            opacity: 1;
-            background: white;
-            color: var(--primary);
-        }
-
-        .card {
-            background: white;
-            border-radius: 20px;
-            padding: 24px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-        }
-
-        .card-title {
-            font-size: 20px;
             font-weight: 700;
-            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* iOS Cards */
+        .ios-card {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 0.5px solid rgba(255,255,255,0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .ios-card h2 {
+            font-size: 20px;
+            margin-bottom: 16px;
+            color: var(--text);
+            font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
         }
 
-        .input-group {
-            margin-bottom: 20px;
+        /* iOS Inputs */
+        .ios-input-group {
+            margin-bottom: 16px;
         }
 
-        .input-label {
+        .ios-input-group label {
             display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--gray-700);
             margin-bottom: 8px;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        .input-field {
+        .ios-input {
             width: 100%;
             padding: 16px;
-            border: 2px solid var(--gray-200);
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
             border-radius: 12px;
-            font-size: 18px;
-            font-weight: 600;
-            transition: all 0.3s;
+            color: var(--text);
+            font-size: 17px;
+            transition: all 0.2s;
+            -webkit-appearance: none;
         }
 
-        .input-field:focus {
+        .ios-input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            background: rgba(99, 102, 241, 0.1);
         }
 
-        .btn {
+        /* iOS Buttons */
+        .ios-btn {
             width: 100%;
-            padding: 18px;
+            padding: 16px;
             border: none;
-            border-radius: 14px;
+            border-radius: 12px;
             font-size: 17px;
-            font-weight: 700;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-        }
-
-        .btn:active {
-            transform: scale(0.97);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
-            color: white;
-        }
-
-        .btn-secondary {
-            background: var(--gray-200);
-            color: var(--dark);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        .week-tabs {
-            display: flex;
             gap: 8px;
-            margin-bottom: 20px;
-            overflow-x: auto;
-            padding: 4px;
+            -webkit-touch-callout: none;
         }
 
-        .week-tab {
-            flex: 1;
-            min-width: 70px;
-            padding: 16px 12px;
-            border-radius: 16px;
-            text-align: center;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: none;
-            background: var(--gray-200);
-            color: var(--gray-700);
-            position: relative;
+        .ios-btn:active {
+            transform: scale(0.96);
+            opacity: 0.9;
         }
 
-        .week-tab.active {
+        .ios-btn-primary {
             background: var(--primary);
             color: white;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
         }
 
-        .week-tab.closed {
+        .ios-btn-secondary {
+            background: var(--surface-light);
+            color: var(--text);
+        }
+
+        .ios-btn-success {
             background: var(--success);
             color: white;
         }
 
-        .week-tab.closed::after {
-            content: '✓';
-            position: absolute;
-            top: 4px;
-            right: 4px;
-            width: 18px;
-            height: 18px;
-            background: white;
-            color: var(--success);
-            border-radius: 50%;
-            font-size: 11px;
+        .ios-btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Week Tabs - iOS Style */
+        .week-tabs {
             display: flex;
-            align-items: center;
-            justify-content: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+            padding: 4px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .week-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .week-tab {
+            flex: 0 0 auto;
+            min-width: 70px;
+            padding: 12px 16px;
+            background: var(--surface);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .week-tab.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .week-tab.completed {
+            background: var(--success);
+            border-color: var(--success);
+            opacity: 0.8;
+        }
+
+        .week-status {
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+
+        .week-label {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Envelope Cards - iOS Grid */
+        .envelopes-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
         }
 
         .envelope-card {
-            background: white;
+            background: var(--surface);
             border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            border-left: 5px solid var(--color, var(--primary));
+            padding: 16px;
+            text-align: center;
+            border: 1px solid var(--border);
+            position: relative;
+            transition: all 0.2s;
         }
 
-        .envelope-header {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 16px;
+        .envelope-card:active {
+            transform: scale(0.95);
+        }
+
+        .envelope-card.over-budget {
+            border-color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
         }
 
         .envelope-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            background: var(--color-bg, var(--gray-100));
-        }
-
-        .envelope-info {
-            flex: 1;
+            font-size: 32px;
+            margin-bottom: 8px;
         }
 
         .envelope-name {
-            font-size: 17px;
-            font-weight: 700;
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 4px;
         }
 
-        .envelope-budget {
-            font-size: 13px;
-            color: var(--gray-700);
-            margin-top: 2px;
+        .envelope-amount {
+            font-size: 19px;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .envelope-amount.negative {
+            color: var(--danger);
+        }
+
+        .envelope-input {
+            width: 100%;
+            padding: 8px;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        /* Progress Ring - Simplified for mobile */
+        .progress-container {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 12px;
         }
 
         .progress-ring {
-            width: 60px;
-            height: 60px;
-            position: relative;
-        }
-
-        .progress-ring svg {
             transform: rotate(-90deg);
+            width: 80px;
+            height: 80px;
         }
 
         .progress-bg {
             fill: none;
-            stroke: var(--gray-200);
+            stroke: var(--surface-light);
             stroke-width: 8;
         }
 
-        .progress-fill {
+        .progress-bar {
             fill: none;
-            stroke: var(--color, var(--primary));
             stroke-width: 8;
             stroke-linecap: round;
-            transition: stroke-dashoffset 0.5s ease;
+            transition: stroke-dashoffset 0.3s;
         }
 
         .progress-text {
@@ -301,793 +322,1164 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 14px;
+            font-size: 18px;
             font-weight: 700;
         }
 
-        .envelope-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .stat-box {
-            background: var(--gray-100);
-            padding: 14px;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .stat-label {
-            font-size: 11px;
-            color: var(--gray-700);
-            font-weight: 600;
-            text-transform: uppercase;
-            margin-bottom: 4px;
-        }
-
-        .stat-value {
-            font-size: 20px;
-            font-weight: 800;
-        }
-
-        .envelope-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr auto;
+        /* Transaction Buttons */
+        .transaction-controls {
+            display: flex;
             gap: 8px;
+            justify-content: center;
+            margin-top: 12px;
         }
 
-        .btn-action {
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 700;
+        .ios-btn-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
             border: none;
-            cursor: pointer;
-        }
-
-        .btn-add { background: var(--success); color: white; }
-        .btn-spend { background: var(--danger); color: white; }
-        .btn-history { background: var(--gray-200); font-size: 18px; }
-
-        .closure-panel {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border-radius: 20px;
-            padding: 24px;
-            margin: 20px 0;
-            border: 2px solid var(--warning);
-        }
-
-        .closure-title {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 16px;
             display: flex;
             align-items: center;
-            gap: 10px;
-        }
-
-        .closure-amount {
-            font-size: 36px;
-            font-weight: 800;
-            color: var(--success);
-            margin-bottom: 20px;
-        }
-
-        .closure-options {
-            display: grid;
-            gap: 12px;
-        }
-
-        .closure-option {
-            background: white;
-            border: 3px solid transparent;
-            border-radius: 16px;
-            padding: 20px;
+            justify-content: center;
+            font-size: 20px;
             cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
+            transition: all 0.2s;
         }
 
-        .closure-option:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        .ios-btn-circle:active {
+            transform: scale(0.9);
         }
 
-        .closure-option.selected {
-            border-color: var(--primary);
-            background: #eef2ff;
+        .btn-minus {
+            background: var(--danger);
+            color: white;
         }
 
-        .closure-option-icon {
+        .btn-plus {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-history {
+            background: var(--info);
+            color: white;
+        }
+
+        /* Gender Buttons - iOS Style */
+        .gender-selector {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .gender-btn {
+            flex: 1;
+            padding: 20px;
+            background: var(--surface-light);
+            border: 2px solid var(--border);
+            border-radius: 16px;
             font-size: 32px;
-            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
         }
 
-        .closure-option-title {
-            font-weight: 700;
-            font-size: 16px;
-            margin-bottom: 4px;
+        .gender-btn.selected {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.2);
+            transform: scale(1.05);
         }
 
-        .closure-option-desc {
-            font-size: 13px;
-            color: var(--gray-700);
+        .gender-label {
+            display: block;
+            font-size: 14px;
+            margin-top: 4px;
+            color: var(--text-muted);
         }
 
-        .borrow-panel {
-            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-            border-radius: 20px;
-            padding: 24px;
-            margin: 20px 0;
-            border: 2px solid var(--danger);
-        }
-
-        .modal {
-            display: none;
+        /* iOS Modal */
+        .ios-modal {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            align-items: flex-end;
-            backdrop-filter: blur(4px);
-        }
-
-        .modal.show {
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
         }
 
-        .modal-content {
-            background: white;
-            border-radius: 32px 32px 0 0;
-            padding: 32px 24px 40px;
+        .ios-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .ios-modal-content {
+            background: var(--surface);
             width: 100%;
-            max-height: 90vh;
+            max-width: 430px;
+            border-radius: 24px 24px 0 0;
+            padding: 24px;
+            padding-bottom: calc(24px + var(--safe-bottom));
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .ios-modal.active .ios-modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-handle {
+            width: 40px;
+            height: 5px;
+            background: var(--border);
+            border-radius: 3px;
+            margin: 0 auto 20px;
+        }
+
+        /* Floating Action Button - iOS Style */
+        .fab {
+            position: fixed;
+            bottom: calc(30px + var(--safe-bottom));
+            right: 20px;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+            border: none;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+            cursor: pointer;
+            z-index: 99;
+            transition: all 0.3s;
+        }
+
+        .fab:active {
+            transform: scale(0.9);
+        }
+
+        /* Summary Cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .summary-card {
+            background: rgba(0,0,0,0.2);
+            padding: 16px;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .summary-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 4px 0;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* iOS Switch */
+        .ios-switch {
+            position: relative;
+            display: inline-block;
+            width: 51px;
+            height: 31px;
+        }
+
+        .ios-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--surface-light);
+            transition: .4s;
+            border-radius: 31px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 27px;
+            width: 27px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        input:checked + .slider {
+            background-color: var(--success);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: calc(20px + var(--safe-top));
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--surface);
+            color: var(--text);
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            z-index: 2000;
+            opacity: 0;
+            transition: all 0.3s;
+            font-weight: 500;
+            border: 1px solid var(--border);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Hidden utility */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Step indicator - dots */
+        .step-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .step-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--surface-light);
+            transition: all 0.3s;
+        }
+
+        .step-dot.active {
+            background: var(--primary);
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        .step-dot.completed {
+            background: var(--success);
+        }
+
+        /* Transaction list */
+        .transaction-list {
+            max-height: 300px;
             overflow-y: auto;
-            animation: slideUp 0.3s ease;
+            -webkit-overflow-scrolling: touch;
         }
 
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(0,0,0,0.2);
+            margin-bottom: 8px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
         }
 
-        .hidden { display: none !important; }
-
-        .fade-in {
-            animation: fadeIn 0.4s ease;
+        .transaction-item.expense {
+            border-left-color: var(--danger);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .transaction-item.income {
+            border-left-color: var(--success);
+        }
+
+        /* Pull to refresh indicator */
+        .refresh-indicator {
+            text-align: center;
+            padding: 10px;
+            color: var(--text-muted);
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .refresh-indicator.visible {
+            opacity: 1;
+        }
+
+        /* iOS PWA Add to Home Banner */
+        .install-banner {
+            background: var(--primary);
+            color: white;
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .install-banner.hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>💰 Budget Complet</h1>
-        <p>Gestion des semaines & Clôture</p>
-        <div class="step-indicator">
-            <div class="step active" id="step-1">1. Config</div>
-            <div class="step" id="step-2">2. Enveloppes</div>
-            <div class="step" id="step-3">3. Semaines</div>
-            <div class="step" id="step-4">4. Bilan</div>
+    <div class="notch-spacer"></div>
+    
+    <div class="app-container">
+        <div class="header">
+            <h1>💰 Budget Hebdo</h1>
+            <p id="current-month">Gestion par enveloppes</p>
+        </div>
+
+        <div class="step-dots" id="step-indicator">
+            <div class="step-dot active"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+        </div>
+
+        <!-- ÉTAPE 1: CONFIGURATION -->
+        <div id="step1" class="step-content">
+            <div class="ios-card">
+                <h2>⚙️ Configuration</h2>
+                
+                <div class="ios-input-group">
+                    <label>Mois</label>
+                    <input type="month" id="config-month" class="ios-input">
+                </div>
+                
+                <div class="ios-input-group">
+                    <label>Revenu (€)</label>
+                    <input type="number" id="config-revenu" class="ios-input" placeholder="2500" step="50">
+                </div>
+                
+                <div class="ios-input-group">
+                    <label>Crédit à rembourser (€)</label>
+                    <input type="number" id="config-credit" class="ios-input" placeholder="0" step="10">
+                </div>
+                
+                <div class="ios-input-group">
+                    <label>Épargne début (€)</label>
+                    <input type="number" id="config-epargne-start" class="ios-input" placeholder="0" step="50">
+                </div>
+                
+                <div class="ios-input-group">
+                    <label>Objectif épargne (€)</label>
+                    <input type="number" id="config-epargne-obj" class="ios-input" placeholder="200" step="50">
+                </div>
+
+                <button class="ios-btn ios-btn-primary" onclick="goToStep2()" style="margin-top: 8px;">
+                    Continuer →
+                </button>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 2: RÉPARTITION -->
+        <div id="step2" class="step-content hidden">
+            <div class="ios-card">
+                <h2>📊 Budget Hebdo</h2>
+                
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="summary-label">Total Net</div>
+                        <div class="summary-value" style="color: var(--success);" id="total-budget">0€</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-label">Par Semaine</div>
+                        <div class="summary-value" style="color: var(--info);" id="weekly-budget">0€</div>
+                    </div>
+                </div>
+
+                <div style="background: rgba(245, 158, 11, 0.1); border-left: 3px solid var(--warning); padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; color: var(--warning);">
+                    💡 Modifiez les montants des enveloppes ci-dessous
+                </div>
+
+                <h3 style="margin-bottom: 12px; font-size: 17px;">📁 Enveloppes</h3>
+                <div class="envelopes-grid" id="envelopes-container">
+                    <!-- Généré dynamiquement -->
+                </div>
+
+                <div style="margin-top: 16px; padding: 16px; background: rgba(0,0,0,0.2); border-radius: 16px;">
+                    <h4 style="margin-bottom: 12px; font-size: 16px;">➕ Nouvelle enveloppe</h4>
+                    <input type="text" id="new-env-name" class="ios-input" placeholder="Nom (ex: Santé)" style="margin-bottom: 12px;">
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;" id="emoji-picker">
+                        <button class="ios-btn-secondary" style="flex: 0 0 auto; padding: 8px 12px; font-size: 24px;" onclick="selectEmoji('🛒')">🛒</button>
+                        <button class="ios-btn-secondary" style="flex: 0 0 auto; padding: 8px 12px; font-size: 24px;" onclick="selectEmoji('⛽')">⛽</button>
+                        <button class="ios-btn-secondary" style="flex: 0 0 auto; padding: 8px 12px; font-size: 24px;" onclick="selectEmoji('👶')">👶</button>
+                        <button class="ios-btn-secondary" style="flex: 0 0 auto; padding: 8px 12px; font-size: 24px;" onclick="selectEmoji('🎮')">🎮</button>
+                        <button class="ios-btn-secondary" style="flex: 0 0 auto; padding: 8px 12px; font-size: 24px;" onclick="selectEmoji('📦')">📦</button>
+                        <button class="ios-btn-secondary" style="flex: 0 0 auto; padding: 8px 12px; font-size: 24px;" onclick="selectEmoji('🏥')">🏥</button>
+                    </div>
+                    <button class="ios-btn ios-btn-secondary" onclick="addEnvelope()">
+                        Ajouter
+                    </button>
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-top: 20px;">
+                    <button class="ios-btn ios-btn-secondary" onclick="goToStep(1)" style="flex: 1;">
+                        ←
+                    </button>
+                    <button class="ios-btn ios-btn-primary" onclick="goToStep3()" style="flex: 3;">
+                        Valider
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 3: SEMAINES -->
+        <div id="step3" class="step-content hidden">
+            <div class="ios-card" style="padding: 16px;">
+                <div class="week-tabs" id="week-tabs">
+                    <!-- Généré dynamiquement -->
+                </div>
+
+                <div id="week-content">
+                    <!-- Contenu dynamique -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 4: BILAN -->
+        <div id="step4" class="step-content hidden">
+            <div class="ios-card">
+                <h2>📈 Bilan Mensuel</h2>
+                
+                <div class="summary-grid" id="final-summary">
+                    <!-- Résumé -->
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <h3 style="margin-bottom: 12px; font-size: 17px;">📊 Détail par semaine</h3>
+                    <div id="weeks-detail"></div>
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-top: 24px;">
+                    <button class="ios-btn ios-btn-secondary" onclick="exportCSV()" style="flex: 1;">
+                        📥 CSV
+                    </button>
+                    <button class="ios-btn ios-btn-primary" onclick="newMonth()" style="flex: 2;">
+                        🔄 Nouveau mois
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- ÉTAPE 1: CONFIGURATION -->
-    <div id="page-1" class="fade-in">
-        <div class="card">
-            <div class="card-title">📅 Configuration du mois</div>
+    <!-- Modal Transaction -->
+    <div id="transaction-modal" class="ios-modal" onclick="closeModalOnBackground(event)">
+        <div class="ios-modal-content" onclick="event.stopPropagation()">
+            <div class="modal-handle"></div>
+            <h3 style="margin-bottom: 20px; text-align: center;">Nouvelle dépense</h3>
             
-            <div class="input-group">
-                <label class="input-label">Revenu Principal</label>
-                <input type="number" class="input-field" id="cfg-revenu" value="2671">
+            <div class="ios-input-group">
+                <label>Montant (€)</label>
+                <input type="number" id="trans-amount" class="ios-input" placeholder="0" step="0.01" style="font-size: 34px; text-align: center;">
+            </div>
+            
+            <div class="ios-input-group">
+                <label>Description</label>
+                <input type="text" id="trans-desc" class="ios-input" placeholder="Ex: Courses Lidl">
+            </div>
+            
+            <div class="ios-input-group">
+                <label>Qui a payé ?</label>
+                <div class="gender-selector">
+                    <button class="gender-btn" id="btn-homme" onclick="selectGender('👨')">
+                        👨
+                        <span class="gender-label">Lui</span>
+                    </button>
+                    <button class="gender-btn" id="btn-femme" onclick="selectGender('👩')">
+                        👩
+                        <span class="gender-label">Elle</span>
+                    </button>
+                </div>
             </div>
 
-            <div class="input-group">
-                <label class="input-label">Crédit à rembourser</label>
-                <input type="number" class="input-field" id="cfg-credit" value="700">
-            </div>
-
-            <div class="input-group">
-                <label class="input-label">Épargne disponible</label>
-                <input type="number" class="input-field" id="cfg-epargne-avant" value="750">
-            </div>
-
-            <div class="input-group">
-                <label class="input-label">Épargne objectif ce mois</label>
-                <input type="number" class="input-field" id="cfg-epargne-objectif" value="500">
-            </div>
-
-            <div class="input-group">
-                <label class="input-label">Mois</label>
-                <input type="month" class="input-field" id="cfg-mois" value="2025-02">
-            </div>
-
-            <button class="btn btn-primary" onclick="goToStep(2)">
-                Continuer →
+            <button class="ios-btn ios-btn-primary" onclick="saveTransaction()" style="margin-top: 20px;">
+                Valider
             </button>
         </div>
     </div>
 
-    <!-- ÉTAPE 2: ENVELOPPES -->
-    <div id="page-2" class="hidden">
-        <div class="card">
-            <div class="card-title">📊 Répartition par semaine</div>
-            <div id="envelopes-config"></div>
-        </div>
-        <button class="btn btn-primary" onclick="goToStep(3)">
-            Démarrer le suivi →
-        </button>
-    </div>
+    <!-- Modal Emprunt -->
+    <div id="borrow-modal" class="ios-modal" onclick="closeModalOnBackground(event)">
+        <div class="ios-modal-content" onclick="event.stopPropagation()">
+            <div class="modal-handle"></div>
+            <h3 style="margin-bottom: 16px; text-align: center;">🆘 Dépassement</h3>
+            
+            <p style="text-align: center; margin-bottom: 20px; color: var(--text-muted);">
+                <span id="borrow-envelope-name" style="color: var(--primary); font-weight: 600;"></span>
+                <br>
+                Manque : <span id="borrow-amount" style="color: var(--danger); font-size: 24px; font-weight: 700;"></span>
+            </p>
 
-    <!-- ÉTAPE 3: SEMAINES -->
-    <div id="page-3" class="hidden">
-        <div class="week-tabs" id="week-tabs"></div>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px; text-align: center;">
+                Emprunter depuis la même enveloppe de la semaine prochaine ?
+            </p>
 
-        <div id="week-content"></div>
-
-        <div id="closure-section" class="hidden">
-            <div class="closure-panel">
-                <div class="closure-title">🎯 Clôture de la semaine</div>
-                <div>Reste non dépensé:</div>
-                <div class="closure-amount" id="closure-amount">0 د.ت</div>
-
-                <div class="closure-options">
-                    <div class="closure-option" onclick="selectClosureOption('epargne')">
-                        <div class="closure-option-icon">💰</div>
-                        <div class="closure-option-title">Vers l'épargne</div>
-                        <div class="closure-option-desc">Ajouter ce montant à mon épargne</div>
-                    </div>
-                    <div class="closure-option" onclick="selectClosureOption('emprunt')">
-                        <div class="closure-option-icon">🔄</div>
-                        <div class="closure-option-title">Emprunt S+1</div>
-                        <div class="closure-option-desc">Prêter à la semaine suivante</div>
-                    </div>
-                    <div class="closure-option" onclick="selectClosureOption('garder')">
-                        <div class="closure-option-icon">💵</div>
-                        <div class="closure-option-title">Garder pour plus tard</div>
-                        <div class="closure-option-desc">Conserver dans l'enveloppe</div>
-                    </div>
-                </div>
-
-                <button class="btn btn-success" onclick="confirmClosure()" style="margin-top: 20px;">
-                    ✅ Confirmer la clôture
+            <div style="display: flex; gap: 12px;">
+                <button class="ios-btn ios-btn-secondary" onclick="closeModal()" style="flex: 1;">
+                    Annuler
                 </button>
-            </div>
-        </div>
-
-        <div id="borrow-section" class="hidden">
-            <div class="borrow-panel">
-                <div class="closure-title" style="color: var(--danger);">🆘 Emprunt nécessaire</div>
-                <p style="margin-bottom: 16px;">Vous avez dépassé le budget. Emprunter à la semaine suivante ?</p>
-                <button class="btn btn-warning" onclick="borrowFromNextWeek()">
-                    🔄 Emprunter de S+<span id="borrow-week-num"></span>
+                <button class="ios-btn ios-btn-warning" onclick="confirmSpecificBorrow()" style="flex: 2; background: var(--warning); color: white;">
+                    Emprunter S+1
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- ÉTAPE 4: BILAN -->
-    <div id="page-4" class="hidden">
-        <div class="card">
-            <div class="card-title">📈 Bilan du mois</div>
-            <div id="bilan-content"></div>
-        </div>
-        <button class="btn btn-primary" onclick="exportMonthCSV()">
-            📥 Exporter en CSV
-        </button>
-        <button class="btn btn-success" onclick="newMonth()" style="margin-top: 12px;">
-            🔄 Nouveau mois
-        </button>
-    </div>
-
-    <!-- MODAL TRANSACTION -->
-    <div class="modal" id="modal-transaction">
-        <div class="modal-content">
-            <h2 style="margin-bottom: 20px;">Nouvelle transaction</h2>
-            <div class="input-group">
-                <label class="input-label">Montant</label>
-                <input type="number" class="input-field" id="trans-amount" placeholder="0">
-            </div>
-            <div class="input-group">
-                <label class="input-label">Description</label>
-                <input type="text" class="input-field" id="trans-desc" placeholder="Ex: Courses">
-            </div>
-            <div class="input-group">
-                <label class="input-label">Qui ?</label>
-                <div style="display: flex; gap: 12px;">
-                    <button class="btn btn-secondary" onclick="selectTransPerson('man')" id="trans-man" style="flex: 1;">👨 Homme</button>
-                    <button class="btn btn-secondary" onclick="selectTransPerson('woman')" id="trans-woman" style="flex: 1;">👩 Femme</button>
-                </div>
-            </div>
-            <button class="btn btn-primary" onclick="confirmTransaction()" style="margin-top: 20px;">
-                Confirmer
+    <!-- Modal Historique -->
+    <div id="history-modal" class="ios-modal" onclick="closeModalOnBackground(event)">
+        <div class="ios-modal-content" onclick="event.stopPropagation()">
+            <div class="modal-handle"></div>
+            <h3 style="margin-bottom: 16px;">📋 Historique</h3>
+            <div class="transaction-list" id="history-list"></div>
+            <button class="ios-btn ios-btn-secondary" onclick="closeModal()" style="margin-top: 16px;">
+                Fermer
             </button>
         </div>
     </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast">Message</div>
+
+    <!-- Floating Action Button -->
+    <button class="fab" id="fab-close-month" onclick="confirmCloseMonth()" style="display: none;">
+        🔒
+    </button>
 
     <script>
-        // DONNÉES GLOBALES
-        let config = {};
-        let envelopes = [
-            { id: 'courses', name: 'Courses', icon: '🛒', color: '#10b981', colorBg: '#d1fae5', amount: 150 },
-            { id: 'transport', name: 'Transport', icon: '⛽', color: '#3b82f6', colorBg: '#dbeafe', amount: 80 },
-            { id: 'enfants', name: 'Enfants', icon: '👶', color: '#8b5cf6', colorBg: '#ede9fe', amount: 100 },
-            { id: 'loisirs', name: 'Loisirs', icon: '🎮', color: '#f59e0b', colorBg: '#fef3c7', amount: 60 },
-            { id: 'divers', name: 'Divers', icon: '📦', color: '#6b7280', colorBg: '#f3f4f6', amount: 50 }
-        ];
-        let weeksData = [];
-        let currentWeek = 1;
-        let currentEnvelope = null;
-        let currentAction = null;
-        let transPerson = null;
-        let closureOption = null;
+        // État global avec localStorage
+        let state = {
+            config: {},
+            envelopes: [
+                { id: 1, name: 'Courses', icon: '🛒', amount: 0 },
+                { id: 2, name: 'Transport', icon: '⛽', amount: 0 },
+                { id: 3, name: 'Enfants', icon: '👶', amount: 0 },
+                { id: 4, name: 'Loisirs', icon: '🎮', amount: 0 },
+                { id: 5, name: 'Divers', icon: '📦', amount: 0 }
+            ],
+            weeks: [],
+            currentWeek: 0,
+            currentEnvelope: null,
+            selectedGender: null,
+            selectedEmoji: '📦',
+            currentStep: 1
+        };
 
-        // NAVIGATION
-        function goToStep(step) {
-            // Sauvegarder avant de changer
-            if (step > 1) saveData();
+        const STORAGE_KEY = 'budget_hebdo_data';
 
-            // Cacher toutes les pages
-            for (let i = 1; i <= 4; i++) {
-                document.getElementById(`page-${i}`).classList.add('hidden');
-                document.getElementById(`step-${i}`).classList.remove('active');
+        // Sauvegarde automatique
+        function saveToStorage() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+                console.log('💾 Sauvegardé');
+            } catch (e) {
+                console.error('Erreur sauvegarde:', e);
             }
-
-            // Afficher la page demandée
-            document.getElementById(`page-${step}`).classList.remove('hidden');
-            document.getElementById(`page-${step}`).classList.add('fade-in');
-            document.getElementById(`step-${step}`).classList.add('active');
-
-            // Initialiser la page
-            if (step === 2) initEnvelopesConfig();
-            if (step === 3) initWeeks();
-            if (step === 4) showBilan();
         }
 
-        // ÉTAPE 2: CONFIG ENVELOPPES
-        function initEnvelopesConfig() {
-            // Calculer budget hebdo
-            config.revenu = parseFloat(document.getElementById('cfg-revenu').value) || 0;
-            config.credit = parseFloat(document.getElementById('cfg-credit').value) || 0;
-            config.epargneAvant = parseFloat(document.getElementById('cfg-epargne-avant').value) || 0;
-            config.epargneObjectif = parseFloat(document.getElementById('cfg-epargne-objectif').value) || 0;
-            config.mois = document.getElementById('cfg-mois').value;
-            config.nbSemaines = getWeeksInMonth(config.mois);
+        // Chargement au démarrage
+        function loadFromStorage() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    // Restaurer l'état
+                    state = { ...state, ...parsed };
+                    
+                    // Restaurer les valeurs d'input si on est à l'étape 1
+                    if (state.config && state.config.month) {
+                        document.getElementById('config-month').value = state.config.month;
+                        document.getElementById('config-revenu').value = state.config.revenu || '';
+                        document.getElementById('config-credit').value = state.config.credit || '';
+                        document.getElementById('config-epargne-start').value = state.config.epargneStart || '';
+                        document.getElementById('config-epargne-obj').value = state.config.epargneObj || '';
+                    }
+                    
+                    // Si des données existent, proposer de reprendre
+                    if (state.weeks && state.weeks.length > 0) {
+                        showToast('📱 Données restaurées');
+                        return true;
+                    }
+                }
+            } catch (e) {
+                console.error('Erreur chargement:', e);
+            }
+            return false;
+        }
 
-            const budgetHebdo = (config.revenu - config.credit + config.epargneAvant - config.epargneObjectif) / config.nbSemaines;
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            // Configurer date par défaut
+            const today = new Date();
+            document.getElementById('config-month').value = today.toISOString().slice(0, 7);
+            
+            // Charger données sauvegardées
+            const hasData = loadFromStorage();
+            
+            if (hasData && confirm('Reprendre le budget en cours ?')) {
+                restoreSession();
+            }
+            
+            // Sauvegarde avant fermeture
+            window.addEventListener('beforeunload', saveToStorage);
+            
+            // Sauvegarde périodique
+            setInterval(saveToStorage, 5000);
+        });
 
-            const container = document.getElementById('envelopes-config');
-            container.innerHTML = `
-                <div style="background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%); color: white; padding: 20px; border-radius: 16px; margin-bottom: 20px; text-align: center;">
-                    <div style="font-size: 14px; opacity: 0.9;">Budget par semaine</div>
-                    <div style="font-size: 32px; font-weight: 800;">${budgetHebdo.toFixed(0)} د.ت</div>
-                    <div style="font-size: 13px; opacity: 0.9; margin-top: 4px;">${config.nbSemaines} semaines</div>
-                </div>
-            `;
+        function restoreSession() {
+            if (state.currentStep === 2) {
+                document.getElementById('total-budget').textContent = state.config.budgetNet.toFixed(2) + '€';
+                document.getElementById('weekly-budget').textContent = state.config.weeklyBudget.toFixed(2) + '€';
+                updateEnvelopesDisplay();
+                goToStep(2);
+            } else if (state.currentStep === 3) {
+                renderWeekTabs();
+                renderWeekContent();
+                goToStep(3);
+            } else if (state.currentStep === 4) {
+                goToStep4();
+            }
+        }
 
-            envelopes.forEach((env, idx) => {
-                container.innerHTML += `
-                    <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 12px; border: 2px solid var(--gray-200);">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                            <div style="width: 44px; height: 44px; border-radius: 12px; background: ${env.colorBg}; display: flex; align-items: center; justify-content: center; font-size: 22px;">${env.icon}</div>
-                            <div style="font-weight: 700; font-size: 16px;">${env.name}</div>
-                        </div>
-                        <input type="number" class="input-field" value="${env.amount}" 
-                               onchange="updateEnvelopeAmount(${idx}, this.value)" style="margin-bottom: 0;">
-                    </div>
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function goToStep(step) {
+            state.currentStep = step;
+            saveToStorage();
+            
+            document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`step${step}`).classList.remove('hidden');
+            
+            const dots = document.querySelectorAll('.step-dot');
+            dots.forEach((dot, idx) => {
+                dot.classList.remove('active', 'completed');
+                if (idx + 1 < step) dot.classList.add('completed');
+                else if (idx + 1 === step) dot.classList.add('active');
+            });
+            
+            // Gérer le FAB
+            const fab = document.getElementById('fab-close-month');
+            fab.style.display = step === 3 ? 'flex' : 'none';
+        }
+
+        function goToStep2() {
+            const revenu = parseFloat(document.getElementById('config-revenu').value) || 0;
+            const credit = parseFloat(document.getElementById('config-credit').value) || 0;
+            const epargneObj = parseFloat(document.getElementById('config-epargne-obj').value) || 0;
+            
+            if (revenu <= 0) {
+                showToast('❌ Entrez un revenu valide');
+                return;
+            }
+
+            const month = document.getElementById('config-month').value;
+            const budgetNet = revenu - credit - epargneObj;
+            const weeklyBudget = budgetNet / 4;
+
+            state.config = {
+                month,
+                revenu,
+                credit,
+                epargneStart: parseFloat(document.getElementById('config-epargne-start').value) || 0,
+                epargneObj,
+                epargneCurrent: parseFloat(document.getElementById('config-epargne-start').value) || 0,
+                weeksInMonth: 4,
+                budgetNet,
+                weeklyBudget
+            };
+
+            document.getElementById('total-budget').textContent = budgetNet.toFixed(2) + '€';
+            document.getElementById('weekly-budget').textContent = weeklyBudget.toFixed(2) + '€';
+            
+            // Réinitialiser les montants des enveloppes
+            const baseAmount = weeklyBudget / state.envelopes.length;
+            state.envelopes.forEach(env => env.amount = baseAmount);
+            
+            updateEnvelopesDisplay();
+            saveToStorage();
+            goToStep(2);
+        }
+
+        function updateEnvelopesDisplay() {
+            const container = document.getElementById('envelopes-container');
+            container.innerHTML = '';
+            
+            state.envelopes.forEach((env, idx) => {
+                const div = document.createElement('div');
+                div.className = 'envelope-card';
+                div.innerHTML = `
+                    <button onclick="deleteEnvelope(${idx})" style="position: absolute; top: 8px; right: 8px; background: var(--danger); color: white; border: none; width: 24px; height: 24px; border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center;">×</button>
+                    <div class="envelope-icon">${env.icon}</div>
+                    <div class="envelope-name">${env.name}</div>
+                    <input type="number" class="envelope-input" value="${env.amount.toFixed(2)}" 
+                           onchange="updateEnvelopeAmount(${idx}, this.value)" step="0.01">
                 `;
+                container.appendChild(div);
             });
         }
 
         function updateEnvelopeAmount(idx, value) {
-            envelopes[idx].amount = parseFloat(value) || 0;
-            saveData();
-        }
-
-        function getWeeksInMonth(monthYear) {
-            const [y, m] = monthYear.split('-').map(Number);
-            const days = new Date(y, m, 0).getDate();
-            return Math.min(Math.ceil(days / 7), 5);
-        }
-
-        // ÉTAPE 3: SEMAINES
-        function initWeeks() {
-            if (weeksData.length === 0) {
-                for (let i = 1; i <= config.nbSemaines; i++) {
-                    const weekEnvs = {};
-                    envelopes.forEach(e => {
-                        weekEnvs[e.id] = {
-                            budget: e.amount,
-                            current: e.amount,
-                            history: [],
-                            borrowedFromNext: 0
-                        };
-                    });
-                    weeksData.push({
-                        week: i,
-                        envelopes: weekEnvs,
-                        closed: false,
-                        closureType: null,
-                        closureAmount: 0
-                    });
-                }
+            const amount = parseFloat(value) || 0;
+            state.envelopes[idx].amount = amount;
+            saveToStorage();
+            
+            const total = state.envelopes.reduce((sum, env) => sum + env.amount, 0);
+            if (total > state.config.weeklyBudget) {
+                showToast(`⚠️ Total: ${total.toFixed(2)}€ > Budget: ${state.config.weeklyBudget.toFixed(2)}€`);
             }
+        }
 
+        function selectEmoji(emoji) {
+            state.selectedEmoji = emoji;
+            document.querySelectorAll('#emoji-picker button').forEach(btn => {
+                btn.style.border = btn.textContent === emoji ? '2px solid var(--primary)' : '1px solid var(--border)';
+            });
+        }
+
+        function addEnvelope() {
+            const name = document.getElementById('new-env-name').value.trim();
+            if (!name) {
+                showToast('❌ Entrez un nom');
+                return;
+            }
+            
+            state.envelopes.push({
+                id: Date.now(),
+                name,
+                icon: state.selectedEmoji,
+                amount: 0
+            });
+            
+            document.getElementById('new-env-name').value = '';
+            updateEnvelopesDisplay();
+            saveToStorage();
+            showToast('✅ Enveloppe ajoutée');
+        }
+
+        function deleteEnvelope(index) {
+            if (state.envelopes.length <= 1) {
+                showToast('❌ Minimum 1 enveloppe');
+                return;
+            }
+            state.envelopes.splice(index, 1);
+            updateEnvelopesDisplay();
+            saveToStorage();
+        }
+
+        function goToStep3() {
+            initWeeks();
             renderWeekTabs();
             renderWeekContent();
+            saveToStorage();
+            goToStep(3);
+        }
+
+        function initWeeks() {
+            state.weeks = [];
+            for (let i = 0; i < 4; i++) {
+                const weekEnvelopes = state.envelopes.map(env => ({
+                    ...env,
+                    initialAmount: env.amount,
+                    currentAmount: env.amount,
+                    transactions: [],
+                    closed: false
+                }));
+                
+                state.weeks.push({
+                    number: i + 1,
+                    envelopes: weekEnvelopes,
+                    borrowedFromNext: 0
+                });
+            }
         }
 
         function renderWeekTabs() {
             const container = document.getElementById('week-tabs');
-            container.innerHTML = weeksData.map(w => `
-                <button class="week-tab ${w.week === currentWeek ? 'active' : ''} ${w.closed ? 'closed' : ''}" 
-                        onclick="switchWeek(${w.week})" ${w.closed ? 'disabled' : ''}>
-                    S${w.week}
-                </button>
-            `).join('');
+            container.innerHTML = '';
+            
+            state.weeks.forEach((week, idx) => {
+                const tab = document.createElement('div');
+                tab.className = `week-tab ${idx === state.currentWeek ? 'active' : ''} ${week.closed ? 'completed' : ''}`;
+                tab.onclick = () => switchWeek(idx);
+                
+                let status = '○';
+                if (week.closed) status = '✓';
+                else if (idx === state.currentWeek) status = '●';
+                
+                tab.innerHTML = `
+                    <div class="week-status">${status}</div>
+                    <div class="week-label">S${week.number}</div>
+                `;
+                container.appendChild(tab);
+            });
         }
 
-        function switchWeek(week) {
-            if (weeksData[week-1].closed) return;
-            currentWeek = week;
+        function switchWeek(index) {
+            state.currentWeek = index;
             renderWeekTabs();
             renderWeekContent();
+            saveToStorage();
         }
 
         function renderWeekContent() {
-            const weekData = weeksData[currentWeek - 1];
+            const week = state.weeks[state.currentWeek];
             const container = document.getElementById('week-content');
-
-            // Vérifier si la semaine est clôturée
-            if (weekData.closed) {
-                container.innerHTML = `
-                    <div class="card" style="text-align: center; padding: 40px;">
-                        <div style="font-size: 64px; margin-bottom: 16px;">✅</div>
-                        <div style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Semaine ${currentWeek} clôturée</div>
-                        <div style="color: var(--gray-700);">Passer à la semaine suivante</div>
-                    </div>
-                `;
-                document.getElementById('closure-section').classList.add('hidden');
-                document.getElementById('borrow-section').classList.add('hidden');
-                return;
-            }
-
-            // Calculer le reste total de la semaine
-            let totalRemaining = 0;
-            let totalBudget = 0;
-
-            container.innerHTML = envelopes.map(env => {
-                const data = weekData.envelopes[env.id];
-                const percent = data.budget > 0 ? (data.current / data.budget) * 100 : 0;
-                const circumference = 2 * Math.PI * 26;
+            
+            let html = `
+                <div style="margin-bottom: 16px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 12px; font-size: 14px;">
+                    <strong>Semaine ${week.number}</strong> · 
+                    <span style="color: var(--success);">${state.config.weeklyBudget.toFixed(2)}€</span>
+                    ${week.borrowedFromNext > 0 ? `<span style="color: var(--warning); margin-left: 8px;">⚠️ Emprunt: ${week.borrowedFromNext.toFixed(2)}€</span>` : ''}
+                </div>
+                <div class="envelopes-grid">
+            `;
+            
+            week.envelopes.forEach((env, idx) => {
+                const percent = env.initialAmount > 0 ? (Math.max(0, env.currentAmount) / env.initialAmount) * 100 : 0;
+                const circumference = 2 * Math.PI * 35;
                 const offset = circumference - (percent / 100) * circumference;
+                const isOver = env.currentAmount < 0;
                 
-                totalRemaining += data.current;
-                totalBudget += data.budget;
-
-                return `
-                    <div class="envelope-card" style="--color: ${env.color}; --color-bg: ${env.colorBg};">
-                        <div class="envelope-header">
-                            <div class="envelope-icon">${env.icon}</div>
-                            <div class="envelope-info">
-                                <div class="envelope-name">${env.name}</div>
-                                <div class="envelope-budget">${data.budget.toFixed(0)} د.ت / semaine</div>
-                            </div>
-                            <div class="progress-ring">
-                                <svg width="60" height="60">
-                                    <circle class="progress-bg" cx="30" cy="30" r="26"/>
-                                    <circle class="progress-fill" cx="30" cy="30" r="26"
-                                            stroke-dasharray="${circumference} ${circumference}"
-                                            stroke-dashoffset="${offset}"
-                                            style="stroke: ${percent < 20 ? 'var(--danger)' : percent < 50 ? 'var(--warning)' : env.color};"/>
-                                </svg>
-                                <div class="progress-text">${percent.toFixed(0)}%</div>
+                html += `
+                    <div class="envelope-card ${isOver ? 'over-budget' : ''}">
+                        <div class="progress-container">
+                            <svg class="progress-ring" viewBox="0 0 80 80">
+                                <circle class="progress-bg" cx="40" cy="40" r="35"/>
+                                <circle class="progress-bar" cx="40" cy="40" r="35" 
+                                    stroke="${isOver ? 'var(--danger)' : percent > 50 ? 'var(--success)' : percent > 25 ? 'var(--warning)' : 'var(--danger)'}" 
+                                    stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"/>
+                            </svg>
+                            <div class="progress-text" style="color: ${isOver ? 'var(--danger)' : 'var(--text)'};">
+                                ${Math.round(percent)}%
                             </div>
                         </div>
-                        <div class="envelope-stats">
-                            <div class="stat-box">
-                                <div class="stat-label">Reste</div>
-                                <div class="stat-value" style="color: var(--success);">${data.current.toFixed(0)}</div>
-                            </div>
-                            <div class="stat-box">
-                                <div class="stat-label">Dépensé</div>
-                                <div class="stat-value" style="color: var(--danger);">${(data.budget - data.current).toFixed(0)}</div>
-                            </div>
+                        <div class="envelope-icon">${env.icon}</div>
+                        <div class="envelope-name">${env.name}</div>
+                        <div class="envelope-amount ${isOver ? 'negative' : ''}">
+                            ${env.currentAmount.toFixed(2)}€
                         </div>
-                        <div class="envelope-actions">
-                            <button class="btn-action btn-add" onclick="openTransaction('${env.id}', 'add')">+</button>
-                            <button class="btn-action btn-spend" onclick="openTransaction('${env.id}', 'remove')" ${data.current <= 0 ? 'disabled' : ''}>-</button>
-                            <button class="btn-action btn-history" onclick="showHistory('${env.id}')">📋</button>
+                        <div style="font-size: 12px; color: var(--text-muted);">
+                            / ${env.initialAmount.toFixed(2)}€
                         </div>
+                        
+                        ${!week.closed ? `
+                            <div class="transaction-controls">
+                                <button class="ios-btn-circle btn-minus" onclick="openTransaction(${idx})">−</button>
+                                <button class="ios-btn-circle btn-history" onclick="showHistory(${idx})">📋</button>
+                            </div>
+                        ` : '<div style="margin-top: 8px; color: var(--success); font-size: 13px; font-weight: 600;">✓ Clôturée</div>'}
                     </div>
                 `;
-            }).join('');
-
-            // Vérifier si on doit montrer le panneau de clôture ou d'emprunt
-            const closureSection = document.getElementById('closure-section');
-            const borrowSection = document.getElementById('borrow-section');
-
-            if (totalRemaining > 0 && currentWeek < config.nbSemaines) {
-                // Montrer options de clôture
-                closureSection.classList.remove('hidden');
-                borrowSection.classList.add('hidden');
-                document.getElementById('closure-amount').textContent = totalRemaining.toFixed(0) + ' د.ت';
-            } else if (totalRemaining < 0 && currentWeek < config.nbSemaines) {
-                // Besoin d'emprunt
-                closureSection.classList.add('hidden');
-                borrowSection.classList.remove('hidden');
-                document.getElementById('borrow-week-num').textContent = currentWeek + 1;
-            } else {
-                closureSection.classList.add('hidden');
-                borrowSection.classList.add('hidden');
-            }
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
         }
 
-        // TRANSACTIONS
-        function openTransaction(envId, action) {
-            currentEnvelope = envId;
-            currentAction = action;
-            transPerson = null;
+        function openTransaction(envelopeIdx) {
+            state.currentEnvelope = envelopeIdx;
+            state.selectedGender = null;
+            document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('selected'));
             document.getElementById('trans-amount').value = '';
             document.getElementById('trans-desc').value = '';
-            document.getElementById('trans-man').classList.remove('btn-primary');
-            document.getElementById('trans-woman').classList.remove('btn-primary');
-            document.getElementById('modal-transaction').classList.add('show');
+            document.getElementById('transaction-modal').classList.add('active');
         }
 
-        function selectTransPerson(person) {
-            transPerson = person;
-            document.getElementById('trans-man').className = 'btn btn-secondary' + (person === 'man' ? ' btn-primary' : '');
-            document.getElementById('trans-woman').className = 'btn btn-secondary' + (person === 'woman' ? ' btn-primary' : '');
+        function selectGender(gender) {
+            state.selectedGender = gender;
+            document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('selected'));
+            document.getElementById(gender === '👨' ? 'btn-homme' : 'btn-femme').classList.add('selected');
         }
 
-        function confirmTransaction() {
+        function saveTransaction() {
             const amount = parseFloat(document.getElementById('trans-amount').value);
-            const desc = document.getElementById('trans-desc').value.trim();
-
-            if (!amount || amount <= 0 || !desc || !transPerson) {
-                alert('Veuillez remplir tous les champs');
-                return;
-            }
-
-            const weekData = weeksData[currentWeek - 1];
-            const env = weekData.envelopes[currentEnvelope];
-
-            if (currentAction === 'add') {
-                env.current += amount;
-                env.history.push({ type: 'add', amount, desc, person: transPerson, date: new Date().toLocaleDateString('fr-FR') });
-            } else {
-                if (amount > env.current) {
-                    alert('Fonds insuffisants. Utilisez l\'emprunt si nécessaire.');
-                    return;
-                }
-                env.current -= amount;
-                env.history.push({ type: 'remove', amount, desc, person: transPerson, date: new Date().toLocaleDateString('fr-FR') });
-            }
-
-            document.getElementById('modal-transaction').classList.remove('show');
-            renderWeekContent();
-            saveData();
-        }
-
-        // CLÔTURE
-        function selectClosureOption(option) {
-            closureOption = option;
-            document.querySelectorAll('.closure-option').forEach(el => el.classList.remove('selected'));
-            event.currentTarget.classList.add('selected');
-        }
-
-        function confirmClosure() {
-            if (!closureOption) {
-                alert('Veuillez choisir une option');
-                return;
-            }
-
-            const weekData = weeksData[currentWeek - 1];
-            let totalRemaining = 0;
-            Object.values(weekData.envelopes).forEach(e => totalRemaining += e.current);
-
-            weekData.closed = true;
-            weekData.closureType = closureOption;
-            weekData.closureAmount = totalRemaining;
-
-            if (closureOption === 'epargne') {
-                config.epargneObjectif += totalRemaining;
-                alert(`✅ ${totalRemaining.toFixed(0)} د.ت ajoutés à l'épargne !`);
-            } else if (closureOption === 'emprunt' && currentWeek < config.nbSemaines) {
-                // Répartir le reste sur la semaine suivante proportionnellement
-                const nextWeek = weeksData[currentWeek];
-                const totalBudget = Object.values(nextWeek.envelopes).reduce((s, e) => s + e.budget, 0);
-                
-                Object.keys(nextWeek.envelopes).forEach(envId => {
-                    const ratio = nextWeek.envelopes[envId].budget / totalBudget;
-                    const addAmount = totalRemaining * ratio;
-                    nextWeek.envelopes[envId].budget += addAmount;
-                    nextWeek.envelopes[envId].current += addAmount;
-                });
-                
-                alert(`🔄 ${totalRemaining.toFixed(0)} د.ت transférés à la semaine ${currentWeek + 1}`);
-            }
-
-            // Passer à la semaine suivante
-            if (currentWeek < config.nbSemaines) {
-                currentWeek++;
-            }
-
-            renderWeekTabs();
-            renderWeekContent();
-            saveData();
-        }
-
-        function borrowFromNextWeek() {
-            const weekData = weeksData[currentWeek - 1];
-            let totalNeeded = 0;
+            const desc = document.getElementById('trans-desc').value || 'Sans description';
             
-            Object.values(weekData.envelopes).forEach(e => {
-                if (e.current < 0) totalNeeded += Math.abs(e.current);
-            });
-
-            if (currentWeek >= config.nbSemaines) {
-                alert('Dernière semaine, impossible d\'emprunter');
+            if (!amount || amount <= 0) {
+                showToast('❌ Montant invalide');
                 return;
             }
-
-            const nextWeek = weeksData[currentWeek];
-            let available = 0;
-            Object.values(nextWeek.envelopes).forEach(e => available += e.current);
-
-            if (available <= 0) {
-                alert('Semaine suivante vide');
+            
+            if (!state.selectedGender) {
+                showToast('❌ Sélectionnez qui a payé');
                 return;
             }
-
-            const borrowAmount = Math.min(totalNeeded, available);
-            const ratio = borrowAmount / available;
-
-            Object.keys(nextWeek.envelopes).forEach(envId => {
-                const deduct = nextWeek.envelopes[envId].current * ratio;
-                nextWeek.envelopes[envId].current -= deduct;
-                weekData.envelopes[envId].current += deduct;
-                weekData.envelopes[envId].borrowedFromNext += deduct;
-            });
-
-            alert(`🔄 Emprunt de ${borrowAmount.toFixed(0)} د.ت effectué`);
-            renderWeekContent();
-            saveData();
+            
+            const week = state.weeks[state.currentWeek];
+            const env = week.envelopes[state.currentEnvelope];
+            
+            const transaction = {
+                id: Date.now(),
+                amount: -amount,
+                desc,
+                who: state.selectedGender,
+                date: new Date().toLocaleString('fr-FR')
+            };
+            
+            env.transactions.push(transaction);
+            env.currentAmount -= amount;
+            
+            closeModal();
+            saveToStorage();
+            
+            if (env.currentAmount < 0 && state.currentWeek < 3) {
+                setTimeout(() => openBorrowModal(state.currentEnvelope), 300);
+            } else {
+                renderWeekContent();
+                showToast('✅ Dépense ajoutée');
+            }
         }
 
-        // BILAN
-        function showBilan() {
-            let totalBudget = 0, totalSpent = 0, totalEpargne = config.epargneObjectif;
-            let weekDetails = [];
+        function openBorrowModal(envelopeIdx) {
+            const week = state.weeks[state.currentWeek];
+            const env = week.envelopes[envelopeIdx];
+            
+            state.currentEnvelope = envelopeIdx;
+            document.getElementById('borrow-envelope-name').textContent = env.name;
+            document.getElementById('borrow-amount').textContent = Math.abs(env.currentAmount).toFixed(2) + '€';
+            document.getElementById('borrow-modal').classList.add('active');
+        }
 
-            weeksData.forEach(w => {
-                let weekBudget = 0, weekSpent = 0;
-                Object.values(w.envelopes).forEach(e => {
-                    weekBudget += e.budget;
-                    weekSpent += (e.budget - e.current);
-                });
-                totalBudget += weekBudget;
-                totalSpent += weekSpent;
-                weekDetails.push({ week: w.week, budget: weekBudget, spent: weekSpent, closed: w.closed });
+        function confirmSpecificBorrow() {
+            const week = state.weeks[state.currentWeek];
+            const nextWeek = state.weeks[state.currentWeek + 1];
+            const env = week.envelopes[state.currentEnvelope];
+            const missing = Math.abs(env.currentAmount);
+            
+            if (!nextWeek) return;
+            
+            const nextEnv = nextWeek.envelopes[state.currentEnvelope];
+            
+            if (nextEnv.initialAmount < missing) {
+                showToast('❌ Fonds insuffisants S+1');
+                closeModal();
+                renderWeekContent();
+                return;
+            }
+            
+            nextEnv.initialAmount -= missing;
+            nextEnv.currentAmount -= missing;
+            nextWeek.borrowedFromNext += missing;
+            
+            env.currentAmount = 0;
+            
+            env.transactions.push({
+                id: Date.now(),
+                amount: missing,
+                desc: `Emprunt S${state.currentWeek + 2}`,
+                who: '🔄',
+                date: new Date().toLocaleString('fr-FR')
             });
+            
+            closeModal();
+            saveToStorage();
+            renderWeekContent();
+            showToast('✅ Emprunt effectué');
+        }
 
-            const container = document.getElementById('bilan-content');
-            container.innerHTML = `
-                <div style="background: linear-gradient(135deg, var(--success) 0%, #059669 100%); color: white; padding: 24px; border-radius: 16px; text-align: center; margin-bottom: 20px;">
-                    <div style="font-size: 14px; opacity: 0.9;">Reste final</div>
-                    <div style="font-size: 42px; font-weight: 800;">${(totalBudget - totalSpent).toFixed(0)} د.ت</div>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
-                    <div style="background: var(--gray-100); padding: 16px; border-radius: 12px; text-align: center;">
-                        <div style="font-size: 12px; color: var(--gray-700);">Budget total</div>
-                        <div style="font-size: 24px; font-weight: 800;">${totalBudget.toFixed(0)}</div>
-                    </div>
-                    <div style="background: var(--gray-100); padding: 16px; border-radius: 12px; text-align: center;">
-                        <div style="font-size: 12px; color: var(--gray-700);">Dépensé</div>
-                        <div style="font-size: 24px; font-weight: 800; color: var(--danger);">${totalSpent.toFixed(0)}</div>
-                    </div>
-                    <div style="background: var(--gray-100); padding: 16px; border-radius: 12px; text-align: center;">
-                        <div style="font-size: 12px; color: var(--gray-700);">Épargne</div>
-                        <div style="font-size: 24px; font-weight: 800; color: var(--success);">${totalEpargne.toFixed(0)}</div>
-                    </div>
-                    <div style="background: var(--gray-100); padding: 16px; border-radius: 12px; text-align: center;">
-                        <div style="font-size: 12px; color: var(--gray-700);">Semaines</div>
-                        <div style="font-size: 24px; font-weight: 800;">${weeksData.filter(w => w.closed).length}/${config.nbSemaines}</div>
-                    </div>
-                </div>
-
-                <div style="background: white; border-radius: 16px; padding: 20px;">
-                    <div style="font-weight: 700; margin-bottom: 16px;">Détail par semaine</div>
-                    ${weekDetails.map(w => `
-                        <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--gray-200);">
-                            <span>Semaine ${w.week} ${w.closed ? '✅' : ''}</span>
-                            <span style="font-weight: 700;">${w.spent.toFixed(0)} / ${w.budget.toFixed(0)} د.ت</span>
+        function showHistory(envelopeIdx) {
+            const week = state.weeks[state.currentWeek];
+            const env = week.envelopes[envelopeIdx];
+            const list = document.getElementById('history-list');
+            
+            if (env.transactions.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 20px;">Aucune transaction</p>';
+            } else {
+                list.innerHTML = env.transactions.map(t => `
+                    <div class="transaction-item ${t.amount < 0 ? 'expense' : 'income'}">
+                        <div>
+                            <div style="font-weight: 600; font-size: 15px;">${t.desc}</div>
+                            <div class="transaction-meta">${t.who} · ${t.date}</div>
                         </div>
-                    `).join('')}
+                        <div style="font-weight: 700; font-size: 17px; color: ${t.amount < 0 ? 'var(--danger)' : 'var(--success)'};">
+                            ${t.amount > 0 ? '+' : ''}${t.amount.toFixed(2)}€
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            document.getElementById('history-modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.querySelectorAll('.ios-modal').forEach(m => m.classList.remove('active'));
+        }
+
+        function closeModalOnBackground(event) {
+            if (event.target === event.currentTarget) {
+                closeModal();
+            }
+        }
+
+        function confirmCloseMonth() {
+            saveToStorage();
+            goToStep4();
+        }
+
+        function goToStep4() {
+            const totalSpent = state.weeks.reduce((sum, week) => {
+                return sum + week.envelopes.reduce((envSum, env) => {
+                    return envSum + env.transactions
+                        .filter(t => t.amount < 0)
+                        .reduce((tSum, t) => tSum + Math.abs(t.amount), 0);
+                }, 0);
+            }, 0);
+            
+            const totalSaved = state.config.epargneCurrent - state.config.epargneStart;
+            const remaining = state.config.budgetNet - totalSpent;
+            
+            document.getElementById('final-summary').innerHTML = `
+                <div class="summary-card">
+                    <div class="summary-label">Dépensé</div>
+                    <div class="summary-value" style="color: var(--danger);">${totalSpent.toFixed(0)}€</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">Épargne</div>
+                    <div class="summary-value" style="color: var(--success);">${totalSaved.toFixed(0)}€</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">Reste</div>
+                    <div class="summary-value" style="color: ${remaining >= 0 ? 'var(--success)' : 'var(--danger)'};">${remaining.toFixed(0)}€</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">Objectif</div>
+                    <div class="summary-value" style="color: ${totalSaved >= state.config.epargneObj ? 'var(--success)' : 'var(--warning)'};">
+                        ${totalSaved >= state.config.epargneObj ? '✓' : '⚠'}
+                    </div>
                 </div>
             `;
+            
+            let detailHtml = '';
+            state.weeks.forEach(week => {
+                const weekSpent = week.envelopes.reduce((sum, env) => {
+                    return sum + env.transactions
+                        .filter(t => t.amount < 0)
+                        .reduce((tSum, t) => tSum + Math.abs(t.amount), 0);
+                }, 0);
+                
+                detailHtml += `
+                    <div style="margin-bottom: 12px; padding: 16px; background: rgba(0,0,0,0.2); border-radius: 12px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <strong>Semaine ${week.number}</strong>
+                            <span style="color: ${week.closed ? 'var(--success)' : 'var(--text-muted)'};">
+                                ${week.closed ? '✓' : '○'}
+                            </span>
+                        </div>
+                        <div style="color: var(--danger); font-weight: 600; margin-bottom: 4px;">
+                            ${weekSpent.toFixed(2)}€ dépensés
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-muted);">
+                            ${week.envelopes.map(env => `${env.icon} ${env.currentAmount.toFixed(0)}€`).join(' · ')}
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('weeks-detail').innerHTML = detailHtml;
+            
+            saveToStorage();
+            goToStep(4);
         }
 
-        function exportMonthCSV() {
-            let csv = 'Semaine,Enveloppe,Budget,Dépensé,Reste,Transactions\\n';
+        function exportCSV() {
+            let csv = 'Semaine,Enveloppe,Description,Montant,Qui,Date\n';
             
-            weeksData.forEach(w => {
-                Object.entries(w.envelopes).forEach(([envId, data]) => {
-                    const env = envelopes.find(e => e.id === envId);
-                    csv += `${w.week},${env.name},${data.budget},${data.budget - data.current},${data.current},${data.history.length}\\n`;
+            state.weeks.forEach(week => {
+                week.envelopes.forEach(env => {
+                    env.transactions.forEach(t => {
+                        csv += `S${week.number},${env.name},${t.desc},${t.amount},${t.who},${t.date}\n`;
+                    });
                 });
             });
-
-            const blob = new Blob([csv], { type: 'text/csv' });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `budget_${config.mois}.csv`;
+            link.download = `budget_${state.config.month}.csv`;
             link.click();
+            
+            showToast('✅ Export CSV réussi');
         }
 
         function newMonth() {
-            if (confirm('Commencer un nouveau mois ? Les données actuelles seront conservées dans l\'historique.')) {
-                // Sauvegarder l'ancien mois
-                const oldData = JSON.parse(localStorage.getItem('budgetHistory') || '[]');
-                oldData.push({
-                    month: config.mois,
-                    config: config,
-                    weeks: weeksData,
-                    date: new Date().toISOString()
-                });
-                localStorage.setItem('budgetHistory', JSON.stringify(oldData));
-
-                // Reset
-                weeksData = [];
-                currentWeek = 1;
-                
-                // Incrémenter le mois
-                const [y, m] = config.mois.split('-').map(Number);
-                let newY = y, newM = m + 1;
-                if (newM > 12) { newM = 1; newY++; }
-                document.getElementById('cfg-mois').value = `${newY}-${String(newM).padStart(2, '0')}`;
-                
-                goToStep(1);
+            if (confirm('Nouveau mois ? Les données seront effacées.')) {
+                localStorage.removeItem(STORAGE_KEY);
+                location.reload();
             }
         }
 
-        // SAUVEGARDE
-        function saveData() {
-            localStorage.setItem('budgetCurrent', JSON.stringify({
-                config, envelopes, weeksData, currentWeek
-            }));
-        }
+        // Gestion du swipe pour changer de semaine
+        let touchStartX = 0;
+        let touchEndX = 0;
 
-        function loadData() {
-            const saved = localStorage.getItem('budgetCurrent');
-            if (saved) {
-                const data = JSON.parse(saved);
-                config = data.config || {};
-                envelopes = data.envelopes || envelopes;
-                weeksData = data.weeksData || [];
-                currentWeek = data.currentWeek || 1;
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
 
-                // Restaurer inputs
-                if (config.revenu) document.getElementById('cfg-revenu').value = config.revenu;
-                if (config.credit) document.getElementById('cfg-credit').value = config.credit;
-                if (config.epargneAvant) document.getElementById('cfg-epargne-avant').value = config.epargneAvant;
-                if (config.epargneObjectif) document.getElementById('cfg-epargne-objectif').value = config.epargneObjectif;
-                if (config.mois) document.getElementById('cfg-mois').value = config.mois;
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (state.currentStep !== 3) return;
+            
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0 && state.currentWeek < 3) {
+                    // Swipe gauche -> semaine suivante
+                    switchWeek(state.currentWeek + 1);
+                } else if (diff < 0 && state.currentWeek > 0) {
+                    // Swipe droite -> semaine précédente
+                    switchWeek(state.currentWeek - 1);
+                }
             }
         }
-
-        // Démarrer
-        loadData();
     </script>
 </body>
 </html>
