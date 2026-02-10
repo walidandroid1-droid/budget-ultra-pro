@@ -172,7 +172,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .week-title {
@@ -239,6 +239,10 @@
             margin-left: 12px;
         }
 
+        .edit-budget-btn:active {
+            background: var(--primary);
+        }
+
         /* Envelopes Grid */
         .envelopes-grid {
             display: grid;
@@ -296,7 +300,7 @@
             justify-content: center;
         }
 
-        .envelope-edit-btn:hover {
+        .envelope-edit-btn:active {
             background: var(--primary);
             color: white;
         }
@@ -730,22 +734,6 @@
         }
 
         .hidden { display: none !important; }
-
-        /* Focus styles for accessibility */
-        button:focus-visible,
-        .envelope-card:focus-visible {
-            outline: 2px solid var(--primary);
-            outline-offset: 2px;
-        }
-
-        /* Reduced motion */
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
-        }
     </style>
 </head>
 <body>
@@ -761,113 +749,30 @@
         <div class="stats-scroll">
             <div class="stat-card epargne">
                 <div class="stat-label">💎 Épargne</div>
-                <div class="stat-value positive" id="stat-epargne">50€</div>
+                <div class="stat-value positive" id="stat-epargne">0€</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">📊 Budget/semaine</div>
-                <div class="stat-value" id="stat-weekly">525€</div>
+                <div class="stat-value" id="stat-weekly">0€</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">💳 Dépensé</div>
-                <div class="stat-value negative" id="stat-spent">320€</div>
+                <div class="stat-value negative" id="stat-spent">0€</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">💵 Reste</div>
-                <div class="stat-value positive" id="stat-remaining">1780€</div>
+                <div class="stat-value" id="stat-remaining">0€</div>
             </div>
         </div>
 
         <!-- Week Selector -->
         <div class="week-selector" id="week-dots">
-            <div class="week-dot active" onclick="goToWeek(0)" role="tab" aria-selected="true" aria-label="Semaine 1"></div>
-            <div class="week-dot" onclick="goToWeek(1)" role="tab" aria-selected="false" aria-label="Semaine 2"></div>
-            <div class="week-dot locked" onclick="goToWeek(2)" role="tab" aria-selected="false" aria-label="Semaine 3"></div>
-            <div class="week-dot locked" onclick="goToWeek(3)" role="tab" aria-selected="false" aria-label="Semaine 4"></div>
+            <!-- Généré dynamiquement -->
         </div>
 
         <!-- Weeks Container -->
         <div class="weeks-container" id="weeks-slider">
-            
-            <!-- Semaine 1 -->
-            <div class="week-slide" role="tabpanel" aria-label="Semaine 1">
-                <div class="week-header">
-                    <div class="week-title">Semaine 1</div>
-                    <div class="week-status active">En cours</div>
-                </div>
-                
-                <div class="week-budget-info">
-                    <div>
-                        <div class="week-budget-label">Budget total semaine</div>
-                        <div class="week-budget-value" id="week-total-0">525€</div>
-                    </div>
-                    <button class="edit-budget-btn" onclick="editWeekBudget(0)">✏️ Modifier</button>
-                </div>
-
-                <div class="envelopes-grid" id="envelopes-week-0">
-                    <!-- Généré dynamiquement -->
-                </div>
-            </div>
-
-            <!-- Semaine 2 -->
-            <div class="week-slide" role="tabpanel" aria-label="Semaine 2">
-                <div class="week-header">
-                    <div class="week-title">Semaine 2</div>
-                    <div class="week-status">À venir</div>
-                </div>
-                
-                <div class="week-budget-info">
-                    <div>
-                        <div class="week-budget-label">Budget total semaine</div>
-                        <div class="week-budget-value" id="week-total-1">525€</div>
-                    </div>
-                    <button class="edit-budget-btn" onclick="editWeekBudget(1)">✏️ Modifier</button>
-                </div>
-
-                <div class="envelopes-grid" id="envelopes-week-1">
-                    <!-- Généré dynamiquement -->
-                </div>
-            </div>
-
-            <!-- Semaine 3 -->
-            <div class="week-slide" role="tabpanel" aria-label="Semaine 3">
-                <div class="week-header">
-                    <div class="week-title">Semaine 3</div>
-                    <div class="week-status">À venir</div>
-                </div>
-                
-                <div class="week-budget-info">
-                    <div>
-                        <div class="week-budget-label">Budget total semaine</div>
-                        <div class="week-budget-value" id="week-total-2">525€</div>
-                    </div>
-                    <button class="edit-budget-btn" onclick="editWeekBudget(2)">✏️ Modifier</button>
-                </div>
-
-                <div class="envelopes-grid" id="envelopes-week-2">
-                    <!-- Généré dynamiquement -->
-                </div>
-            </div>
-
-            <!-- Semaine 4 -->
-            <div class="week-slide" role="tabpanel" aria-label="Semaine 4">
-                <div class="week-header">
-                    <div class="week-title">Semaine 4</div>
-                    <div class="week-status">À venir</div>
-                </div>
-                
-                <div class="week-budget-info">
-                    <div>
-                        <div class="week-budget-label">Budget total semaine</div>
-                        <div class="week-budget-value" id="week-total-3">525€</div>
-                    </div>
-                    <button class="edit-budget-btn" onclick="editWeekBudget(3)">✏️ Modifier</button>
-                </div>
-
-                <div class="envelopes-grid" id="envelopes-week-3">
-                    <!-- Généré dynamiquement -->
-                </div>
-            </div>
-
+            <!-- Généré dynamiquement -->
         </div>
 
         <!-- Close Week Button -->
@@ -942,30 +847,30 @@
         <div class="budget-info-grid">
             <div class="budget-info-item">
                 <div class="budget-info-label">Budget actuel</div>
-                <div class="budget-info-value" id="edit-current-budget">105€</div>
+                <div class="budget-info-value" id="edit-current-budget">0€</div>
             </div>
             <div class="budget-info-item">
                 <div class="budget-info-label">Dépensé</div>
-                <div class="budget-info-value" id="edit-spent-budget">60€</div>
+                <div class="budget-info-value" id="edit-spent-budget">0€</div>
             </div>
         </div>
 
         <div class="input-group">
             <label class="input-label">Nouveau budget</label>
-            <div class="amount-display" id="edit-budget-display">105€</div>
+            <div class="amount-display" id="edit-budget-display">0€</div>
             <input type="range" 
                    class="budget-slider" 
                    id="edit-budget-slider" 
                    min="0" 
-                   max="525" 
+                   max="1000" 
                    step="5"
                    oninput="updateEditBudget(this.value)">
         </div>
 
         <div class="budget-info-grid">
             <div class="budget-info-item">
-                <div class="budget-info-label">Reste à répartir</div>
-                <div class="budget-info-value" id="edit-remaining-total" style="color: var(--success);">420€</div>
+                <div class="budget-info-label">Reste disponible</div>
+                <div class="budget-info-value" id="edit-remaining-total" style="color: var(--success);">0€</div>
             </div>
             <div class="budget-info-item">
                 <div class="budget-info-label">Autres enveloppes</div>
@@ -993,22 +898,22 @@
         <div class="budget-info-grid">
             <div class="budget-info-item">
                 <div class="budget-info-label">Budget actuel</div>
-                <div class="budget-info-value" id="edit-week-current">525€</div>
+                <div class="budget-info-value" id="edit-week-current">0€</div>
             </div>
             <div class="budget-info-item">
                 <div class="budget-info-label">Minimum requis</div>
-                <div class="budget-info-value" id="edit-week-min">285€</div>
+                <div class="budget-info-value" id="edit-week-min">0€</div>
             </div>
         </div>
 
         <div class="input-group">
             <label class="input-label">Nouveau budget total</label>
-            <div class="amount-display" id="edit-week-display">525€</div>
+            <div class="amount-display" id="edit-week-display">0€</div>
             <input type="range" 
                    class="budget-slider" 
                    id="edit-week-slider" 
-                   min="285" 
-                   max="1000" 
+                   min="0" 
+                   max="2000" 
                    step="5"
                    oninput="updateEditWeek(this.value)">
         </div>
@@ -1016,7 +921,7 @@
         <div style="background: var(--bg); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
             <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">Répartition automatique</div>
             <div style="font-size: 15px; color: var(--text);">
-                Chaque enveloppe recevra <strong id="edit-week-per-env">105€</strong>
+                Chaque enveloppe recevra <strong id="edit-week-per-env">0€</strong>
             </div>
         </div>
 
@@ -1034,7 +939,7 @@
 
         <div class="borrow-info">
             <div id="borrow-envelope-name" style="font-size: 18px; margin-bottom: 10px;">📦 Divers</div>
-            <div class="borrow-amount" id="borrow-missing">12€</div>
+            <div class="borrow-amount" id="borrow-missing">0€</div>
             <div style="color: var(--text-muted);">dépassement</div>
         </div>
 
@@ -1043,10 +948,10 @@
             <div style="background: var(--bg); padding: 16px; border-radius: 12px; margin-bottom: 12px;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                     <span>Emprunter de S<span id="borrow-next-week">2</span>:</span>
-                    <strong id="borrow-available">93€</strong>
+                    <strong id="borrow-available">0€</strong>
                 </div>
                 <div style="font-size: 13px; color: var(--text-muted);">
-                    Montant à transférer: <strong id="borrow-amount">12€</strong>
+                    Montant à transférer: <strong id="borrow-amount">0€</strong>
                 </div>
             </div>
         </div>
@@ -1065,7 +970,7 @@
 
         <div style="text-align: center; margin-bottom: 20px; padding: 20px; background: var(--bg); border-radius: 16px;">
             <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 8px;">Reste total</div>
-            <div style="font-size: 36px; font-weight: 700; color: var(--success);" id="close-remaining">205€</div>
+            <div style="font-size: 36px; font-weight: 700; color: var(--success);" id="close-remaining">0€</div>
         </div>
 
         <div class="input-group">
@@ -1098,42 +1003,31 @@
         <div class="modal-title">📊 Bilan du Mois</div>
 
         <div class="bilan-content">
-            <div class="bilan-big" style="color: var(--success);" id="bilan-total">+255€</div>
+            <div class="bilan-big" style="color: var(--success);" id="bilan-total">0€</div>
             <div class="bilan-label">Budget final</div>
 
             <div class="bilan-grid">
                 <div class="bilan-item">
-                    <div class="bilan-value" style="color: var(--success);">2500€</div>
+                    <div class="bilan-value" style="color: var(--success);" id="bilan-revenu">0€</div>
                     <div class="bilan-item-label">Revenus</div>
                 </div>
                 <div class="bilan-item">
-                    <div class="bilan-value" style="color: var(--danger);">320€</div>
+                    <div class="bilan-value" style="color: var(--danger);" id="bilan-depense">0€</div>
                     <div class="bilan-item-label">Dépenses</div>
                 </div>
                 <div class="bilan-item">
-                    <div class="bilan-value" style="color: var(--info);">50€</div>
+                    <div class="bilan-value" style="color: var(--info);" id="bilan-epargne">0€</div>
                     <div class="bilan-item-label">Épargne</div>
                 </div>
                 <div class="bilan-item">
-                    <div class="bilan-value">205€</div>
+                    <div class="bilan-value" id="bilan-reste">0€</div>
                     <div class="bilan-item-label">Reste</div>
                 </div>
             </div>
 
             <div style="margin-bottom: 20px; text-align: left;">
                 <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase;">Détail par semaine</div>
-                <div id="bilan-weeks">
-                    <div style="display: flex; justify-content: space-between; padding: 12px; background: var(--surface); border-radius: 12px; margin-bottom: 8px;">
-                        <div>
-                            <div style="font-weight: 600;">Semaine 1</div>
-                            <div style="font-size: 13px; color: var(--text-muted);">En cours</div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="font-weight: 700;">320€</div>
-                            <div style="font-size: 13px; color: var(--text-muted);">/ 525€</div>
-                        </div>
-                    </div>
-                </div>
+                <div id="bilan-weeks"></div>
             </div>
 
             <div class="btn-group">
@@ -1183,7 +1077,7 @@
     <div class="toast" id="toast" role="status" aria-live="polite">Message</div>
 
     <script>
-        // État global avec données de démo
+        // État global
         const state = {
             config: {
                 month: '2025-02',
@@ -1191,7 +1085,7 @@
                 credit: 0,
                 epargneStart: 0,
                 epargneObj: 200,
-                epargneCurrent: 50
+                epargneCurrent: 0
             },
             envelopes: [
                 { id: 1, name: 'Courses', icon: '🛒' },
@@ -1208,9 +1102,14 @@
             editingBudget: { week: 0, envelope: 0 }
         };
 
-        // Initialisation avec répartition automatique
+        // Calcul du budget hebdomadaire
+        function getWeeklyBudget() {
+            return (state.config.revenu - state.config.credit - state.config.epargneObj) / 4;
+        }
+
+        // Initialisation
         function init() {
-            const weeklyBudget = (state.config.revenu - state.config.credit - state.config.epargneObj) / 4;
+            const weeklyBudget = getWeeklyBudget();
             const perEnvelope = weeklyBudget / state.envelopes.length;
 
             state.weeks = Array(4).fill(null).map((_, i) => ({
@@ -1226,28 +1125,18 @@
                 }))
             }));
 
-            // Données de démo pour la semaine 1
-            state.weeks[0].envelopes[0].spent = 60;
-            state.weeks[0].envelopes[1].spent = 23;
-            state.weeks[0].envelopes[2].spent = 75;
-            state.weeks[0].envelopes[3].spent = 10;
-            state.weeks[0].envelopes[4].spent = 117;
-
-            // Données de démo pour la semaine 2
-            state.weeks[1].envelopes[4].spent = 12;
-
             renderAll();
         }
 
         function renderAll() {
             updateStats();
             renderDots();
-            renderAllWeeks();
+            renderWeeksContainer();
             updateCloseButton();
         }
 
         function updateStats() {
-            const weekly = (state.config.revenu - state.config.credit - state.config.epargneObj) / 4;
+            const weekly = getWeeklyBudget();
             const totalSpent = state.weeks.reduce((sum, w) => 
                 sum + w.envelopes.reduce((eSum, e) => eSum + e.spent, 0), 0);
             const totalBudget = weekly * 4;
@@ -1277,33 +1166,35 @@
             }).join('');
         }
 
-        function renderAllWeeks() {
-            state.weeks.forEach((week, weekIdx) => {
-                renderWeek(weekIdx);
-            });
+        function renderWeeksContainer() {
+            const container = document.getElementById('weeks-slider');
+            container.innerHTML = state.weeks.map((week, weekIdx) => `
+                <div class="week-slide" role="tabpanel" aria-label="Semaine ${week.number}">
+                    <div class="week-header">
+                        <div class="week-title">Semaine ${week.number}</div>
+                        <div class="week-status ${week.closed ? 'closed' : weekIdx === state.currentWeek ? 'active' : ''}">
+                            ${week.closed ? '✓ Clôturée' : weekIdx === state.currentWeek ? 'En cours' : 'À venir'}
+                        </div>
+                    </div>
+                    
+                    <div class="week-budget-info">
+                        <div>
+                            <div class="week-budget-label">Budget total semaine</div>
+                            <div class="week-budget-value" id="week-total-${weekIdx}">${formatMoney(week.totalBudget)}</div>
+                        </div>
+                        <button class="edit-budget-btn" onclick="editWeekBudget(${weekIdx})">✏️ Modifier</button>
+                    </div>
+
+                    <div class="envelopes-grid" id="envelopes-week-${weekIdx}">
+                        ${renderEnvelopes(weekIdx)}
+                    </div>
+                </div>
+            `).join('');
         }
 
-        function renderWeek(weekIdx) {
+        function renderEnvelopes(weekIdx) {
             const week = state.weeks[weekIdx];
-            const container = document.getElementById(`envelopes-week-${weekIdx}`);
-            const totalEl = document.getElementById(`week-total-${weekIdx}`);
-            
-            if (!container || !totalEl) return;
-
-            // Mettre à jour le total affiché
-            const totalAllocated = week.envelopes.reduce((sum, e) => sum + e.budget, 0);
-            totalEl.textContent = formatMoney(totalAllocated);
-            
-            // Colorer selon si ça dépasse ou pas
-            if (totalAllocated > week.totalBudget) {
-                totalEl.className = 'week-budget-value danger';
-            } else if (totalAllocated < week.totalBudget) {
-                totalEl.className = 'week-budget-value warning';
-            } else {
-                totalEl.className = 'week-budget-value';
-            }
-
-            container.innerHTML = week.envelopes.map((env, envIdx) => {
+            return week.envelopes.map((env, envIdx) => {
                 const remaining = env.budget - env.spent;
                 const percent = env.budget > 0 ? (Math.max(0, remaining) / env.budget) * 100 : 0;
                 const colorClass = percent > 50 ? 'high' : percent > 20 ? 'medium' : 'low';
@@ -1330,6 +1221,33 @@
             }).join('');
         }
 
+        function refreshWeek(weekIdx) {
+            // Met à jour uniquement la semaine modifiée sans tout re-render
+            const week = state.weeks[weekIdx];
+            const totalEl = document.getElementById(`week-total-${weekIdx}`);
+            const container = document.getElementById(`envelopes-week-${weekIdx}`);
+            
+            if (totalEl) {
+                const totalAllocated = week.envelopes.reduce((sum, e) => sum + e.budget, 0);
+                totalEl.textContent = formatMoney(totalAllocated);
+                
+                if (totalAllocated > week.totalBudget) {
+                    totalEl.className = 'week-budget-value danger';
+                } else if (totalAllocated < week.totalBudget) {
+                    totalEl.className = 'week-budget-value warning';
+                } else {
+                    totalEl.className = 'week-budget-value';
+                }
+            }
+            
+            if (container) {
+                container.innerHTML = renderEnvelopes(weekIdx);
+            }
+            
+            updateStats();
+            updateCloseButton();
+        }
+
         function goToWeek(index) {
             if (index < 0 || index > 3) return;
             
@@ -1342,11 +1260,7 @@
             const container = document.getElementById('weeks-slider');
             container.scrollTo({ left: container.offsetWidth * index, behavior: 'smooth' });
             
-            document.querySelectorAll('.week-dot').forEach((dot, i) => {
-                dot.classList.toggle('active', i === index);
-                dot.setAttribute('aria-selected', i === index);
-            });
-            
+            renderDots();
             updateCloseButton();
         }
 
@@ -1394,10 +1308,10 @@
             const week = state.weeks[weekIdx];
             const env = week.envelopes[envIdx];
             
-            // Calculer le budget disponible pour cette enveloppe
+            // Calculer le budget disponible
             const currentTotal = week.envelopes.reduce((sum, e) => sum + e.budget, 0);
             const maxBudget = week.totalBudget - (currentTotal - env.budget);
-            const minBudget = env.spent; // Minimum = déjà dépensé
+            const minBudget = env.spent;
             
             document.getElementById('edit-budget-icon').textContent = env.icon;
             document.getElementById('edit-budget-name').textContent = env.name;
@@ -1411,20 +1325,19 @@
             slider.max = Math.round(maxBudget);
             slider.value = env.budget;
             
-            updateEditBudgetSlider();
+            updateEditBudgetDisplay();
             
             openModal('edit-budget');
         }
 
-        function updateEditBudgetSlider() {
+        function updateEditBudgetDisplay() {
             const week = state.weeks[state.editingBudget.week];
             const env = week.envelopes[state.editingBudget.envelope];
             const slider = document.getElementById('edit-budget-slider');
-            const newValue = parseInt(slider.value);
+            const newValue = parseInt(slider.value) || 0;
             
             document.getElementById('edit-budget-display').textContent = formatMoney(newValue);
             
-            // Calculer le reste à répartir
             const currentTotal = week.envelopes.reduce((sum, e, idx) => 
                 sum + (idx === state.editingBudget.envelope ? newValue : e.budget), 0);
             const remaining = week.totalBudget - currentTotal;
@@ -1432,19 +1345,16 @@
             const remainingEl = document.getElementById('edit-remaining-total');
             remainingEl.textContent = formatMoney(remaining);
             remainingEl.style.color = remaining >= 0 ? 'var(--success)' : 'var(--danger)';
-            
-            document.getElementById('edit-other-envelopes').textContent = 
-                week.envelopes.length - 1;
         }
 
         function updateEditBudget(value) {
-            updateEditBudgetSlider();
+            updateEditBudgetDisplay();
         }
 
         function saveEditBudget() {
             const week = state.weeks[state.editingBudget.week];
             const env = week.envelopes[state.editingBudget.envelope];
-            const newBudget = parseInt(document.getElementById('edit-budget-slider').value);
+            const newBudget = parseInt(document.getElementById('edit-budget-slider').value) || 0;
             const oldBudget = env.budget;
             
             if (newBudget === oldBudget) {
@@ -1452,20 +1362,20 @@
                 return;
             }
             
-            // Calculer la différence
             const diff = newBudget - oldBudget;
             
-            // Si on augmente, réduire les autres enveloppes proportionnellement
-            // Si on réduit, augmenter les autres enveloppes proportionnellement
-            const otherEnvelopes = week.envelopes.filter((_, idx) => idx !== state.editingBudget.envelope);
-            const otherTotal = otherEnvelopes.reduce((sum, e) => sum + e.budget, 0);
+            // Ajuster les autres enveloppes
+            const otherIndices = week.envelopes
+                .map((e, idx) => idx !== state.editingBudget.envelope ? idx : -1)
+                .filter(idx => idx !== -1);
+            
+            const otherTotal = otherIndices.reduce((sum, idx) => sum + week.envelopes[idx].budget, 0);
             
             if (otherTotal > 0) {
-                week.envelopes.forEach((e, idx) => {
-                    if (idx !== state.editingBudget.envelope) {
-                        const ratio = e.budget / otherTotal;
-                        e.budget = Math.max(0, e.budget - (diff * ratio));
-                    }
+                otherIndices.forEach(idx => {
+                    const e = week.envelopes[idx];
+                    const ratio = e.budget / otherTotal;
+                    e.budget = Math.max(0, Math.round(e.budget - (diff * ratio)));
                 });
             }
             
@@ -1473,8 +1383,7 @@
             
             showToast(`✅ Budget ${env.name} mis à jour`);
             closeModal('edit-budget');
-            renderWeek(state.editingBudget.week);
-            updateCloseButton();
+            refreshWeek(state.editingBudget.week);
             saveStorage();
         }
 
@@ -1490,22 +1399,28 @@
             
             const slider = document.getElementById('edit-week-slider');
             slider.min = Math.round(minBudget);
+            slider.max = Math.round(state.config.revenu); // Max = revenu total
             slider.value = week.totalBudget;
             
-            updateEditWeek(week.totalBudget);
+            updateEditWeekDisplay();
             
             openModal('edit-week');
         }
 
-        function updateEditWeek(value) {
-            document.getElementById('edit-week-display').textContent = formatMoney(parseInt(value));
-            const perEnv = parseInt(value) / state.envelopes.length;
+        function updateEditWeekDisplay() {
+            const value = parseInt(document.getElementById('edit-week-slider').value) || 0;
+            document.getElementById('edit-week-display').textContent = formatMoney(value);
+            const perEnv = value / state.envelopes.length;
             document.getElementById('edit-week-per-env').textContent = formatMoney(perEnv);
+        }
+
+        function updateEditWeek(value) {
+            updateEditWeekDisplay();
         }
 
         function saveEditWeek() {
             const week = state.weeks[state.currentWeek];
-            const newTotal = parseInt(document.getElementById('edit-week-slider').value);
+            const newTotal = parseInt(document.getElementById('edit-week-slider').value) || 0;
             
             if (newTotal === week.totalBudget) {
                 closeModal('edit-week');
@@ -1522,8 +1437,7 @@
             
             showToast(`✅ Budget réparti: ${formatMoney(perEnvelope)} par enveloppe`);
             closeModal('edit-week');
-            renderWeek(state.currentWeek);
-            updateStats();
+            refreshWeek(state.currentWeek);
             saveStorage();
         }
 
@@ -1589,8 +1503,7 @@
             });
 
             closeModal('expense');
-            renderWeek(state.currentExpense.week);
-            updateStats();
+            refreshWeek(state.currentExpense.week);
             
             const remaining = env.budget - env.spent;
             if (remaining < 0 && state.currentExpense.week < 3) {
@@ -1669,9 +1582,8 @@
             showToast(`✅ Emprunt de ${formatMoney(amount)} effectué`);
             closeModal('borrow');
             state.borrowProposal = null;
-            renderWeek(toWeek);
-            renderWeek(fromWeek);
-            updateStats();
+            refreshWeek(toWeek);
+            refreshWeek(fromWeek);
             saveStorage();
         }
 
@@ -1732,9 +1644,7 @@
             }
             
             closeModal('close');
-            renderWeek(state.currentWeek);
-            updateCloseButton();
-            updateStats();
+            renderAll();
             saveStorage();
             
             if (state.currentWeek < 3) {
@@ -1744,17 +1654,93 @@
 
         // Bilan
         function showBilan() {
+            const totalRevenu = state.config.revenu;
+            const totalDepense = state.weeks.reduce((sum, w) => 
+                sum + w.envelopes.reduce((eSum, e) => eSum + e.spent, 0), 0);
+            const totalEpargne = state.config.epargneCurrent - state.config.epargneStart;
+            const reste = totalRevenu - totalDepense - (state.config.epargneObj - totalEpargne);
+            
+            document.getElementById('bilan-total').textContent = (reste >= 0 ? '+' : '') + formatMoney(reste);
+            document.getElementById('bilan-total').style.color = reste >= 0 ? 'var(--success)' : 'var(--danger)';
+            document.getElementById('bilan-revenu').textContent = formatMoney(totalRevenu);
+            document.getElementById('bilan-depense').textContent = formatMoney(totalDepense);
+            document.getElementById('bilan-epargne').textContent = formatMoney(totalEpargne);
+            document.getElementById('bilan-reste').textContent = formatMoney(reste);
+            
+            document.getElementById('bilan-weeks').innerHTML = state.weeks.map(w => {
+                const spent = w.envelopes.reduce((sum, e) => sum + e.spent, 0);
+                const budget = w.envelopes.reduce((sum, e) => sum + e.budget, 0);
+                return `
+                    <div style="display: flex; justify-content: space-between; padding: 12px; background: var(--surface); border-radius: 12px; margin-bottom: 8px;">
+                        <div>
+                            <div style="font-weight: 600;">Semaine ${w.number}</div>
+                            <div style="font-size: 13px; color: var(--text-muted);">${w.closed ? '✓ Clôturée' : 'Non clôturée'}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-weight: 700;">${formatMoney(spent)}</div>
+                            <div style="font-size: 13px; color: var(--text-muted);">/ ${formatMoney(budget)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
             openModal('bilan');
         }
 
         // Config
         function showConfig() {
+            document.getElementById('config-month').value = state.config.month;
+            document.getElementById('config-revenu').value = state.config.revenu;
+            document.getElementById('config-credit').value = state.config.credit;
+            document.getElementById('config-epargne-start').value = state.config.epargneStart;
+            document.getElementById('config-epargne-obj').value = state.config.epargneObj;
             openModal('config');
         }
 
         function saveConfig() {
+            const newRevenu = parseFloat(document.getElementById('config-revenu').value) || 2500;
+            const newCredit = parseFloat(document.getElementById('config-credit').value) || 0;
+            const newEpargneObj = parseFloat(document.getElementById('config-epargne-obj').value) || 200;
+            
+            // Vérifier si changement critique
+            const changed = newRevenu !== state.config.revenu || 
+                          newCredit !== state.config.credit || 
+                          newEpargneObj !== state.config.epargneObj;
+            
+            if (changed) {
+                if (!confirm('Les paramètres de budget ont changé. Recalculer les budgets ?')) {
+                    return;
+                }
+                
+                state.config.month = document.getElementById('config-month').value;
+                state.config.revenu = newRevenu;
+                state.config.credit = newCredit;
+                state.config.epargneStart = parseFloat(document.getElementById('config-epargne-start').value) || 0;
+                state.config.epargneObj = newEpargneObj;
+                state.config.epargneCurrent = state.config.epargneStart;
+                
+                // Recalculer tous les budgets
+                const newWeekly = getWeeklyBudget();
+                const perEnvelope = newWeekly / state.envelopes.length;
+                
+                state.weeks.forEach(week => {
+                    week.totalBudget = newWeekly;
+                    week.envelopes.forEach(e => {
+                        e.budget = perEnvelope;
+                    });
+                });
+                
+                showToast('✅ Budgets recalculés');
+                renderAll();
+            } else {
+                state.config.month = document.getElementById('config-month').value;
+                state.config.epargneStart = parseFloat(document.getElementById('config-epargne-start').value) || 0;
+                showToast('✅ Configuration enregistrée');
+                updateStats();
+            }
+            
             closeModal('config');
-            showToast('✅ Configuration enregistrée');
+            saveStorage();
         }
 
         // Utils
@@ -1778,11 +1764,30 @@
         }
 
         function exportCSV() {
-            showToast('📥 Export CSV démarré');
+            let csv = 'Semaine,Enveloppe,Description,Montant,Qui,Date\n';
+            state.weeks.forEach(w => {
+                w.envelopes.forEach(e => {
+                    e.transactions.forEach(t => {
+                        const date = new Date(t.date).toLocaleString('fr-FR');
+                        csv += `${w.number},${e.name},"${t.desc}",${t.amount},${t.payer},${date}\n`;
+                    });
+                });
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `budget_${state.config.month}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
         function newMonth() {
             if (confirm('Nouveau mois ? Les données actuelles seront effacées.')) {
+                localStorage.removeItem('budget_hebdo_v3');
                 location.reload();
             }
         }
@@ -1796,6 +1801,24 @@
             }
         }
 
+        function loadStorage() {
+            try {
+                const saved = localStorage.getItem('budget_hebdo_v3');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    Object.assign(state.config, parsed.config);
+                    if (parsed.weeks && parsed.weeks.length === 4) {
+                        state.weeks = parsed.weeks;
+                        renderAll();
+                        return true;
+                    }
+                }
+            } catch (e) {
+                console.error('Erreur chargement:', e);
+            }
+            return false;
+        }
+
         // Gestion du scroll natif
         let scrollTimeout;
         const slider = document.getElementById('weeks-slider');
@@ -1806,10 +1829,7 @@
                 const newIndex = Math.round(slider.scrollLeft / slider.offsetWidth);
                 if (newIndex !== state.currentWeek && newIndex >= 0 && newIndex <= 3) {
                     state.currentWeek = newIndex;
-                    document.querySelectorAll('.week-dot').forEach((dot, i) => {
-                        dot.classList.toggle('active', i === newIndex);
-                        dot.setAttribute('aria-selected', i === newIndex);
-                    });
+                    renderDots();
                     updateCloseButton();
                 }
             }, 150);
@@ -1823,7 +1843,9 @@
         });
 
         // Init
-        init();
+        if (!loadStorage()) {
+            init();
+        }
     </script>
 </body>
 </html>
