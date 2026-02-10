@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f172a">
+    <title>Budget Hebdo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-light: #334155;
+            --primary: #6366f1;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #475569;
+            --safe-top: env(safe-area-inset-top, 47px);
+            --safe-bottom: env(safe-area-inset-bottom, 34px);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .app {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: var(--safe-top);
+            padding-bottom: var(--safe-bottom);
+        }
+
+        /* Header */
+        .header {
+            padding: 16px 20px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+        }
+
+        .header-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .header-subtitle {
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        /* Stats Cards */
+        .stats-scroll {
+            display: flex;
+            gap: 12px;
+            padding: 16px 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .stats-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .stat-card {
+            flex: 0 0 auto;
+            min-width: 140px;
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .stat-card.epargne {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), var(--surface));
+            border-color: var(--success);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .stat-value.positive { color: var(--success); }
+        .stat-value.negative { color: var(--danger); }
+        .stat-value.warning { color: var(--warning); }
+
+        /* Week Selector */
+        .week-selector {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .week-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--surface-light);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .week-dot.active {
+            width: 24px;
+            border-radius: 4px;
+            background: var(--primary);
+        }
+
+        .week-dot.completed {
+            background: var(--success);
+        }
+
+        .week-dot.locked {
+            background: var(--danger);
+            opacity: 0.5;
+        }
+
+        /* Main Content - Horizontal Scroll */
+        .weeks-container {
+            flex: 1;
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .weeks-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .week-slide {
+            flex: 0 0 100%;
+            scroll-snap-align: start;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .week-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .week-title {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .week-status {
+            font-size: 13px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: var(--surface-light);
+            color: var(--text-muted);
+        }
+
+        .week-status.active {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+        }
+
+        .week-status.closed {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        /* Envelopes Grid */
+        .envelopes-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 80px;
+        }
+
+        .envelope-card {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        .envelope-card:active {
+            transform: scale(0.96);
+        }
+
+        .envelope-card.over {
+            border-color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .envelope-card.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .envelope-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+
+        .envelope-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .envelope-amount {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .envelope-amount.over {
+            color: var(--danger);
+        }
+
+        .envelope-total {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .envelope-progress {
+            height: 6px;
+            background: var(--surface-light);
+            border-radius: 3px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+
+        .envelope-bar {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .envelope-bar.high { background: var(--success); }
+        .envelope-bar.medium { background: var(--warning); }
+        .envelope-bar.low { background: var(--danger); }
+
+        /* Close Week Button */
+        .close-week-btn {
+            position: fixed;
+            bottom: calc(100px + var(--safe-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 16px 32px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 17px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+            z-index: 50;
+            cursor: pointer;
+        }
+
+        .close-week-btn:disabled {
+            background: var(--surface-light);
+            color: var(--text-muted);
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-sheet {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--surface);
+            border-radius: 24px 24px 0 0;
+            padding: 20px;
+            padding-bottom: calc(20px + var(--safe-bottom));
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1001;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active + .modal-sheet {
+            transform: translateY(0);
+        }
+
+        .modal-handle {
+            width: 40px;
+            height: 5px;
+            background: var(--border);
+            border-radius: 3px;
+            margin: 0 auto 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .ios-input {
+            width: 100%;
+            padding: 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 17px;
+            -webkit-appearance: none;
+        }
+
+        .ios-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .amount-display {
+            font-size: 48px;
+            font-weight: 300;
+            text-align: center;
+            margin: 20px 0;
+            letter-spacing: -2px;
+        }
+
+        .gender-selector {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .gender-btn {
+            flex: 1;
+            padding: 20px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .gender-btn.selected {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.2);
+        }
+
+        .gender-icon {
+            font-size: 32px;
+            margin-bottom: 4px;
+        }
+
+        .gender-label {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--surface-light);
+            color: var(--text);
+        }
+
+        /* Close Options */
+        .close-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .close-option {
+            padding: 20px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .close-option.selected {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .close-option-title {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .close-option-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        /* Bilan Modal */
+        .bilan-content {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .bilan-big {
+            font-size: 56px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .bilan-label {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        .bilan-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .bilan-item {
+            background: var(--bg);
+            padding: 20px;
+            border-radius: 16px;
+        }
+
+        .bilan-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .bilan-item-label {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Config Button */
+        .config-btn {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--surface-light);
+            border: none;
+            color: var(--text);
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: calc(20px + var(--safe-top));
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--surface);
+            color: var(--text);
+            padding: 16px 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            z-index: 2000;
+            opacity: 0;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <div class="header">
+            <button class="config-btn" onclick="showConfig()">⚙️</button>
+            <div class="header-title">💰 Budget Hebdo</div>
+            <div class="header-subtitle" id="header-month">Janvier 2024</div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-scroll">
+            <div class="stat-card epargne">
+                <div class="stat-label">💎 Épargne</div>
+                <div class="stat-value positive" id="stat-epargne">0€</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">📊 Budget/semaine</div>
+                <div class="stat-value" id="stat-weekly">0€</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">💳 Dépensé</div>
+                <div class="stat-value negative" id="stat-spent">0€</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">💵 Reste</div>
+                <div class="stat-value" id="stat-remaining">0€</div>
+            </div>
+        </div>
+
+        <!-- Week Selector -->
+        <div class="week-selector" id="week-dots">
+            <!-- Généré dynamiquement -->
+        </div>
+
+        <!-- Weeks Container -->
+        <div class="weeks-container" id="weeks-slider">
+            <!-- Généré dynamiquement -->
+        </div>
+
+        <!-- Close Week Button -->
+        <button class="close-week-btn" id="close-week-btn" onclick="showCloseWeek()">
+            🔒 Clôturer la semaine
+        </button>
+    </div>
+
+    <!-- Modal: Dépense -->
+    <div class="modal-overlay" id="expense-modal" onclick="closeModal('expense')"></div>
+    <div class="modal-sheet" id="expense-sheet">
+        <div class="modal-handle"></div>
+        
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="font-size: 48px; margin-bottom: 8px;" id="expense-icon">🛒</div>
+            <div style="font-size: 20px; font-weight: 700;" id="expense-name">Courses</div>
+            <div style="color: var(--text-muted); margin-top: 4px;">
+                Semaine <span id="expense-week">1</span>
+            </div>
+        </div>
+
+        <div class="amount-display" id="amount-display">0€</div>
+
+        <input type="number" 
+               class="ios-input" 
+               id="expense-input" 
+               placeholder="0" 
+               step="0.01"
+               style="position: absolute; opacity: 0; top: -1000px;"
+               oninput="updateAmount(this.value)">
+
+        <div class="input-group">
+            <label class="input-label">Description (optionnel)</label>
+            <input type="text" class="ios-input" id="expense-desc" placeholder="Ex: Courses Lidl">
+        </div>
+
+        <div class="input-group">
+            <label class="input-label">Qui a payé ?</label>
+            <div class="gender-selector">
+                <div class="gender-btn" onclick="selectGender(this, '👨')">
+                    <div class="gender-icon">👨</div>
+                    <div class="gender-label">Lui</div>
+                </div>
+                <div class="gender-btn" onclick="selectGender(this, '👩')">
+                    <div class="gender-icon">👩</div>
+                    <div class="gender-label">Elle</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-secondary" onclick="closeModal('expense')">Annuler</button>
+            <button class="btn btn-primary" onclick="saveExpense()">Valider</button>
+        </div>
+    </div>
+
+    <!-- Modal: Clôturer Semaine -->
+    <div class="modal-overlay" id="close-modal" onclick="closeModal('close')"></div>
+    <div class="modal-sheet" id="close-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-title">🔒 Clôturer Semaine <span id="close-week-num">1</span></div>
+
+        <div style="text-align: center; margin-bottom: 20px; padding: 20px; background: var(--bg); border-radius: 16px;">
+            <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 8px;">Reste total</div>
+            <div style="font-size: 36px; font-weight: 700; color: var(--success);" id="close-remaining">0€</div>
+        </div>
+
+        <div class="input-group">
+            <label class="input-label">Que faire du reste ?</label>
+            <div class="close-options">
+                <div class="close-option selected" onclick="selectCloseOption(this, 'epargne')">
+                    <div class="close-option-title">💰 Épargne</div>
+                    <div class="close-option-desc">Ajouter à l'épargne du mois</div>
+                </div>
+                <div class="close-option" onclick="selectCloseOption(this, 'next')" id="option-next">
+                    <div class="close-option-title">🔄 Semaine suivante</div>
+                    <div class="close-option-desc">Transférer à la semaine prochaine</div>
+                </div>
+                <div class="close-option" onclick="selectCloseOption(this, 'keep')">
+                    <div class="close-option-title">💵 Garder</div>
+                    <div class="close-option-desc">Conserver pour plus tard</div>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" style="width: 100%;" onclick="confirmCloseWeek()">
+            Confirmer la clôture
+        </button>
+    </div>
+
+    <!-- Modal: Bilan -->
+    <div class="modal-overlay" id="bilan-modal" onclick="closeModal('bilan')"></div>
+    <div class="modal-sheet" id="bilan-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-title">📊 Bilan du Mois</div>
+
+        <div class="bilan-content">
+            <div class="bilan-big" id="bilan-total">0€</div>
+            <div class="bilan-label">Budget final</div>
+
+            <div class="bilan-grid">
+                <div class="bilan-item">
+                    <div class="bilan-value" style="color: var(--success);" id="bilan-revenu">0€</div>
+                    <div class="bilan-item-label">Revenus</div>
+                </div>
+                <div class="bilan-item">
+                    <div class="bilan-value" style="color: var(--danger);" id="bilan-depense">0€</div>
+                    <div class="bilan-item-label">Dépenses</div>
+                </div>
+                <div class="bilan-item">
+                    <div class="bilan-value" style="color: var(--info);" id="bilan-epargne">0€</div>
+                    <div class="bilan-item-label">Épargne</div>
+                </div>
+                <div class="bilan-item">
+                    <div class="bilan-value" id="bilan-reste">0€</div>
+                    <div class="bilan-item-label">Reste</div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px; text-align: left;">
+                <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase;">Détail par semaine</div>
+                <div id="bilan-weeks"></div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="exportCSV()">📥 Export</button>
+                <button class="btn btn-primary" onclick="newMonth()">🔄 Nouveau</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Config -->
+    <div class="modal-overlay" id="config-modal" onclick="closeModal('config')"></div>
+    <div class="modal-sheet" id="config-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-title">⚙️ Configuration</div>
+
+        <div class="input-group">
+            <label class="input-label">Mois</label>
+            <input type="month" class="ios-input" id="config-month">
+        </div>
+
+        <div class="input-group">
+            <label class="input-label">Revenu (€)</label>
+            <input type="number" class="ios-input" id="config-revenu" value="2500">
+        </div>
+
+        <div class="input-group">
+            <label class="input-label">Crédit mensuel (€)</label>
+            <input type="number" class="ios-input" id="config-credit" value="0">
+        </div>
+
+        <div class="input-group">
+            <label class="input-label">Épargne début (€)</label>
+            <input type="number" class="ios-input" id="config-epargne-start" value="0">
+        </div>
+
+        <div class="input-group">
+            <label class="input-label">Objectif épargne (€)</label>
+            <input type="number" class="ios-input" id="config-epargne-obj" value="200">
+        </div>
+
+        <button class="btn btn-primary" style="width: 100%;" onclick="saveConfig()">
+            Enregistrer
+        </button>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">Message</div>
+
+    <script>
+        const state = {
+            config: {
+                month: new Date().toISOString().slice(0, 7),
+                revenu: 2500,
+                credit: 0,
+                epargneStart: 0,
+                epargneObj: 200,
+                epargneCurrent: 0
+            },
+            envelopes: [
+                { id: 1, name: 'Courses', icon: '🛒' },
+                { id: 2, name: 'Transport', icon: '⛽' },
+                { id: 3, name: 'Enfants', icon: '👶' },
+                { id: 4, name: 'Loisirs', icon: '🎮' },
+                { id: 5, name: 'Divers', icon: '📦' }
+            ],
+            weeks: [],
+            currentWeek: 0,
+            currentExpense: { week: 0, envelope: 0, gender: null },
+            closeOption: 'epargne'
+        };
+
+        function init() {
+            const weeklyBudget = (state.config.revenu - state.config.credit - state.config.epargneObj) / 4;
+            const perEnvelope = weeklyBudget / state.envelopes.length;
+
+            state.weeks = Array(4).fill(null).map((_, i) => ({
+                number: i + 1,
+                closed: false,
+                closeOption: null,
+                envelopes: state.envelopes.map(e => ({
+                    ...e,
+                    budget: perEnvelope,
+                    spent: 0,
+                    transactions: []
+                }))
+            }));
+
+            state.config.epargneCurrent = state.config.epargneStart;
+            render();
+            loadStorage();
+        }
+
+        function render() {
+            updateStats();
+            renderDots();
+            renderWeeks();
+            updateCloseButton();
+        }
+
+        function updateStats() {
+            const weekly = (state.config.revenu - state.config.credit - state.config.epargneObj) / 4;
+            const totalSpent = state.weeks.reduce((sum, w) => 
+                sum + w.envelopes.reduce((eSum, e) => eSum + e.spent, 0), 0);
+            const totalBudget = weekly * 4;
+            const remaining = totalBudget - totalSpent;
+
+            document.getElementById('stat-epargne').textContent = state.config.epargneCurrent.toFixed(0) + '€';
+            document.getElementById('stat-weekly').textContent = weekly.toFixed(0) + '€';
+            document.getElementById('stat-spent').textContent = totalSpent.toFixed(0) + '€';
+            document.getElementById('stat-remaining').textContent = remaining.toFixed(0) + '€';
+            document.getElementById('stat-remaining').style.color = remaining >= 0 ? 'var(--success)' : 'var(--danger)';
+            
+            document.getElementById('header-month').textContent = new Date(state.config.month + '-01').toLocaleDateString('fr-FR', {month: 'long', year: 'numeric'});
+        }
+
+        function renderDots() {
+            const container = document.getElementById('week-dots');
+            container.innerHTML = state.weeks.map((w, i) => {
+                let className = 'week-dot';
+                if (i === state.currentWeek) className += ' active';
+                else if (w.closed) className += ' completed';
+                else if (i > 0 && !state.weeks[i-1].closed) className += ' locked';
+                return `<div class="${className}" onclick="goToWeek(${i})"></div>`;
+            }).join('');
+        }
+
+        function renderWeeks() {
+            const container = document.getElementById('weeks-slider');
+            container.innerHTML = state.weeks.map((week, wIdx) => `
+                <div class="week-slide">
+                    <div class="week-header">
+                        <div class="week-title">Semaine ${week.number}</div>
+                        <div class="week-status ${week.closed ? 'closed' : wIdx === state.currentWeek ? 'active' : ''}">
+                            ${week.closed ? '✓ Clôturée' : wIdx === state.currentWeek ? 'En cours' : 'À venir'}
+                        </div>
+                    </div>
+                    <div class="envelopes-grid">
+                        ${week.envelopes.map((env, eIdx) => {
+                            const remaining = env.budget - env.spent;
+                            const percent = env.budget > 0 ? (Math.max(0, remaining) / env.budget) * 100 : 0;
+                            const colorClass = percent > 50 ? 'high' : percent > 20 ? 'medium' : 'low';
+                            const isOver = remaining < 0;
+                            
+                            return `
+                                <div class="envelope-card ${isOver ? 'over' : ''} ${week.closed ? 'disabled' : ''}" 
+                                     onclick="${week.closed ? '' : `openExpense(${wIdx}, ${eIdx})`}">
+                                    <div class="envelope-icon">${env.icon}</div>
+                                    <div class="envelope-name">${env.name}</div>
+                                    <div class="envelope-amount ${isOver ? 'over' : ''}">${remaining.toFixed(0)}€</div>
+                                    <div class="envelope-total">/ ${env.budget.toFixed(0)}€</div>
+                                    <div class="envelope-progress">
+                                        <div class="envelope-bar ${colorClass}" style="width: ${Math.min(100, percent)}%"></div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            // Scroll to current week
+            setTimeout(() => {
+                container.scrollLeft = container.offsetWidth * state.currentWeek;
+            }, 100);
+        }
+
+        function goToWeek(index) {
+            if (index > 0 && !state.weeks[index-1].closed && !state.weeks[index].closed) {
+                showToast('❌ Clôturez la semaine précédente d\'abord');
+                return;
+            }
+            state.currentWeek = index;
+            const container = document.getElementById('weeks-slider');
+            container.scrollTo({ left: container.offsetWidth * index, behavior: 'smooth' });
+            renderDots();
+            updateCloseButton();
+        }
+
+        function updateCloseButton() {
+            const week = state.weeks[state.currentWeek];
+            const btn = document.getElementById('close-week-btn');
+            
+            if (week.closed) {
+                if (state.currentWeek === 3) {
+                    btn.innerHTML = '📊 Voir le bilan';
+                    btn.onclick = showBilan;
+                    btn.disabled = false;
+                } else {
+                    btn.innerHTML = '✓ Semaine clôturée';
+                    btn.disabled = true;
+                }
+            } else {
+                // Check if previous week is closed
+                if (state.currentWeek > 0 && !state.weeks[state.currentWeek - 1].closed) {
+                    btn.innerHTML = '🔒 Semaine précédente non clôturée';
+                    btn.disabled = true;
+                } else {
+                    const remaining = week.envelopes.reduce((sum, e) => sum + (e.budget - e.spent), 0);
+                    btn.innerHTML = `🔒 Clôturer (${remaining.toFixed(0)}€ reste)`;
+                    btn.onclick = showCloseWeek;
+                    btn.disabled = false;
+                }
+            }
+        }
+
+        // Expense Modal
+        function openExpense(weekIdx, envIdx) {
+            if (state.weeks[weekIdx].closed) return;
+            
+            state.currentExpense = { week: weekIdx, envelope: envIdx, gender: null };
+            const week = state.weeks[weekIdx];
+            const env = week.envelopes[envIdx];
+            
+            document.getElementById('expense-icon').textContent = env.icon;
+            document.getElementById('expense-name').textContent = env.name;
+            document.getElementById('expense-week').textContent = week.number;
+            document.getElementById('amount-display').textContent = '0€';
+            document.getElementById('expense-input').value = '';
+            document.getElementById('expense-desc').value = '';
+            
+            document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('selected'));
+            
+            openModal('expense');
+            
+            // Focus input after animation
+            setTimeout(() => {
+                document.getElementById('expense-input').focus();
+            }, 300);
+        }
+
+        function updateAmount(val) {
+            const num = parseFloat(val) || 0;
+            document.getElementById('amount-display').textContent = num.toFixed(2) + '€';
+        }
+
+        function selectGender(el, gender) {
+            state.currentExpense.gender = gender;
+            document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        function saveExpense() {
+            const amount = parseFloat(document.getElementById('expense-input').value);
+            if (!amount || amount <= 0) {
+                showToast('❌ Entrez un montant');
+                return;
+            }
+            if (!state.currentExpense.gender) {
+                showToast('❌ Sélectionnez qui a payé');
+                return;
+            }
+
+            const week = state.weeks[state.currentExpense.week];
+            const env = week.envelopes[state.currentExpense.envelope];
+            const desc = document.getElementById('expense-desc').value || 'Dépense';
+
+            env.spent += amount;
+            env.transactions.push({
+                amount: -amount,
+                desc,
+                payer: state.currentExpense.gender,
+                date: new Date()
+            });
+
+            closeModal('expense');
+            
+            // Check over budget
+            const remaining = env.budget - env.spent;
+            if (remaining < 0 && state.currentExpense.week < 3) {
+                setTimeout(() => proposeBorrow(state.currentExpense.week, state.currentExpense.envelope), 300);
+            } else {
+                render();
+                saveStorage();
+            }
+        }
+
+        function proposeBorrow(weekIdx, envIdx) {
+            const week = state.weeks[weekIdx];
+            const env = week.envelopes[envIdx];
+            const missing = Math.abs(env.budget - env.spent);
+            const nextWeek = state.weeks[weekIdx + 1];
+            
+            if (!nextWeek || nextWeek.closed) {
+                showToast('❌ Impossible d\'emprunter');
+                render();
+                saveStorage();
+                return;
+            }
+
+            const nextEnv = nextWeek.envelopes[envIdx];
+            const available = nextEnv.budget - nextEnv.spent;
+            
+            if (available <= 0) {
+                showToast('❌ S+1 vide');
+                render();
+                saveStorage();
+                return;
+            }
+
+            const borrowAmount = Math.min(missing, available);
+            
+            if (confirm(`${env.icon} ${env.name}\nDépassement: ${missing.toFixed(2)}€\n\nEmprunter ${borrowAmount.toFixed(2)}€ de S${weekIdx + 2} ?`)) {
+                // Transfer
+                nextEnv.budget -= borrowAmount;
+                env.budget += borrowAmount;
+                env.spent -= borrowAmount; // Cancel overflow
+                
+                env.transactions.push({
+                    amount: borrowAmount,
+                    desc: `Emprunt S${weekIdx + 2}`,
+                    payer: '🔄',
+                    date: new Date()
+                });
+                
+                showToast('✅ Emprunt effectué');
+            }
+            
+            render();
+            saveStorage();
+        }
+
+        // Close Week
+        function showCloseWeek() {
+            const week = state.weeks[state.currentWeek];
+            const remaining = week.envelopes.reduce((sum, e) => sum + Math.max(0, e.budget - e.spent), 0);
+            
+            document.getElementById('close-week-num').textContent = week.number;
+            document.getElementById('close-remaining').textContent = remaining.toFixed(2) + '€';
+            
+            // Disable next week option if last week or next week closed
+            const nextOption = document.getElementById('option-next');
+            if (state.currentWeek === 3 || state.weeks[state.currentWeek + 1]?.closed) {
+                nextOption.style.opacity = '0.5';
+                nextOption.style.pointerEvents = 'none';
+            } else {
+                nextOption.style.opacity = '1';
+                nextOption.style.pointerEvents = 'auto';
+            }
+            
+            openModal('close');
+        }
+
+        function selectCloseOption(el, option) {
+            state.closeOption = option;
+            document.querySelectorAll('.close-option').forEach(o => o.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        function confirmCloseWeek() {
+            const week = state.weeks[state.currentWeek];
+            const remaining = week.envelopes.reduce((sum, e) => sum + Math.max(0, e.budget - e.spent), 0);
+            
+            week.closed = true;
+            week.closeOption = state.closeOption;
+            
+            if (state.closeOption === 'epargne') {
+                state.config.epargneCurrent += remaining;
+                showToast(`💰 ${remaining.toFixed(0)}€ ajoutés à l'épargne`);
+            } else if (state.closeOption === 'next' && state.currentWeek < 3) {
+                const nextWeek = state.weeks[state.currentWeek + 1];
+                const addPerEnv = remaining / nextWeek.envelopes.length;
+                nextWeek.envelopes.forEach(e => {
+                    e.budget += addPerEnv;
+                });
+                showToast(`🔄 ${remaining.toFixed(0)}€ transférés à S${state.currentWeek + 2}`);
+            } else {
+                showToast('💵 Reste conservé');
+            }
+            
+            closeModal('close');
+            
+            // Auto advance to next week
+            if (state.currentWeek < 3) {
+                setTimeout(() => goToWeek(state.currentWeek + 1), 500);
+            } else {
+                render();
+            }
+            
+            saveStorage();
+        }
+
+        // Bilan
+        function showBilan() {
+            const totalRevenu = state.config.revenu;
+            const totalDepense = state.weeks.reduce((sum, w) => 
+                sum + w.envelopes.reduce((eSum, e) => eSum + e.spent, 0), 0);
+            const totalEpargne = state.config.epargneCurrent - state.config.epargneStart;
+            const reste = totalRevenu - totalDepense - (state.config.epargneObj - totalEpargne);
+            
+            document.getElementById('bilan-total').textContent = reste.toFixed(0) + '€';
+            document.getElementById('bilan-total').style.color = reste >= 0 ? 'var(--success)' : 'var(--danger)';
+            document.getElementById('bilan-revenu').textContent = totalRevenu.toFixed(0) + '€';
+            document.getElementById('bilan-depense').textContent = totalDepense.toFixed(0) + '€';
+            document.getElementById('bilan-epargne').textContent = totalEpargne.toFixed(0) + '€';
+            document.getElementById('bilan-reste').textContent = reste.toFixed(0) + '€';
+            
+            document.getElementById('bilan-weeks').innerHTML = state.weeks.map(w => {
+                const spent = w.envelopes.reduce((sum, e) => sum + e.spent, 0);
+                const budget = w.envelopes.reduce((sum, e) => sum + e.budget, 0);
+                return `
+                    <div style="display: flex; justify-content: space-between; padding: 12px; background: var(--surface); border-radius: 12px; margin-bottom: 8px;">
+                        <div>
+                            <div style="font-weight: 600;">Semaine ${w.number}</div>
+                            <div style="font-size: 13px; color: var(--text-muted);">${w.closed ? '✓ Clôturée' : 'Non clôturée'}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-weight: 700;">${spent.toFixed(0)}€</div>
+                            <div style="font-size: 13px; color: var(--text-muted);">/ ${budget.toFixed(0)}€</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            openModal('bilan');
+        }
+
+        // Config
+        function showConfig() {
+            document.getElementById('config-month').value = state.config.month;
+            document.getElementById('config-revenu').value = state.config.revenu;
+            document.getElementById('config-credit').value = state.config.credit;
+            document.getElementById('config-epargne-start').value = state.config.epargneStart;
+            document.getElementById('config-epargne-obj').value = state.config.epargneObj;
+            openModal('config');
+        }
+
+        function saveConfig() {
+            state.config.month = document.getElementById('config-month').value;
+            state.config.revenu = parseFloat(document.getElementById('config-revenu').value) || 0;
+            state.config.credit = parseFloat(document.getElementById('config-credit').value) || 0;
+            state.config.epargneStart = parseFloat(document.getElementById('config-epargne-start').value) || 0;
+            state.config.epargneObj = parseFloat(document.getElementById('config-epargne-obj').value) || 0;
+            
+            closeModal('config');
+            init();
+            saveStorage();
+        }
+
+        // Utils
+        function openModal(name) {
+            document.getElementById(`${name}-modal`).classList.add('active');
+        }
+
+        function closeModal(name) {
+            document.getElementById(`${name}-modal`).classList.remove('active');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        function exportCSV() {
+            let csv = 'Semaine,Enveloppe,Description,Montant,Qui,Date\n';
+            state.weeks.forEach(w => {
+                w.envelopes.forEach(e => {
+                    e.transactions.forEach(t => {
+                        csv += `${w.number},${e.name},${t.desc},${t.amount},${t.payer},${new Date(t.date).toLocaleString('fr-FR')}\n`;
+                    });
+                });
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `budget_${state.config.month}.csv`;
+            a.click();
+        }
+
+        function newMonth() {
+            if (confirm('Nouveau mois ? Les données seront effacées.')) {
+                localStorage.removeItem('budget_hebdo_v3');
+                location.reload();
+            }
+        }
+
+        // Storage
+        function saveStorage() {
+            localStorage.setItem('budget_hebdo_v3', JSON.stringify(state));
+        }
+
+        function loadStorage() {
+            const saved = localStorage.getItem('budget_hebdo_v3');
+            if (saved) {
+                Object.assign(state, JSON.parse(saved));
+                render();
+            }
+        }
+
+        // Swipe handling
+        let touchStartX = 0;
+        const slider = document.getElementById('weeks-slider');
+        
+        slider.addEventListener('touchstart', e => {
+            touchStartX = e.touches[0].clientX;
+        });
+
+        slider.addEventListener('touchend', e => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0 && state.currentWeek < 3) {
+                    goToWeek(state.currentWeek + 1);
+                } else if (diff < 0 && state.currentWeek > 0) {
+                    goToWeek(state.currentWeek - 1);
+                }
+            }
+        });
+
+        // Init
+        init();
+    </script>
+</body>
+</html>
